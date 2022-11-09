@@ -1,0 +1,5 @@
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Data Source=localhost;Database=QianShiChat;User ID=root;Password=000000;pooling=true;port=3306;sslmode=none;CharSet=utf8;"
+  }
+}
