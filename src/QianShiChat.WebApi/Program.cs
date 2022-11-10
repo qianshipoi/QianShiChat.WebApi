@@ -2,14 +2,10 @@ using FluentValidation;
 
 using MediatR;
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 using QianShiChat.WebApi;
-using QianShiChat.WebApi.Endpoints;
 using QianShiChat.WebApi.Hubs;
-using QianShiChat.WebApi.Models;
-using QianShiChat.WebApi.Requests;
 using QianShiChat.WebApi.Services;
 
 using System.Reflection;
@@ -19,6 +15,11 @@ const string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter());
+    });
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(MyAllowSpecificOrigins, builder =>
@@ -74,6 +75,7 @@ builder.Services.AddSignalR();
 
 builder.Services.AddMediatR(x => x.AsScoped(), typeof(Program));
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 var app = builder.Build();
 
@@ -94,16 +96,7 @@ app.UseCors("MyAllowSpecificOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MediatePost<AuthRequest>("/api/auth")
-    .Produces<string>(StatusCodes.Status200OK)
-    .Produces<string>(StatusCodes.Status400BadRequest)
-    .WithName("auth user.")
-    .WithTags("all");
-
-app.MapGroup("/api/user")
-    .MapUserApi()
-    .RequireAuthorization()
-    .WithTags("all");
+app.MapControllers();
 
 app.MapHub<ChatHub>("/Hubs/Chat").RequireAuthorization();
 
