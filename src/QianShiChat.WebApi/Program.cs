@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 using QianShiChat.WebApi;
+using QianShiChat.WebApi.Endpoints;
 using QianShiChat.WebApi.Hubs;
 using QianShiChat.WebApi.Models;
 using QianShiChat.WebApi.Requests;
@@ -93,18 +94,15 @@ app.UseCors("MyAllowSpecificOrigins");
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("user", async (ChatDbContext context)
-    => await context.UserInfos.ToListAsync())
-    .RequireAuthorization()
-    .Produces<List<UserInfo>>(StatusCodes.Status200OK)
-    .Produces(StatusCodes.Status401Unauthorized)
-    .WithName("get users.")
-    .WithTags("all");
-
-app.MediatePost<AuthRequest>("user")
+app.MediatePost<AuthRequest>("/api/auth")
     .Produces<string>(StatusCodes.Status200OK)
     .Produces<string>(StatusCodes.Status400BadRequest)
     .WithName("auth user.")
+    .WithTags("all");
+
+app.MapGroup("/api/user")
+    .MapUserApi()
+    .RequireAuthorization()
     .WithTags("all");
 
 app.MapHub<ChatHub>("/Hubs/Chat").RequireAuthorization();
