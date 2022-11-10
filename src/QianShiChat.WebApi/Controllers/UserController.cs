@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+using QianShiChat.Models;
 using QianShiChat.WebApi.Models;
 
 namespace QianShiChat.WebApi.Controllers
