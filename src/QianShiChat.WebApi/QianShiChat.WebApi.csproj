@@ -29,4 +29,8 @@
     <Folder Include="Hubs\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\QianShiChat.Common\QianShiChat.Common.csproj" />
+  </ItemGroup>
+
 </Project>

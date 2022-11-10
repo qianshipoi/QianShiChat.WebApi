@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace QianShiChat.WebApi.Models
+namespace QianShiChat.Models
 {
     public class UserAuthDto
     {
