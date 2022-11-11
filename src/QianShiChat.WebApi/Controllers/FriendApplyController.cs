@@ -39,26 +39,37 @@ namespace QianShiChat.WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Apply([FromRoute] int userId, [FromBody] CreateFriendApplyDto dto, CancellationToken cancellationToken = default)
         {
-            var user = await _context.UserInfos.AsNoTracking().FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
-            if (user == null)
+            var user = await _context.UserInfos
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
+
+            if (user is null)
             {
                 return NotFound();
             }
 
-            var friendApply = new FriendApply()
+            var friendApply = await _context.FriendApplies
+                .AsNoTracking()
+                .Where(x => x.Status == ApplyStatus.Applied)
+                .FirstOrDefaultAsync(x => x.UserId == CurrentUserId && x.FriendId == userId, cancellationToken);
+
+            if (friendApply == null)
             {
-                CreateTime = DateTime.Now,
-                UserId = CurrentUserId,
-                FriendId = userId,
-                LaseUpdateTime = DateTime.Now,
-                Remark = dto.Remark,
-                Status = ApplyStatus.Applied,
-                User = user
-            };
+                friendApply = new FriendApply()
+                {
+                    CreateTime = DateTime.Now,
+                    UserId = CurrentUserId,
+                    FriendId = userId,
+                    LaseUpdateTime = DateTime.Now,
+                    Remark = dto.Remark,
+                    Status = ApplyStatus.Applied,
+                    User = user
+                };
 
-            await _context.AddAsync(friendApply, cancellationToken);
+                await _context.AddAsync(friendApply, cancellationToken);
 
-            await _context.SaveChangesAsync(cancellationToken);
+                await _context.SaveChangesAsync(cancellationToken);
+            }
 
             await _hubContext.Clients.User(userId.ToString()).Notification(new NotificationMessage
             {

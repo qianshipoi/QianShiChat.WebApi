@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B475C797-8EB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QianShiChat.Common", "src\QianShiChat.Common\QianShiChat.Common.csproj", "{F643FA6D-FAD0-4B61-A646-1AE44BBBA375}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QianShiChat.WebApi", "src\QianShiChat.WebApi\QianShiChat.WebApi.csproj", "{083696EF-D9F3-4B78-8BF4-3AB5E937BD84}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QianShiChat.WebApi", "src\QianShiChat.WebApi\QianShiChat.WebApi.csproj", "{083696EF-D9F3-4B78-8BF4-3AB5E937BD84}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
