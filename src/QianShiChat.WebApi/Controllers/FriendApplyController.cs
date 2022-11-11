@@ -1,9 +1,16 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
+using QianShiChat.Common.Models;
 using QianShiChat.Models;
+using QianShiChat.WebApi.Hubs;
 using QianShiChat.WebApi.Models;
+
+using System.Text.Json;
 
 namespace QianShiChat.WebApi.Controllers
 {
@@ -13,9 +20,13 @@ namespace QianShiChat.WebApi.Controllers
     public class FriendApplyController : BaseController
     {
         private readonly ChatDbContext _context;
-        public FriendApplyController(ChatDbContext context)
+        private readonly IHubContext<ChatHub, IChatClient> _hubContext;
+        private readonly IMapper _mapper;
+        public FriendApplyController(ChatDbContext context, IHubContext<ChatHub, IChatClient> hubContext, IMapper mapper)
         {
             _context = context;
+            _hubContext = hubContext;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -28,8 +39,8 @@ namespace QianShiChat.WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Apply([FromRoute] int userId, [FromBody] CreateFriendApplyDto dto, CancellationToken cancellationToken = default)
         {
-            var existsUser = _context.UserInfos.AnyAsync(x => x.Id == userId, cancellationToken);
-            if (existsUser is null)
+            var user = await _context.UserInfos.AsNoTracking().FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
+            if (user == null)
             {
                 return NotFound();
             }
@@ -41,12 +52,19 @@ namespace QianShiChat.WebApi.Controllers
                 FriendId = userId,
                 LaseUpdateTime = DateTime.Now,
                 Remark = dto.Remark,
-                Status = ApplyStatus.Applied
+                Status = ApplyStatus.Applied,
+                User = user
             };
 
             await _context.AddAsync(friendApply, cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
+
+            await _hubContext.Clients.User(userId.ToString()).Notification(new NotificationMessage
+            {
+                Type = NotificationType.FirendApply,
+                Message = JsonSerializer.Serialize(_mapper.Map<FriendApplyDto>(friendApply))
+            });
 
             return Ok(friendApply);
         }
@@ -94,7 +112,7 @@ namespace QianShiChat.WebApi.Controllers
             }
 
             var user = await _context.UserInfos
-                .FindAsync(new object[] { id }, cancellationToken);
+                .FindAsync(new object[] { userId }, cancellationToken);
             if (user is null)
             {
                 return NotFound();
@@ -102,7 +120,9 @@ namespace QianShiChat.WebApi.Controllers
 
             var apply = await _context.FriendApplies
                 .Where(x => x.Id == id)
+                .Include(x => x.Friend)
                 .FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
+
             if (apply is null)
             {
                 return NotFound();
@@ -135,6 +155,14 @@ namespace QianShiChat.WebApi.Controllers
             }
 
             await _context.SaveChangesAsync(cancellationToken);
+
+            apply.User = user;
+
+            await _hubContext.Clients.Users(apply.UserId.ToString(), apply.FriendId.ToString()).Notification(new NotificationMessage
+            {
+                Type = NotificationType.NewFirend,
+                Message = JsonSerializer.Serialize(_mapper.Map<FriendApply>(apply))
+            });
 
             return Ok("处理成功");
         }

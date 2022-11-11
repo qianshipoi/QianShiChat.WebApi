@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
+using System.Security.Claims;
+
 namespace QianShiChat.WebApi.Controllers
 {
     public abstract class BaseController : ControllerBase
@@ -11,7 +13,7 @@ namespace QianShiChat.WebApi.Controllers
         {
             get
             {
-                var val = User.Claims?.FirstOrDefault(x => x.Type == AppConsts.ClaimUserId)?.Value;
+                var val = User.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrWhiteSpace(val))
                 {
                     return 0;

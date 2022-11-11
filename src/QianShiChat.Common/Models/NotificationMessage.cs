@@ -1,0 +1,21 @@
+﻿namespace QianShiChat.Models
+{
+    public class NotificationMessage
+    {
+        public NotificationType Type { get; set; }
+
+        public string Message { get; set; }
+    }
+
+    public enum NotificationType
+    {
+        /// <summary>
+        /// 好友申请
+        /// </summary>
+        FirendApply,
+        /// <summary>
+        /// 新好友
+        /// </summary>
+        NewFirend,
+    }
+}

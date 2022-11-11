@@ -50,7 +50,7 @@ namespace QianShiChat.WebApi.Controllers
             var token = _jwtService.CreateToken(new List<Claim>
             {
                 new Claim(ClaimTypes.Name , userInfo.NickName),
-                new Claim(AppConsts.ClaimUserId, userInfo.Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, userInfo.Id.ToString()),
             });
 
             var userDto = _mapper.Map<UserDto>(userInfo);

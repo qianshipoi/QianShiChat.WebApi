@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace QianShiChat.WebApi.Hubs;
 
-public class ChatHub : Hub
+public class ChatHub : Hub<IChatClient>
 {
 
     public override Task OnConnectedAsync()
@@ -17,5 +17,5 @@ public class ChatHub : Hub
     }
 
     public async Task SendMessage(string user, string message)
-      => await Clients.All.SendAsync("ReceiveMessage", user, message);
+      => await Clients.All.ReceiveMessage(user,message);
 }
