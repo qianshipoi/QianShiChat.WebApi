@@ -7,7 +7,7 @@ namespace QianShiChat.WebApi.Controllers
         /// <summary>
         /// user id
         /// </summary>
-        protected int UserId
+        protected int CurrentUserId
         {
             get
             {
@@ -23,6 +23,6 @@ namespace QianShiChat.WebApi.Controllers
         /// <summary>
         /// is login
         /// </summary>
-        protected bool IsLogin => UserId == 0;
+        protected bool IsLogin => CurrentUserId == 0;
     }
 }

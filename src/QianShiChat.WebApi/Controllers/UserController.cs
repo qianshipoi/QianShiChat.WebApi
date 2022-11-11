@@ -41,8 +41,14 @@ namespace QianShiChat.WebApi.Controllers
             return _mapper.Map<List<UserDto>>(users);
         }
 
+        /// <summary>
+        /// get user info.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<UserDto>> Get(int id, CancellationToken cancellationToken = default)
+        public async Task<ActionResult<UserDto>> GetUser(int id, CancellationToken cancellationToken = default)
         {
             var info = await _context.UserInfos
                 .AsNoTracking()
@@ -56,6 +62,12 @@ namespace QianShiChat.WebApi.Controllers
             return Ok(_mapper.Map<UserDto>(info));
         }
 
+        /// <summary>
+        /// create user
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Create(CreateUserDto dto, CancellationToken cancellationToken = default)
         {

@@ -6,6 +6,10 @@ namespace QianShiChat.WebApi.Models
     {
         public DbSet<UserInfo> UserInfos { get; set; }
 
+        public DbSet<UserRealtion> UserRealtions { get; set; }
+
+        public DbSet<FriendApply> FriendApplies { get; set; }
+
         public ChatDbContext(DbContextOptions options) : base(options)
         {
         }

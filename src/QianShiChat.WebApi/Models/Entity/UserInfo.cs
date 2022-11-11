@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace QianShiChat.WebApi.Models
 {
     public class UserInfo
@@ -16,6 +18,17 @@ namespace QianShiChat.WebApi.Models
         public DateTime CreateTime { get; set; }
 
         public bool IsDeleted { get; set; }
+
+        public List<UserRealtion> Realtions { get; set; } = new();
+
+        public List<UserRealtion> Friends { get; set; } = new();
+
+        [InverseProperty(nameof(FriendApply.User))]
+        public List<FriendApply> FriendApplyUsers { get; set; } = new();
+
+        [InverseProperty(nameof(FriendApply.Friend))]
+        public List<FriendApply> FriendApplyFriends { get; set; } = new();
+
     }
 
     public class UserInfoEntityTypeConfiguration : IEntityTypeConfiguration<UserInfo>
@@ -24,11 +37,11 @@ namespace QianShiChat.WebApi.Models
         {
             builder.ToTable(nameof(UserInfo));
             builder.HasKey(x => x.Id);
+
             builder.Property(x => x.Id)
                 .IsRequired()
                 .ValueGeneratedOnAdd()
                 .HasComment("用户表主键");
-
             builder.Property(x => x.Account)
                 .IsRequired()
                 .HasMaxLength(32)
@@ -51,7 +64,9 @@ namespace QianShiChat.WebApi.Models
                 .HasComment("是否已删除");
 
             builder.HasData(
-                new UserInfo { Id = 1, Account = "admin", Password = "123456", NickName = "Admin" }
+                new UserInfo { Id = 1, Account = "admin", Password = "E10ADC3949BA59ABBE56E057F20F883E", NickName = "Admin" },
+                    new UserInfo { Id = 2, Account = "qianshi", Password = "E10ADC3949BA59ABBE56E057F20F883E", NickName = "千矢" },
+                    new UserInfo { Id = 3, Account = "kuriyama", Password = "E10ADC3949BA59ABBE56E057F20F883E", NickName = "栗山未来" }
                 );
         }
     }
