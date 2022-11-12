@@ -1,11 +1,15 @@
 ﻿using AutoMapper;
 
+using EasyCaching.Core;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using QianShiChat.Models;
 using QianShiChat.WebApi.Models;
 using QianShiChat.WebApi.Services;
+
+using System.Text.Json;
 
 namespace QianShiChat.WebApi.Controllers
 {
@@ -20,16 +24,18 @@ namespace QianShiChat.WebApi.Controllers
         private readonly ChatDbContext _context;
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
+        private readonly IRedisCachingProvider _redisCachingProvider;
 
         /// <summary>
         /// user controller
         /// </summary>
-        public UserController(ChatDbContext context, IMapper mapper, ILogger<UserController> logger, IUserService userService)
+        public UserController(ChatDbContext context, IMapper mapper, ILogger<UserController> logger, IUserService userService, IRedisCachingProvider redisCachingProvider)
         {
             _context = context;
             _mapper = mapper;
             _logger = logger;
             _userService = userService;
+            _redisCachingProvider = redisCachingProvider;
         }
 
         /// <summary>
@@ -53,12 +59,23 @@ namespace QianShiChat.WebApi.Controllers
         [HttpGet("{id:int}")]
         public async Task<ActionResult<UserDto>> GetUser(int id, CancellationToken cancellationToken = default)
         {
-            var info = _userService.GetUserByIdAsync(id, cancellationToken);
+            var cacheKey = nameof(GetUser) + id.ToString();
+
+            var cacheValue = await _redisCachingProvider.StringGetAsync(cacheKey);
+
+            if (!string.IsNullOrEmpty(cacheValue))
+            {
+                return Ok(JsonSerializer.Deserialize<UserDto>(cacheValue));
+            }
+
+            var info = await _userService.GetUserByIdAsync(id, cancellationToken);
 
             if (info == null)
             {
                 return NotFound();
             }
+
+            await _redisCachingProvider.StringSetAsync(cacheKey, JsonSerializer.Serialize(info), TimeSpan.FromSeconds(60));
 
             return Ok(info);
         }

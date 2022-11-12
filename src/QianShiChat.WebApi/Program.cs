@@ -72,9 +72,11 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddChatDbContext(builder.Configuration);
 
 builder.Services.AddScoped<IJwtService, JwtService>();
-builder.Services.AddSignalR();
+builder.Services.AddSignalR()
+    .AddStackExchangeRedis(builder.Configuration.GetConnectionString("Redis")!);
 
 builder.Services.AddAutoDI();
+builder.Services.AddCache(builder.Configuration);
 
 builder.Services.AddMediatR(x => x.AsScoped(), typeof(Program));
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();

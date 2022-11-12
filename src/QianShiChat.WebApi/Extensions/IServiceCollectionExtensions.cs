@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using EasyCaching.Serialization.SystemTextJson.Configurations;
+
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 using QianShiChat.WebApi;
@@ -62,5 +65,23 @@ namespace Microsoft.Extensions.DependencyInjection
             });
             return services;
         }
+
+        /// <summary>
+        /// 添加缓存服务
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddCache(this IServiceCollection services,IConfiguration configuration)
+        {
+            services.AddEasyCaching(setup =>
+            {
+                setup.UseRedis(configuration);
+                setup.WithSystemTextJson("mymsgpack");
+            });
+
+            return services;
+        }
+
     }
 }
