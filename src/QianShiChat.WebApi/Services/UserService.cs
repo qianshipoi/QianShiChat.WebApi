@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
 using QianShiChat.Models;
 using QianShiChat.WebApi.Core.AutoDI;
 using QianShiChat.WebApi.Models;
+
+using System.Drawing;
 
 namespace QianShiChat.WebApi.Services
 {
@@ -47,5 +50,32 @@ namespace QianShiChat.WebApi.Services
             await _context.SaveChangesAsync(cancellationToken);
         }
 
+        public async Task<List<UserDto>> GetUserByAccontAsync(string account, CancellationToken cancellationToken = default)
+        {
+            var users = await _context.UserInfos.AsNoTracking()
+                .Where(x => x.Account == account)
+                .ToListAsync(cancellationToken);
+
+            return _mapper.Map<List<UserDto>>(users);
+        }
+
+        public async Task<List<UserDto>> GetUserByNickNameAsync(int page, int size, string nickName, CancellationToken cancellationToken = default)
+        {
+            var users = await _context.UserInfos.AsNoTracking()
+                .Where(x => EF.Functions.Like(x.NickName, $"%{nickName}%"))
+                .OrderBy(x => x.CreateTime)
+                .Skip((page - 1) * size)
+                .Take(size)
+                .ToListAsync(cancellationToken);
+
+            return _mapper.Map<List<UserDto>>(users);
+        }
+
+        public async Task<long> GetUserCountByNickNameAsync(string nickName, CancellationToken cancellationToken = default)
+        {
+            return await _context.UserInfos.AsNoTracking()
+                    .Where(x => EF.Functions.Like(x.NickName, $"%{nickName}%"))
+                    .CountAsync(cancellationToken);
+        }
     }
 }

@@ -9,6 +9,7 @@ using QianShiChat.Models;
 using QianShiChat.WebApi.Models;
 using QianShiChat.WebApi.Services;
 
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 
 namespace QianShiChat.WebApi.Controllers
@@ -21,7 +22,6 @@ namespace QianShiChat.WebApi.Controllers
     public class UserController : BaseController
     {
         private readonly ILogger<UserController> _logger;
-        private readonly ChatDbContext _context;
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
         private readonly IRedisCachingProvider _redisCachingProvider;
@@ -29,25 +29,31 @@ namespace QianShiChat.WebApi.Controllers
         /// <summary>
         /// user controller
         /// </summary>
-        public UserController(ChatDbContext context, IMapper mapper, ILogger<UserController> logger, IUserService userService, IRedisCachingProvider redisCachingProvider)
+        public UserController( 
+            IMapper mapper, 
+            ILogger<UserController> logger, 
+            IUserService userService,
+            IRedisCachingProvider redisCachingProvider)
         {
-            _context = context;
             _mapper = mapper;
             _logger = logger;
             _userService = userService;
             _redisCachingProvider = redisCachingProvider;
         }
 
-        /// <summary>
-        /// get all user.
-        /// </summary>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<List<UserDto>> GetUsers(CancellationToken cancellationToken = default)
+        [HttpGet("{page:int}/{size:int}")]
+        public async Task<PagedList<UserDto>> Search(
+            [FromRoute] int page,
+            [FromRoute] int size,
+            [FromQuery, Required] string nickName,
+            CancellationToken cancellationToken = default)
         {
-            var users = await _context.UserInfos.ToListAsync(cancellationToken);
-            return _mapper.Map<List<UserDto>>(users);
+            var users = await _userService.GetUserByNickNameAsync(page, size, nickName, cancellationToken);
+            var totalCount = await _userService.GetUserCountByNickNameAsync(nickName, cancellationToken);
+
+            PagedList.Create(users, totalCount, page, size);
+
+            return PagedList.Create(users, totalCount, page, size);
         }
 
         /// <summary>
