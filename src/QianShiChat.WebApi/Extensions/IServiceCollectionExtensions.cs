@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
+using QianShiChat.WebApi;
 using QianShiChat.WebApi.Models;
 
 using System.Text;
