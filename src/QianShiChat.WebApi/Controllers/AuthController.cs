@@ -1,17 +1,14 @@
 ﻿using AutoMapper;
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 using QianShiChat.Models;
-using QianShiChat.WebApi.Models;
 using QianShiChat.WebApi.Services;
 
 using System.Security.Claims;
 
 namespace QianShiChat.WebApi.Controllers
 {
-
     /// <summary>
     /// auth controller
     /// </summary>
@@ -20,23 +17,23 @@ namespace QianShiChat.WebApi.Controllers
     public class AuthController : BaseController
     {
         private readonly ILogger<AuthController> _logger;
-        private readonly ChatDbContext _context;
         private readonly IMapper _mapper;
         private readonly IJwtService _jwtService;
-        public AuthController(ChatDbContext context, ILogger<AuthController> logger, IMapper mapper, IJwtService jwtService)
+        private readonly IUserService _userService;
+
+        public AuthController(ILogger<AuthController> logger, IMapper mapper, IJwtService jwtService, IUserService userService)
         {
-            _context = context;
             _logger = logger;
             _mapper = mapper;
             _jwtService = jwtService;
+            _userService = userService;
         }
 
         [HttpPost]
         public async Task<ActionResult<UserDto>> Auth([FromBody] UserAuthDto dto, CancellationToken cancellationToken = default)
         {
-            var userInfo = await _context.UserInfos
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Account == dto.Account, cancellationToken);
+            var userInfo = await _userService.GetUserByAccountAsync(dto.Account, cancellationToken);
+
             if (userInfo == null)
             {
                 return BadRequest("Unknown user.");
@@ -57,6 +54,5 @@ namespace QianShiChat.WebApi.Controllers
             Response.Headers.Add("X-Access-Token", token);
             return Ok(userDto);
         }
-
     }
 }
