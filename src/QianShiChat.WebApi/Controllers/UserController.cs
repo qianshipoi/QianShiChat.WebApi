@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 using QianShiChat.Models;
 using QianShiChat.WebApi.Models;
+using QianShiChat.WebApi.Services;
 
 namespace QianShiChat.WebApi.Controllers
 {
@@ -18,15 +19,17 @@ namespace QianShiChat.WebApi.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly ChatDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IUserService _userService;
 
         /// <summary>
         /// user controller
         /// </summary>
-        public UserController(ChatDbContext context, IMapper mapper, ILogger<UserController> logger)
+        public UserController(ChatDbContext context, IMapper mapper, ILogger<UserController> logger, IUserService userService)
         {
             _context = context;
             _mapper = mapper;
             _logger = logger;
+            _userService = userService;
         }
 
         /// <summary>
@@ -50,16 +53,14 @@ namespace QianShiChat.WebApi.Controllers
         [HttpGet("{id:int}")]
         public async Task<ActionResult<UserDto>> GetUser(int id, CancellationToken cancellationToken = default)
         {
-            var info = await _context.UserInfos
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+            var info = _userService.GetUserByIdAsync(id, cancellationToken);
 
             if (info == null)
             {
                 return NotFound();
             }
 
-            return Ok(_mapper.Map<UserDto>(info));
+            return Ok(info);
         }
 
         /// <summary>
@@ -71,23 +72,14 @@ namespace QianShiChat.WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateUserDto dto, CancellationToken cancellationToken = default)
         {
-            var existsAccount = await _context.UserInfos
-                 .AsNoTracking()
-                 .AnyAsync(x => x.Account.Equals(dto.Account), cancellationToken);
-
-            if (existsAccount)
+            if (await _userService.AccountExistsAsync(dto.Account, cancellationToken))
             {
                 return BadRequest("The account already exists.");
             }
 
-            var user = _mapper.Map<UserInfo>(dto);
+            await _userService.AddAsync(dto, cancellationToken);
 
-            await _context.AddAsync(user, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            var newDto = _mapper.Map<UserDto>(user);
-
-            return Ok(newDto);
+            return Ok();
         }
     }
 }

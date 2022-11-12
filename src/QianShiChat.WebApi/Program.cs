@@ -20,6 +20,7 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter());
     });
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(MyAllowSpecificOrigins, builder =>
@@ -72,6 +73,8 @@ builder.Services.AddChatDbContext(builder.Configuration);
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddSignalR();
+
+builder.Services.AddAutoDI();
 
 builder.Services.AddMediatR(x => x.AsScoped(), typeof(Program));
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();

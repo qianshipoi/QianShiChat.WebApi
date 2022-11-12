@@ -6,7 +6,7 @@ using QianShiChat.WebApi.Models;
 
 using System.Text;
 
-namespace QianShiChat.WebApi
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Service Extension

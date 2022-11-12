@@ -10,6 +10,14 @@
     public enum NotificationType
     {
         /// <summary>
+        /// 好友上线
+        /// </summary>
+        FirendOnline,
+        /// <summary>
+        /// 好友下线
+        /// </summary>
+        FirendOffline,
+        /// <summary>
         /// 好友申请
         /// </summary>
         FirendApply,
