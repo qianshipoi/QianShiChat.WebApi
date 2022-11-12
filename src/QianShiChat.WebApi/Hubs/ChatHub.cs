@@ -9,9 +9,9 @@ public class ChatHub : Hub<IChatClient>
 {
     private int CurrentUserId => int.Parse(Context.UserIdentifier!);
 
-    private readonly FirendService _firendService;
+    private readonly IFirendService _firendService;
 
-    public ChatHub(FirendService firendService)
+    public ChatHub(IFirendService firendService)
     {
         _firendService = firendService;
     }
