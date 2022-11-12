@@ -1,60 +1,47 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QianShiChat.WebApi.Models
 {
     /// <summary>
     /// 用户关系表
     /// </summary>
+    [Table(nameof(UserRealtion))]
+    [Index(nameof(Id))]
     public class UserRealtion
     {
         /// <summary>
         /// 编号
         /// </summary>
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key]
+        [Comment("用户关系表主键")]
         public int Id { get; set; }
         /// <summary>
         /// 用户编号
         /// </summary>
+        [Required]
+        [Comment("用户编号")]
         public int UserId { get; set; }
         /// <summary>
         /// 朋友编号
         /// </summary>
+        [Required]
+        [Comment("朋友编号")]
         public int FriendId { get; set; }
         /// <summary>
         /// 创建时间
         /// </summary>
+        [Required]
+        [Comment("创建时间")]
         public DateTime CreateTime { get; set; }
 
+        [ForeignKey(nameof(UserId))]
         public UserInfo User { get; set; }
 
+        [ForeignKey(nameof(FriendId))]
         public UserInfo Friend { get; set; }
-    }
-
-    public class UserRealtionEntityTypeConfiguration : IEntityTypeConfiguration<UserRealtion>
-    {
-        public void Configure(EntityTypeBuilder<UserRealtion> builder)
-        {
-            builder.ToTable(nameof(UserRealtion));
-            builder.HasIndex(x => x.Id);
-
-            builder.HasOne(p => p.User)
-                .WithMany(p => p.Realtions);
-            builder.HasOne(p => p.Friend)
-                .WithMany(p => p.Friends);
-
-            builder.Property(x => x.Id)
-                .IsRequired()
-                .ValueGeneratedOnAdd()
-                .HasComment("用户关系表主键");
-            builder.Property(x => x.UserId)
-                .IsRequired()
-                .HasComment("用户编号");
-            builder.Property(x => x.FriendId)
-                .IsRequired()
-                .HasComment("朋友编号");
-            builder.Property(x => x.CreateTime)
-                .IsRequired()
-                .HasComment("创建时间");
-        }
     }
 }
