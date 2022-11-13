@@ -18,7 +18,7 @@ builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, relo
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter());
+        //options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter());
     });
 
 builder.Services.AddCors(options =>

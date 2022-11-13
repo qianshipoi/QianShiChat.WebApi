@@ -51,8 +51,6 @@ namespace QianShiChat.WebApi.Controllers
             var users = await _userService.GetUserByNickNameAsync(page, size, nickName, cancellationToken);
             var totalCount = await _userService.GetUserCountByNickNameAsync(nickName, cancellationToken);
 
-            PagedList.Create(users, totalCount, page, size);
-
             return PagedList.Create(users, totalCount, page, size);
         }
 
