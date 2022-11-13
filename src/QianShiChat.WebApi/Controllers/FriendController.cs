@@ -4,9 +4,11 @@ using QianShiChat.Models;
 using QianShiChat.WebApi.Models;
 using QianShiChat.WebApi.Services;
 
+using System.ComponentModel.DataAnnotations;
+
 namespace QianShiChat.WebApi.Controllers
 {
-    [Route("api/User/{userId}/[Controller]")]
+    [Route("api/[Controller]")]
     [ApiController]
     public class FriendController : BaseController
     {
@@ -18,7 +20,7 @@ namespace QianShiChat.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<UserDto>>> GetAllFriend([FromRoute] int userId, CancellationToken cancellationToken = default)
+        public async Task<ActionResult<List<UserDto>>> GetAllFriends([FromQuery, Required, Range(1, int.MaxValue)] int userId, CancellationToken cancellationToken = default)
         {
             if (userId != CurrentUserId)
             {

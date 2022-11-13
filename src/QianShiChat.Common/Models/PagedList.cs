@@ -1,4 +1,4 @@
-﻿namespace QianShiChat.WebApi.Models
+﻿namespace QianShiChat.Models
 {
     public class PagedList<T> where T : class
     {

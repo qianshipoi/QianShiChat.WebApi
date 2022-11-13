@@ -29,9 +29,9 @@ namespace QianShiChat.WebApi.Controllers
         /// <summary>
         /// user controller
         /// </summary>
-        public UserController( 
-            IMapper mapper, 
-            ILogger<UserController> logger, 
+        public UserController(
+            IMapper mapper,
+            ILogger<UserController> logger,
             IUserService userService,
             IRedisCachingProvider redisCachingProvider)
         {
@@ -63,7 +63,7 @@ namespace QianShiChat.WebApi.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<UserDto>> GetUser(int id, CancellationToken cancellationToken = default)
+        public async Task<ActionResult<UserDto>> GetUser([FromRoute] int id, CancellationToken cancellationToken = default)
         {
             var cacheKey = nameof(GetUser) + id.ToString();
 
@@ -93,16 +93,16 @@ namespace QianShiChat.WebApi.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> Create(CreateUserDto dto, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> Create([FromBody] CreateUserDto dto, CancellationToken cancellationToken = default)
         {
             if (await _userService.AccountExistsAsync(dto.Account, cancellationToken))
             {
                 return BadRequest("The account already exists.");
             }
 
-            await _userService.AddAsync(dto, cancellationToken);
+            var user = await _userService.AddAsync(dto, cancellationToken);
 
-            return Ok();
+            return CreatedAtAction(nameof(GetUser), new { Id = user.Id });
         }
     }
 }

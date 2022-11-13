@@ -16,7 +16,7 @@ namespace QianShiChat.WebApi.Models
 
         public string Password { get; set; } = null!;
 
-        public string Avatar { get; set; } = null!;
+        public string? Avatar { get; set; }
 
         public DateTime CreateTime { get; set; }
 
@@ -69,9 +69,9 @@ namespace QianShiChat.WebApi.Models
                 .HasComment("是否已删除");
 
             builder.HasData(
-                new UserInfo { Id = 1, Account = "admin", Password = "E10ADC3949BA59ABBE56E057F20F883E", Avatar = "123", NickName = "Admin" },
-                    new UserInfo { Id = 2, Account = "qianshi", Password = "E10ADC3949BA59ABBE56E057F20F883E", Avatar = "123", NickName = "千矢" },
-                    new UserInfo { Id = 3, Account = "kuriyama", Password = "E10ADC3949BA59ABBE56E057F20F883E", Avatar = "123", NickName = "栗山未来" }
+                new UserInfo { Id = 1, Account = "admin", Password = "E10ADC3949BA59ABBE56E057F20F883E", NickName = "Admin" },
+                    new UserInfo { Id = 2, Account = "qianshi", Password = "E10ADC3949BA59ABBE56E057F20F883E", NickName = "千矢" },
+                    new UserInfo { Id = 3, Account = "kuriyama", Password = "E10ADC3949BA59ABBE56E057F20F883E", NickName = "栗山未来" }
                 );
         }
     }

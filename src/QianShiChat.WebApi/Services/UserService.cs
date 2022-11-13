@@ -43,11 +43,12 @@ namespace QianShiChat.WebApi.Services
                  .AnyAsync(x => x.Account.Equals(account), cancellationToken);
         }
 
-        public async Task AddAsync(CreateUserDto dto, CancellationToken cancellationToken = default)
+        public async Task<UserDto> AddAsync(CreateUserDto dto, CancellationToken cancellationToken = default)
         {
             var user = _mapper.Map<UserInfo>(dto);
             await _context.AddAsync(user, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
+            return _mapper.Map<UserDto>(user);
         }
 
         public async Task<List<UserDto>> GetUserByAccontAsync(string account, CancellationToken cancellationToken = default)

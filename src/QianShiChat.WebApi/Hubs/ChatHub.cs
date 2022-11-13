@@ -1,3 +1,5 @@
+using EasyCaching.Core;
+
 using Microsoft.AspNetCore.SignalR;
 
 using QianShiChat.Models;
@@ -7,13 +9,16 @@ namespace QianShiChat.WebApi.Hubs;
 
 public class ChatHub : Hub<IChatClient>
 {
+    public const string OnlineCacheKey = "OnlineList";
     private int CurrentUserId => int.Parse(Context.UserIdentifier!);
 
     private readonly IFirendService _firendService;
+    private readonly IRedisCachingProvider _redisCachingProvider;
 
-    public ChatHub(IFirendService firendService)
+    public ChatHub(IFirendService firendService, IRedisCachingProvider redisCachingProvider)
     {
         _firendService = firendService;
+        _redisCachingProvider = redisCachingProvider;
     }
 
     public override async Task OnConnectedAsync()
@@ -41,6 +46,15 @@ public class ChatHub : Hub<IChatClient>
             Type = isOnline ? NotificationType.FirendOnline : NotificationType.FirendOffline,
             Message = CurrentUserId.ToString()
         });
+
+        if (isOnline)
+        {
+            await _redisCachingProvider.HSetAsync(OnlineCacheKey, CurrentUserId.ToString(), "1");
+        }
+        else
+        {
+            await _redisCachingProvider.HDelAsync(OnlineCacheKey, new string[] { CurrentUserId.ToString() });
+        }
     }
 
     public async Task SendMessage(string user, string message)

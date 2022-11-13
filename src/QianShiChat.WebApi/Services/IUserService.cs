@@ -11,7 +11,7 @@ namespace QianShiChat.WebApi.Services
 
         Task<bool> AccountExistsAsync(string account, CancellationToken cancellationToken = default);
 
-        Task AddAsync(CreateUserDto dto, CancellationToken cancellationToken = default);
+        Task<UserDto> AddAsync(CreateUserDto dto, CancellationToken cancellationToken = default);
 
         Task<List<UserDto>> GetUserByAccontAsync(string account, CancellationToken cancellationToken = default);
 
