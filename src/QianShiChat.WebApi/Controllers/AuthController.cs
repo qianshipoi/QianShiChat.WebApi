@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using QianShiChat.Models;
+using QianShiChat.WebApi.Models;
 using QianShiChat.WebApi.Services;
 
 using System.Security.Claims;
@@ -51,6 +53,23 @@ namespace QianShiChat.WebApi.Controllers
             });
 
             var userDto = _mapper.Map<UserDto>(userInfo);
+            Response.Headers.Add("X-Access-Token", token);
+            return Ok(userDto);
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<ActionResult<UserDto>> CheckAuth(CancellationToken cancellationToken = default)
+        {
+            var user = await _userService.GetUserByIdAsync(CurrentUserId, cancellationToken);
+
+            var token = _jwtService.CreateToken(new List<Claim>
+            {
+                new Claim(ClaimTypes.Name , user.NickName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            });
+
+            var userDto = _mapper.Map<UserDto>(user);
             Response.Headers.Add("X-Access-Token", token);
             return Ok(userDto);
         }

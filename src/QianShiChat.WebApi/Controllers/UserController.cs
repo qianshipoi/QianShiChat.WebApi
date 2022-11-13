@@ -2,6 +2,7 @@
 
 using EasyCaching.Core;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -61,6 +62,7 @@ namespace QianShiChat.WebApi.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpGet("{id:int}")]
+        [Authorize]
         public async Task<ActionResult<UserDto>> GetUser([FromRoute] int id, CancellationToken cancellationToken = default)
         {
             var cacheKey = nameof(GetUser) + id.ToString();
