@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
-using QianShiChat.Common.Models;
 using QianShiChat.Models;
 using QianShiChat.WebApi.Hubs;
 using QianShiChat.WebApi.Models;

@@ -3,7 +3,6 @@ using AutoMapper.QueryableExtensions;
 
 using Microsoft.EntityFrameworkCore;
 
-using QianShiChat.Common.Models;
 using QianShiChat.Models;
 using QianShiChat.WebApi.Core.AutoDI;
 using QianShiChat.WebApi.Models;

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 
-using QianShiChat.Common.Models;
 using QianShiChat.Models;
 using QianShiChat.WebApi.Models;
 

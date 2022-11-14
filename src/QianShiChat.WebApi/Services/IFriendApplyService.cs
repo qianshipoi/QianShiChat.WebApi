@@ -1,5 +1,4 @@
-﻿using QianShiChat.Common.Models;
-using QianShiChat.Models;
+﻿using QianShiChat.Models;
 
 namespace QianShiChat.WebApi.Services
 {
