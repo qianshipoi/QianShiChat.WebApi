@@ -5,7 +5,7 @@ namespace QianShiChat.WebApi.Services
 {
     public interface IUserService
     {
-        Task<UserDto> GetUserByIdAsync(int id, CancellationToken cancellationToken = default);
+        Task<UserDto?> GetUserByIdAsync(int id, CancellationToken cancellationToken = default);
 
         Task<UserInfo?> GetUserByAccountAsync(string account, CancellationToken cancellationToken = default);
 

@@ -6,21 +6,29 @@ using QianShiChat.Models;
 using QianShiChat.WebApi.Core.AutoDI;
 using QianShiChat.WebApi.Models;
 
+using System.Net;
+
 namespace QianShiChat.WebApi.Services
 {
-    public class FirendService : IFirendService, ITransient
+    public class FriendService : IFriendService, ITransient
     {
         private readonly ChatDbContext _context;
-        private readonly ILogger<FirendService> _logger;
+        private readonly ILogger<FriendService> _logger;
         private readonly IMapper _mapper;
 
-        public FirendService(ChatDbContext context, ILogger<FirendService> logger)
+        public FriendService(ChatDbContext context, ILogger<FriendService> logger)
         {
             _context = context;
             _logger = logger;
         }
 
-        public async Task<List<int>> GetFirendIdsAsync(int userId, CancellationToken cancellationToken = default)
+        public async Task<bool> IsFriendAsync(int userId, int friendId, CancellationToken cancellationToken = default)
+        {
+            return await _context.UserRealtions
+                .AnyAsync(x => x.UserId == userId && x.FriendId == friendId, cancellationToken);
+        }
+
+        public async Task<List<int>> GetFriendIdsAsync(int userId, CancellationToken cancellationToken = default)
         {
             return await _context.UserRealtions.AsNoTracking()
                 .Where(x => x.UserId == userId)
@@ -28,7 +36,7 @@ namespace QianShiChat.WebApi.Services
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<UserDto>> GetFirendsAsync(int userId, CancellationToken cancellationToken = default)
+        public async Task<List<UserDto>> GetFriendsAsync(int userId, CancellationToken cancellationToken = default)
         {
             var friends = await _context.UserRealtions
                 .AsNoTracking()

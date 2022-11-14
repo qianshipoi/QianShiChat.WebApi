@@ -9,12 +9,13 @@ using QianShiChat.Common.Models;
 using QianShiChat.Models;
 using QianShiChat.WebApi.Hubs;
 using QianShiChat.WebApi.Models;
+using QianShiChat.WebApi.Services;
 
 using System.Text.Json;
 
 namespace QianShiChat.WebApi.Controllers
 {
-    [Route("api/User/{userId:int}/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     [Authorize]
     public class FriendApplyController : BaseController
@@ -22,11 +23,18 @@ namespace QianShiChat.WebApi.Controllers
         private readonly ChatDbContext _context;
         private readonly IHubContext<ChatHub, IChatClient> _hubContext;
         private readonly IMapper _mapper;
-        public FriendApplyController(ChatDbContext context, IHubContext<ChatHub, IChatClient> hubContext, IMapper mapper)
+        private readonly IUserService _userService;
+        private readonly IFriendApplyService _friendApplyService;
+        private readonly IFriendService _friendService;
+
+        public FriendApplyController(ChatDbContext context, IHubContext<ChatHub, IChatClient> hubContext, IMapper mapper, IUserService userService, IFriendApplyService friendApplyService, IFriendService friendService)
         {
             _context = context;
             _hubContext = hubContext;
             _mapper = mapper;
+            _userService = userService;
+            _friendApplyService = friendApplyService;
+            _friendService = friendService;
         }
 
         /// <summary>
@@ -37,142 +45,95 @@ namespace QianShiChat.WebApi.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> Apply([FromRoute] int userId, [FromBody] CreateFriendApplyDto dto, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> Apply([FromBody] CreateFriendApplyDto dto, CancellationToken cancellationToken = default)
         {
-            var user = await _context.UserInfos
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
+            var friend = await _userService.GetUserByIdAsync(dto.UserId, cancellationToken);
+            var user = await _userService.GetUserByIdAsync(CurrentUserId, cancellationToken);
 
-            if (user is null)
+            if (friend is null || user is null)
             {
                 return NotFound();
             }
 
-            var friendApply = await _context.FriendApplies
-                .AsNoTracking()
-                .Where(x => x.Status == ApplyStatus.Applied)
-                .FirstOrDefaultAsync(x => x.UserId == CurrentUserId && x.FriendId == userId, cancellationToken);
+            var isFriend = await _friendService.IsFriendAsync(CurrentUserId, dto.UserId, cancellationToken);
 
-            if (friendApply == null)
+            if (isFriend)
             {
-                friendApply = new FriendApply()
-                {
-                    CreateTime = DateTime.Now,
-                    UserId = CurrentUserId,
-                    FriendId = userId,
-                    LaseUpdateTime = DateTime.Now,
-                    Remark = dto.Remark,
-                    Status = ApplyStatus.Applied,
-                    User = user
-                };
-
-                await _context.AddAsync(friendApply, cancellationToken);
-
-                await _context.SaveChangesAsync(cancellationToken);
+                return BadRequest("已经是好友，请勿继续申请");
             }
 
-            await _hubContext.Clients.User(userId.ToString()).Notification(new NotificationMessage
+            var isApply = await _friendApplyService.IsApplyAsync(CurrentUserId, dto.UserId, cancellationToken);
+            FriendApplyDto applyDto;
+            if (!isApply)
             {
-                Type = NotificationType.FirendApply,
-                Message = JsonSerializer.Serialize(_mapper.Map<FriendApplyDto>(friendApply))
-            });
+                // 提交申请
+                applyDto = await _friendApplyService.ApplyAsync(CurrentUserId, dto, cancellationToken);
+            }
+            else
+            {
+                // 更新申请时间
+                applyDto = await _friendApplyService.UpdateApplyAsync(CurrentUserId, dto, cancellationToken);
+            }
 
-            return Ok(friendApply);
+            applyDto.User = user;
+            applyDto.Firend = friend;
+
+            await _hubContext.Clients.User(applyDto.FirendId.ToString())
+                .Notification(new NotificationMessage
+                {
+                    Type = NotificationType.FirendApply,
+                    Message = JsonSerializer.Serialize(applyDto)
+                });
+
+            return Ok(applyDto);
         }
 
         /// <summary>
         /// 待处理
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="page"></param>
+        /// <param name="size"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpGet("Pending")]
-        public async Task<ActionResult<List<FriendApply>>> Pending([FromRoute] int userId, CancellationToken cancellationToken = default)
+        public async Task<PagedList<FriendApplyDto>> Pending(int page, int size, CancellationToken cancellationToken = default)
         {
-            if (userId != CurrentUserId)
-            {
-                return Forbid();
-            }
+            var items = await _friendApplyService.GetPendingListByUserAsync(page, size, CurrentUserId, cancellationToken);
 
-            var user = await _context.UserInfos
-                 .Include(x => x.FriendApplyFriends.Where(x => x.Status == ApplyStatus.Applied))
-                 .FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
+            var total = await _friendApplyService.GetPendingListCountByUserAsync(CurrentUserId, default);
 
-            if (user is null)
-            {
-                return NotFound();
-            }
-
-            return Ok(user.FriendApplyFriends);
+            return PagedList.Create(items, total, page, size);
         }
 
         /// <summary>
         /// 审批
         /// </summary>
-        /// <param name="userId"></param>
         /// <param name="id"></param>
         /// <param name="status"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpGet("{id}/Approval/{status}")]
-        public async Task<IActionResult> Approval([FromRoute] int userId, [FromRoute] int id, [FromRoute] ApplyStatus status, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> Approval([FromRoute] int id, [FromRoute] ApplyStatus status, CancellationToken cancellationToken = default)
         {
-            if (userId != CurrentUserId)
-            {
-                return Forbid();
-            }
-
             var user = await _context.UserInfos
-                .FindAsync(new object[] { userId }, cancellationToken);
+                .FindAsync(new object[] { CurrentUserId }, cancellationToken);
+
             if (user is null)
             {
                 return NotFound();
             }
 
-            var apply = await _context.FriendApplies
-                .Where(x => x.Id == id)
-                .Include(x => x.Friend)
-                .FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
-
-            if (apply is null)
-            {
-                return NotFound();
-            }
-            if (apply.Status != ApplyStatus.Applied)
+            if (await _friendApplyService.IsApprovalAsync(id, cancellationToken))
             {
                 return BadRequest("该申请已处理");
             }
 
-            var now = DateTime.Now;
+            var dto = await _friendApplyService.ApprovalAsync(CurrentUserId, id, status, cancellationToken);
 
-            apply.Status = status;
-            apply.LaseUpdateTime = now;
-            if (status == ApplyStatus.Passed)
-            {
-                // 创建关系
-                user.Realtions.Add(new UserRealtion
-                {
-                    UserId = apply.FriendId,
-                    FriendId = apply.UserId,
-                    CreateTime = now
-                });
-
-                user.Friends.Add(new UserRealtion
-                {
-                    UserId = apply.UserId,
-                    FriendId = apply.FriendId,
-                    CreateTime = now
-                });
-            }
-
-            await _context.SaveChangesAsync(cancellationToken);
-
-            apply.User = user;
-
-            await _hubContext.Clients.Users(apply.UserId.ToString(), apply.FriendId.ToString()).Notification(new NotificationMessage
+            await _hubContext.Clients.Users(dto.UserId.ToString(), dto.FirendId.ToString()).Notification(new NotificationMessage
             {
                 Type = NotificationType.NewFirend,
-                Message = JsonSerializer.Serialize(_mapper.Map<FriendApply>(apply))
+                Message = JsonSerializer.Serialize(dto)
             });
 
             return Ok("处理成功");

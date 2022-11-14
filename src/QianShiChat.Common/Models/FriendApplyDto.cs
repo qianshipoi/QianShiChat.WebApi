@@ -13,6 +13,10 @@ namespace QianShiChat.Common.Models
         /// </summary>
         public int UserId { get; set; }
         /// <summary>
+        /// 好友
+        /// </summary>
+        public int FirendId { get; set; }
+        /// <summary>
         /// 创建时间
         /// </summary>
         public DateTime CreateTime { get; set; }
@@ -23,10 +27,14 @@ namespace QianShiChat.Common.Models
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
         /// <summary>
-        /// 目标
+        /// 申请人
         /// </summary>
-        public UserDto User { get; set; }
+        public UserDto? User { get; set; }
+        /// <summary>
+        /// 被申请人
+        /// </summary>
+        public UserDto? Firend { get; set; }
     }
 }

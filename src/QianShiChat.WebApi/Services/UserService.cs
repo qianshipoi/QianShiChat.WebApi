@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -24,16 +25,19 @@ namespace QianShiChat.WebApi.Services
             _logger = logger;
         }
 
-        public async Task<UserDto> GetUserByIdAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<UserDto?> GetUserByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            var user = await _context.UserInfos.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-
-            return _mapper.Map<UserDto>(user);
+            return await _context.UserInfos
+                .AsNoTracking()
+                .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
         public async Task<UserInfo?> GetUserByAccountAsync(string account, CancellationToken cancellationToken = default)
         {
-            return await _context.UserInfos.Where(x => x.Account == account).FirstOrDefaultAsync(cancellationToken);
+            return await _context.UserInfos
+                .Where(x => x.Account == account)
+                .FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task<bool> AccountExistsAsync(string account, CancellationToken cancellationToken = default)
@@ -53,11 +57,10 @@ namespace QianShiChat.WebApi.Services
 
         public async Task<List<UserDto>> GetUserByAccontAsync(string account, CancellationToken cancellationToken = default)
         {
-            var users = await _context.UserInfos.AsNoTracking()
+            return await _context.UserInfos.AsNoTracking()
                 .Where(x => x.Account == account)
+                .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
                 .ToListAsync(cancellationToken);
-
-            return _mapper.Map<List<UserDto>>(users);
         }
 
         public async Task<List<UserDto>> GetUserByNickNameAsync(int page, int size, string nickName, CancellationToken cancellationToken = default)

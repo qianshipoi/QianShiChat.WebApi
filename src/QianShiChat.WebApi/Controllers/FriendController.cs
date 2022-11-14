@@ -12,11 +12,11 @@ namespace QianShiChat.WebApi.Controllers
     [ApiController]
     public class FriendController : BaseController
     {
-        private readonly IFirendService _firendService;
+        private readonly IFriendService _friendService;
 
-        public FriendController(IFirendService firendService)
+        public FriendController(IFriendService firendService)
         {
-            _firendService = firendService;
+            _friendService = firendService;
         }
 
         [HttpGet]
@@ -27,7 +27,7 @@ namespace QianShiChat.WebApi.Controllers
                 return Forbid();
             }
 
-            return await _firendService.GetFirendsAsync(userId, cancellationToken);
+            return await _friendService.GetFriendsAsync(userId, cancellationToken);
         }
     }
 }

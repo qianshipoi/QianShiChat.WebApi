@@ -12,12 +12,12 @@ public class ChatHub : Hub<IChatClient>
     public const string OnlineCacheKey = "OnlineList";
     private int CurrentUserId => int.Parse(Context.UserIdentifier!);
 
-    private readonly IFirendService _firendService;
+    private readonly IFriendService _friendService;
     private readonly IRedisCachingProvider _redisCachingProvider;
 
-    public ChatHub(IFirendService firendService, IRedisCachingProvider redisCachingProvider)
+    public ChatHub(IFriendService friendService, IRedisCachingProvider redisCachingProvider)
     {
-        _firendService = firendService;
+        _friendService = friendService;
         _redisCachingProvider = redisCachingProvider;
     }
 
@@ -40,7 +40,7 @@ public class ChatHub : Hub<IChatClient>
     /// <returns></returns>
     private async Task UserOnlineOffline(bool isOnline = true)
     {
-        var ids = await _firendService.GetFirendIdsAsync(CurrentUserId);
+        var ids = await _friendService.GetFriendIdsAsync(CurrentUserId);
         await Clients.Users(ids.Select(x => x.ToString())).Notification(new NotificationMessage
         {
             Type = isOnline ? NotificationType.FirendOnline : NotificationType.FirendOffline,
