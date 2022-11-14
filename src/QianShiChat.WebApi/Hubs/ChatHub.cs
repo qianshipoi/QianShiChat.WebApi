@@ -43,7 +43,7 @@ public class ChatHub : Hub<IChatClient>
         var ids = await _friendService.GetFriendIdsAsync(CurrentUserId);
         await Clients.Users(ids.Select(x => x.ToString())).Notification(new NotificationMessage
         {
-            Type = isOnline ? NotificationType.FirendOnline : NotificationType.FirendOffline,
+            Type = isOnline ? NotificationType.FriendOnline : NotificationType.FriendOffline,
             Message = CurrentUserId.ToString()
         });
 

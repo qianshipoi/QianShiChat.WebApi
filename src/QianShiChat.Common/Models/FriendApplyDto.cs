@@ -1,6 +1,6 @@
 ﻿using QianShiChat.Models;
 
-namespace QianShiChat.Common.Models
+namespace QianShiChat.Models
 {
     public class FriendApplyDto
     {
@@ -15,7 +15,7 @@ namespace QianShiChat.Common.Models
         /// <summary>
         /// 好友
         /// </summary>
-        public int FirendId { get; set; }
+        public int FriendId { get; set; }
         /// <summary>
         /// 创建时间
         /// </summary>
@@ -35,6 +35,6 @@ namespace QianShiChat.Common.Models
         /// <summary>
         /// 被申请人
         /// </summary>
-        public UserDto? Firend { get; set; }
+        public UserDto? Friend { get; set; }
     }
 }

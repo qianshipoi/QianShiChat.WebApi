@@ -76,12 +76,12 @@ namespace QianShiChat.WebApi.Controllers
             }
 
             applyDto.User = user;
-            applyDto.Firend = friend;
+            applyDto.Friend = friend;
 
-            await _hubContext.Clients.User(applyDto.FirendId.ToString())
+            await _hubContext.Clients.User(applyDto.FriendId.ToString())
                 .Notification(new NotificationMessage
                 {
-                    Type = NotificationType.FirendApply,
+                    Type = NotificationType.FriendApply,
                     Message = JsonSerializer.Serialize(applyDto)
                 });
 
@@ -130,9 +130,9 @@ namespace QianShiChat.WebApi.Controllers
 
             var dto = await _friendApplyService.ApprovalAsync(CurrentUserId, id, status, cancellationToken);
 
-            await _hubContext.Clients.Users(dto.UserId.ToString(), dto.FirendId.ToString()).Notification(new NotificationMessage
+            await _hubContext.Clients.Users(dto.UserId.ToString(), dto.FriendId.ToString()).Notification(new NotificationMessage
             {
-                Type = NotificationType.NewFirend,
+                Type = NotificationType.NewFriend,
                 Message = JsonSerializer.Serialize(dto)
             });
 

@@ -14,9 +14,9 @@ namespace QianShiChat.WebApi.Controllers
     {
         private readonly IFriendService _friendService;
 
-        public FriendController(IFriendService firendService)
+        public FriendController(IFriendService friendService)
         {
-            _friendService = firendService;
+            _friendService = friendService;
         }
 
         [HttpGet]

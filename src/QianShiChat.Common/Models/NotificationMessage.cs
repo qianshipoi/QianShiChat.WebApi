@@ -12,18 +12,18 @@
         /// <summary>
         /// 好友上线
         /// </summary>
-        FirendOnline,
+        FriendOnline,
         /// <summary>
         /// 好友下线
         /// </summary>
-        FirendOffline,
+        FriendOffline,
         /// <summary>
         /// 好友申请
         /// </summary>
-        FirendApply,
+        FriendApply,
         /// <summary>
         /// 新好友
         /// </summary>
-        NewFirend,
+        NewFriend,
     }
 }
