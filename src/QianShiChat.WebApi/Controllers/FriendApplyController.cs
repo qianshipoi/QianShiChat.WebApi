@@ -39,7 +39,6 @@ namespace QianShiChat.WebApi.Controllers
         /// <summary>
         /// 申请
         /// </summary>
-        /// <param name="userId"></param>
         /// <param name="dto"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
