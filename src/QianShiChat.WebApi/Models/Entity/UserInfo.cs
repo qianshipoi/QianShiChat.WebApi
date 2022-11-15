@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using QianShiChat.Common.Extensions;
+
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
 
@@ -18,7 +20,7 @@ namespace QianShiChat.WebApi.Models
 
         public string? Avatar { get; set; }
 
-        public DateTime CreateTime { get; set; }
+        public long CreateTime { get; set; }
 
         public bool IsDeleted { get; set; }
 
@@ -61,7 +63,6 @@ namespace QianShiChat.WebApi.Models
                 .HasComment("密码");
             builder.Property(x => x.CreateTime)
                 .IsRequired()
-                .ValueGeneratedOnAdd()
                 .HasComment("创建时间");
             builder.Property(x => x.IsDeleted)
                 .IsRequired()
@@ -69,9 +70,9 @@ namespace QianShiChat.WebApi.Models
                 .HasComment("是否已删除");
 
             builder.HasData(
-                new UserInfo { Id = 1, Account = "admin", Password = "E10ADC3949BA59ABBE56E057F20F883E", NickName = "Admin" },
-                    new UserInfo { Id = 2, Account = "qianshi", Password = "E10ADC3949BA59ABBE56E057F20F883E", NickName = "千矢" },
-                    new UserInfo { Id = 3, Account = "kuriyama", Password = "E10ADC3949BA59ABBE56E057F20F883E", NickName = "栗山未来" }
+                new UserInfo { Id = 1, Account = "admin", CreateTime = Timestamp.Now, Password = "E10ADC3949BA59ABBE56E057F20F883E", NickName = "Admin" },
+                    new UserInfo { Id = 2, Account = "qianshi", CreateTime = Timestamp.Now, Password = "E10ADC3949BA59ABBE56E057F20F883E", NickName = "千矢" },
+                    new UserInfo { Id = 3, Account = "kuriyama", CreateTime = Timestamp.Now, Password = "E10ADC3949BA59ABBE56E057F20F883E", NickName = "栗山未来" }
                 );
         }
     }

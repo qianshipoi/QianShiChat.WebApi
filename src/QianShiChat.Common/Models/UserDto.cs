@@ -8,6 +8,6 @@
 
         public string NickName { get; set; }
 
-        public DateTime CreateTime { get; set; }
+        public long CreateTime { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 
 using Microsoft.EntityFrameworkCore;
 
+using QianShiChat.Common.Extensions;
 using QianShiChat.Models;
 using QianShiChat.WebApi.Core.AutoDI;
 using QianShiChat.WebApi.Models;
@@ -52,10 +53,22 @@ namespace QianShiChat.WebApi.Services
                 .SingleOrDefaultAsync(cancellationToken);
 
             apply.Remark = dto.Remark;
-            apply.LaseUpdateTime = DateTime.Now;
+            apply.LaseUpdateTime = Timestamp.Now;
             await _context.SaveChangesAsync(cancellationToken);
 
             return _mapper.Map<FriendApplyDto>(apply);
+        }
+
+        public async Task<List<FriendApplyDto>> GetPendingListByUserAsync(int size, int userId, long beforeTime = 0, CancellationToken cancellationToken = default)
+        {
+            return await _context.FriendApplies
+                  .AsNoTracking()
+                  .Where(x => x.UserId == userId)
+                  .Where(x => x.CreateTime > beforeTime)
+                  .OrderByDescending(x => x.LaseUpdateTime)
+                  .Take(size)
+                  .ProjectTo<FriendApplyDto>(_mapper.ConfigurationProvider)
+                  .ToListAsync(cancellationToken);
         }
 
         public async Task<List<FriendApplyDto>> GetPendingListByUserAsync(int page, int size, int userId, CancellationToken cancellationToken = default)
@@ -87,7 +100,7 @@ namespace QianShiChat.WebApi.Services
                 .FirstAsync(cancellationToken);
 
             apply.Status = status;
-            apply.LaseUpdateTime = DateTime.Now;
+            apply.LaseUpdateTime = Timestamp.Now;
 
             if (status == ApplyStatus.Passed
                 && !await _context.UserRealtions.AnyAsync(x => x.UserId == apply.UserId && x.FriendId == apply.FriendId, cancellationToken))

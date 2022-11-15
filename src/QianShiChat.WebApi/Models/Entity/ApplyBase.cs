@@ -25,7 +25,7 @@ namespace QianShiChat.WebApi.Models
         /// 创建时间
         /// </summary>
         [Required]
-        public DateTime CreateTime { get; set; }
+        public long CreateTime { get; set; }
         /// <summary>
         /// 申请状态
         /// </summary>
@@ -40,7 +40,7 @@ namespace QianShiChat.WebApi.Models
         /// 最后更新时间
         /// </summary>
         [Required]
-        public DateTime LaseUpdateTime { get; set; }
+        public long LaseUpdateTime { get; set; }
         /// <summary>
         /// 目标
         /// </summary>

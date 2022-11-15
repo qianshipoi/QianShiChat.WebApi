@@ -9,7 +9,7 @@ namespace QianShiChat.WebApi.Models
     /// 好友申请
     /// </summary>
     [Table(nameof(FriendApply))]
-    [Index(nameof(ApplyBase.Id))]
+    [Index(nameof(Id))]
     public class FriendApply : ApplyBase
     {
         /// <summary>

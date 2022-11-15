@@ -19,7 +19,7 @@ namespace QianShiChat.Models
         /// <summary>
         /// 创建时间
         /// </summary>
-        public DateTime CreateTime { get; set; }
+        public long CreateTime { get; set; }
         /// <summary>
         /// 申请状态
         /// </summary>

@@ -29,5 +29,17 @@
                 CurrentSize = size
             };
         }
+
+        public static PagedList<T> Create<T>(IEnumerable<T> items, long total, int size) where T : class
+        {
+            return new PagedList<T>
+            {
+                Items = items,
+                Total = total,
+                CurrentSize = items.Count(),
+                CurrentPage = 0,
+                HasNext = items.Count() == size,
+            };
+        }
     }
 }

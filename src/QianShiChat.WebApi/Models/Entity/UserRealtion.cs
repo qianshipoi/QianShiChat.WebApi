@@ -36,7 +36,7 @@ namespace QianShiChat.WebApi.Models
         /// </summary>
         [Required]
         [Comment("创建时间")]
-        public DateTime CreateTime { get; set; }
+        public long CreateTime { get; set; }
 
         [ForeignKey(nameof(UserId))]
         public UserInfo User { get; set; }
