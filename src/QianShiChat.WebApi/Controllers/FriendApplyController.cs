@@ -94,13 +94,13 @@ namespace QianShiChat.WebApi.Controllers
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpGet("Pending")]
-        public async Task<PagedList<FriendApplyDto>> Pending(int page, int size, CancellationToken cancellationToken = default)
+        public async Task<PagedList<FriendApplyDto>> Pending([FromQuery]QueryFriendApplyPendingDto dto, CancellationToken cancellationToken = default)
         {
-            var items = await _friendApplyService.GetPendingListByUserAsync(page, size, CurrentUserId, cancellationToken);
+            var items = await _friendApplyService.GetPendingListByUserAsync(dto.Size, CurrentUserId, dto.BeforeLastTime, cancellationToken);
 
             var total = await _friendApplyService.GetPendingListCountByUserAsync(CurrentUserId, default);
 
-            return PagedList.Create(items, total, page, size);
+            return PagedList.Create(items, total, dto.Size);
         }
 
         /// <summary>

@@ -50,12 +50,22 @@ namespace QianShiChat.WebApi.Services
         /// <summary>
         /// 获取申请列表
         /// </summary>
-        /// <param name="page"></param>
         /// <param name="size"></param>
         /// <param name="userId"></param>
+        /// <param name="beforeTime"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<List<FriendApplyDto>> GetPendingListByUserAsync(int page, int size, int userId, CancellationToken cancellationToken = default);
+        Task<List<FriendApplyDto>> GetPendingListByUserAsync(int size, int userId, long beforeTime = 0, CancellationToken cancellationToken = default);
+
+        ///// <summary>
+        ///// 获取申请列表
+        ///// </summary>
+        ///// <param name="page"></param>
+        ///// <param name="size"></param>
+        ///// <param name="userId"></param>
+        ///// <param name="cancellationToken"></param>
+        ///// <returns></returns>
+        //Task<List<FriendApplyDto>> GetPendingListByUserAsync(int page, int size, int userId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// 审批

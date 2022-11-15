@@ -16,10 +16,11 @@ namespace QianShiChat.WebApi.Services
         private readonly ILogger<FriendService> _logger;
         private readonly IMapper _mapper;
 
-        public FriendService(ChatDbContext context, ILogger<FriendService> logger)
+        public FriendService(ChatDbContext context, ILogger<FriendService> logger, IMapper mapper)
         {
             _context = context;
             _logger = logger;
+            _mapper = mapper;
         }
 
         public async Task<bool> IsFriendAsync(int userId, int friendId, CancellationToken cancellationToken = default)
