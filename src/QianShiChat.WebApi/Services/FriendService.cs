@@ -42,6 +42,8 @@ namespace QianShiChat.WebApi.Services
             var friends = await _context.UserRealtions
                 .AsNoTracking()
                 .Where(x => x.UserId == userId)
+                .Include(x => x.Friend)
+                .Select(x => x.Friend)
                 .ToListAsync(cancellationToken);
 
             return _mapper.Map<List<UserDto>>(friends);
