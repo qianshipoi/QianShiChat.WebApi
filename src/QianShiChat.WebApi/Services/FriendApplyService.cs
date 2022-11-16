@@ -72,18 +72,6 @@ namespace QianShiChat.WebApi.Services
                   .ToListAsync(cancellationToken);
         }
 
-        //public async Task<List<FriendApplyDto>> GetPendingListByUserAsync(int page, int size, int userId, CancellationToken cancellationToken = default)
-        //{
-        //    return await _context.FriendApplies
-        //          .AsNoTracking()
-        //          .Where(x => x.UserId == userId)
-        //          .OrderByDescending(x => x.LaseUpdateTime)
-        //          .Skip((page - 1) * size)
-        //          .Take(size)
-        //          .ProjectTo<FriendApplyDto>(_mapper.ConfigurationProvider)
-        //          .ToListAsync(cancellationToken);
-        //}
-
         public async Task<long> GetPendingListCountByUserAsync(int userId, CancellationToken cancellationToken = default)
         {
             return await _context.FriendApplies

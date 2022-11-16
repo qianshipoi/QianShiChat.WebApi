@@ -9,7 +9,7 @@
 
         public static DateTimeOffset ToDateTimeOffset(this long timestamp)
         {
-            return DateTimeOffset.FromUnixTimeSeconds(timestamp);
+            return DateTimeOffset.FromUnixTimeMilliseconds(timestamp);
         }
 
         public static long Now => DateTimeOffset.Now.ToTimestamp();
