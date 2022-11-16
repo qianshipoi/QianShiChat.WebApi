@@ -23,7 +23,7 @@ namespace QianShiChat.WebApi.Controllers
             if (userIds is not null && userIds.Length > 0)
             {
                 await _hubContext.Clients.Users(userIds.Select(x => x.ToString()))
-                           .Notification(new NotificationMessage
+                           .Notification(new NotificationMessage(default, default)
                            {
                                Type = type,
                                Message = msg
@@ -31,7 +31,7 @@ namespace QianShiChat.WebApi.Controllers
             }
             else
             {
-                await _hubContext.Clients.All.Notification(new NotificationMessage
+                await _hubContext.Clients.All.Notification(new NotificationMessage(default, default)
                 {
                     Type = type,
                     Message = msg

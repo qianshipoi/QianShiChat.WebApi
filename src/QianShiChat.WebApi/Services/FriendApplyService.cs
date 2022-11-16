@@ -66,6 +66,7 @@ namespace QianShiChat.WebApi.Services
                   .Where(x => x.UserId == userId)
                   .Where(x => x.CreateTime > beforeTime)
                   .OrderByDescending(x => x.LaseUpdateTime)
+                  .ThenByDescending(x=>x.Id)
                   .Take(size)
                   .ProjectTo<FriendApplyDto>(_mapper.ConfigurationProvider)
                   .ToListAsync(cancellationToken);

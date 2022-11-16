@@ -1,11 +1,8 @@
 ﻿namespace QianShiChat.Models
 {
-    public class NotificationMessage
-    {
-        public NotificationType Type { get; set; }
+    public record PrivateChatMessage(int UserId, string Message);
 
-        public string Message { get; set; }
-    }
+    public record NotificationMessage(NotificationType Type, string Message);
 
     public enum NotificationType
     {

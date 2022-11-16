@@ -2,8 +2,12 @@ using EasyCaching.Core;
 
 using Microsoft.AspNetCore.SignalR;
 
+using QianShiChat.Common.Extensions;
 using QianShiChat.Models;
 using QianShiChat.WebApi.Services;
+
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace QianShiChat.WebApi.Hubs;
 
@@ -41,7 +45,7 @@ public class ChatHub : Hub<IChatClient>
     private async Task UserOnlineOffline(bool isOnline = true)
     {
         var ids = await _friendService.GetFriendIdsAsync(CurrentUserId);
-        await Clients.Users(ids.Select(x => x.ToString())).Notification(new NotificationMessage
+        await Clients.Users(ids.Select(x => x.ToString())).Notification(new NotificationMessage(default, default)
         {
             Type = isOnline ? NotificationType.FriendOnline : NotificationType.FriendOffline,
             Message = CurrentUserId.ToString()
@@ -59,4 +63,17 @@ public class ChatHub : Hub<IChatClient>
 
     public async Task SendMessage(string user, string message)
       => await Clients.All.ReceiveMessage(user, message);
+
+    public async Task PrivateChatSend(PrivateChatMessage message)
+    {
+        await Clients.User(message.UserId.ToString()).PrivateChat(new PrivateChatMessage(CurrentUserId, message.Message));
+        var cacheKey = GetPrivateCacheKey(message.UserId);
+        await _redisCachingProvider.HSetAsync(cacheKey, Timestamp.Now.ToString(), JsonSerializer.Serialize(message));
+    }
+
+    private string GetPrivateCacheKey(int userId)
+    {
+        return CurrentUserId > userId ? $"{userId}-{CurrentUserId}" : $"{CurrentUserId}-{userId}";
+    }
+
 }

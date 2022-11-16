@@ -7,5 +7,7 @@ namespace QianShiChat.WebApi.Hubs
         Task ReceiveMessage(string user, string text);
 
         Task Notification(NotificationMessage message);
+
+        Task PrivateChat(PrivateChatMessage message);
     }
 }
