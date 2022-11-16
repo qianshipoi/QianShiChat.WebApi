@@ -68,12 +68,6 @@ namespace QianShiChat.WebApi.Models
                 .IsRequired()
                 .HasDefaultValue(false)
                 .HasComment("是否已删除");
-
-            builder.HasData(
-                new UserInfo { Id = 1, Account = "admin", CreateTime = Timestamp.Now, Password = "E10ADC3949BA59ABBE56E057F20F883E", NickName = "Admin" },
-                    new UserInfo { Id = 2, Account = "qianshi", CreateTime = Timestamp.Now, Password = "E10ADC3949BA59ABBE56E057F20F883E", NickName = "千矢" },
-                    new UserInfo { Id = 3, Account = "kuriyama", CreateTime = Timestamp.Now, Password = "E10ADC3949BA59ABBE56E057F20F883E", NickName = "栗山未来" }
-                );
         }
     }
 }

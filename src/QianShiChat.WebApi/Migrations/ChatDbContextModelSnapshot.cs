@@ -54,6 +54,38 @@ namespace QianShiChat.WebApi.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("FriendApply");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreateTime = 1668583992424L,
+                            FriendId = 2,
+                            LaseUpdateTime = 1668583992424L,
+                            Remark = "很高兴认识你。",
+                            Status = (sbyte)3,
+                            UserId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreateTime = 1668583992424L,
+                            FriendId = 2,
+                            LaseUpdateTime = 1668583992424L,
+                            Remark = "Nice to meet you.",
+                            Status = (sbyte)2,
+                            UserId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreateTime = 1668583992424L,
+                            FriendId = 3,
+                            LaseUpdateTime = 1668583992424L,
+                            Remark = "hi!",
+                            Status = (sbyte)1,
+                            UserId = 1
+                        });
                 });
 
             modelBuilder.Entity("QianShiChat.WebApi.Models.UserInfo", b =>
@@ -103,7 +135,7 @@ namespace QianShiChat.WebApi.Migrations
                         {
                             Id = 1,
                             Account = "admin",
-                            CreateTime = 1668481855841L,
+                            CreateTime = 1668583992424L,
                             IsDeleted = false,
                             NickName = "Admin",
                             Password = "E10ADC3949BA59ABBE56E057F20F883E"
@@ -112,7 +144,7 @@ namespace QianShiChat.WebApi.Migrations
                         {
                             Id = 2,
                             Account = "qianshi",
-                            CreateTime = 1668481855841L,
+                            CreateTime = 1668583992424L,
                             IsDeleted = false,
                             NickName = "千矢",
                             Password = "E10ADC3949BA59ABBE56E057F20F883E"
@@ -121,9 +153,63 @@ namespace QianShiChat.WebApi.Migrations
                         {
                             Id = 3,
                             Account = "kuriyama",
-                            CreateTime = 1668481855841L,
+                            CreateTime = 1668583992424L,
                             IsDeleted = false,
                             NickName = "栗山未来",
+                            Password = "E10ADC3949BA59ABBE56E057F20F883E"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Account = "admin1",
+                            CreateTime = 1668583992424L,
+                            IsDeleted = false,
+                            NickName = "Admin1",
+                            Password = "E10ADC3949BA59ABBE56E057F20F883E"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Account = "qianshi1",
+                            CreateTime = 1668583992424L,
+                            IsDeleted = false,
+                            NickName = "千矢1",
+                            Password = "E10ADC3949BA59ABBE56E057F20F883E"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Account = "kuriyama1",
+                            CreateTime = 1668583992424L,
+                            IsDeleted = false,
+                            NickName = "栗山未来1",
+                            Password = "E10ADC3949BA59ABBE56E057F20F883E"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Account = "admin2",
+                            CreateTime = 1668583992424L,
+                            IsDeleted = false,
+                            NickName = "Admin2",
+                            Password = "E10ADC3949BA59ABBE56E057F20F883E"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Account = "qianshi2",
+                            CreateTime = 1668583992424L,
+                            IsDeleted = false,
+                            NickName = "千矢2",
+                            Password = "E10ADC3949BA59ABBE56E057F20F883E"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Account = "kuriyama2",
+                            CreateTime = 1668583992424L,
+                            IsDeleted = false,
+                            NickName = "栗山未来2",
                             Password = "E10ADC3949BA59ABBE56E057F20F883E"
                         });
                 });
@@ -156,6 +242,36 @@ namespace QianShiChat.WebApi.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserRealtion");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreateTime = 1668583992424L,
+                            FriendId = 2,
+                            UserId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreateTime = 1668583992424L,
+                            FriendId = 1,
+                            UserId = 2
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreateTime = 1668583992424L,
+                            FriendId = 3,
+                            UserId = 2
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreateTime = 1668583992424L,
+                            FriendId = 2,
+                            UserId = 3
+                        });
                 });
 
             modelBuilder.Entity("QianShiChat.WebApi.Models.FriendApply", b =>
