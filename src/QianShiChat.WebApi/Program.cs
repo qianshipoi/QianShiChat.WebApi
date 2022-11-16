@@ -10,7 +10,12 @@ using QianShiChat.WebApi.Services;
 
 using System.Reflection;
 
+using Yitter.IdGenerator;
+
 const string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+var options = new IdGeneratorOptions(1);
+YitIdHelper.SetIdGenerator(options);
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);

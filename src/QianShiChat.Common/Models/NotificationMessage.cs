@@ -1,6 +1,8 @@
 ﻿namespace QianShiChat.Models
 {
-    public record PrivateChatMessage(int UserId, string Message);
+    public record PrivateChatMessageRequest(int UserId, string Message);
+
+    public record PrivateChatMessage(long Id, int UserId, string Message);
 
     public record NotificationMessage(NotificationType Type, string Message);
 

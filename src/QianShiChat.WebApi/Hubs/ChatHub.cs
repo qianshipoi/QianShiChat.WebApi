@@ -9,6 +9,8 @@ using QianShiChat.WebApi.Services;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+using Yitter.IdGenerator;
+
 namespace QianShiChat.WebApi.Hubs;
 
 public class ChatHub : Hub<IChatClient>
@@ -64,9 +66,14 @@ public class ChatHub : Hub<IChatClient>
     public async Task SendMessage(string user, string message)
       => await Clients.All.ReceiveMessage(user, message);
 
-    public async Task PrivateChatSend(PrivateChatMessage message)
+    public async Task PrivateChatSend(PrivateChatMessageRequest request)
     {
-        await Clients.User(message.UserId.ToString()).PrivateChat(new PrivateChatMessage(CurrentUserId, message.Message));
+        var message = new PrivateChatMessage(
+            YitIdHelper.NextId(),
+            CurrentUserId,
+            request.Message);
+
+        await Clients.User(request.UserId.ToString()).PrivateChat(message);
         var cacheKey = GetPrivateCacheKey(message.UserId);
         await _redisCachingProvider.HSetAsync(cacheKey, Timestamp.Now.ToString(), JsonSerializer.Serialize(message));
     }
