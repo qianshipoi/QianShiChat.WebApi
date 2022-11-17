@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.SignalR;
 
 using QianShiChat.Common.Extensions;
 using QianShiChat.Models;
+using QianShiChat.WebApi.Models.Entity;
 using QianShiChat.WebApi.Services;
 
 using System.Text.Json;
@@ -76,6 +77,22 @@ public class ChatHub : Hub<IChatClient>
         await Clients.User(request.UserId.ToString()).PrivateChat(message);
         var cacheKey = GetPrivateCacheKey(request.UserId);
         await _redisCachingProvider.HSetAsync(cacheKey, Timestamp.Now.ToString(), JsonSerializer.Serialize(message));
+
+        var now = Timestamp.Now;
+
+        var chatMessage = new ChatMessage()
+        {
+            Id = YitIdHelper.NextId(),
+            Content = request.Message,
+            CreateTime = now,
+            FormId = CurrentUserId,
+            ToId = request.UserId,
+            LastUpdateTime = now,
+            MessageType = Common.Models.ChatMessageType.Text,
+            SendType = Common.Models.ChatMessageSendType.Personal
+        };
+
+        await _redisCachingProvider.HSetAsync(AppConsts.ChatMessageCacheKey, chatMessage.Id.ToString(), JsonSerializer.Serialize(chatMessage));
 
         return message;
     }

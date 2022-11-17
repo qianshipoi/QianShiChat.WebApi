@@ -6,7 +6,10 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 using QianShiChat.WebApi;
+using QianShiChat.WebApi.BackgroundHost;
 using QianShiChat.WebApi.Models;
+
+using Quartz;
 
 using System.Text;
 
@@ -83,5 +86,34 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
+        /// <summary>
+        /// 后台持久化消息服务
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddSaveChatMessageJob(this IServiceCollection services)
+        {
+            services.AddQuartz(q =>
+            {
+                // base Quartz scheduler, job and trigger configuration
+                q.UseMicrosoftDependencyInjectionJobFactory();
+                var jobKey = nameof(SaveChatMessageJob);
+                q.AddJob<SaveChatMessageJob>(options => options.WithIdentity(jobKey));
+                q.AddTrigger(options => options
+                    .ForJob(jobKey)
+                    .WithIdentity(jobKey + "_trigger")
+                    .WithDailyTimeIntervalSchedule(opt => opt.WithIntervalInMinutes(5))
+                );
+            });
+
+            // ASP.NET Core hosting
+            services.AddQuartzServer(options =>
+            {
+                // when shutting down we want jobs to complete gracefully
+                options.WaitForJobsToComplete = true;
+            });
+
+            return services;
+        }
     }
 }

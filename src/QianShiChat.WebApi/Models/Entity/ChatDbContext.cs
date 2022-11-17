@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
 using QianShiChat.Common.Extensions;
+using QianShiChat.WebApi.Models.Entity;
 
 namespace QianShiChat.WebApi.Models
 {
@@ -11,6 +12,7 @@ namespace QianShiChat.WebApi.Models
         public DbSet<UserRealtion> UserRealtions { get; set; }
 
         public DbSet<FriendApply> FriendApplies { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
 
         public ChatDbContext(DbContextOptions options) : base(options)
         {
@@ -21,7 +23,7 @@ namespace QianShiChat.WebApi.Models
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(Program).Assembly);
 
-            var nowTime = Timestamp.Now;
+            var nowTime = 1668583992424L;
             var password = "E10ADC3949BA59ABBE56E057F20F883E";
 
             var userInfos = new List<UserInfo>()

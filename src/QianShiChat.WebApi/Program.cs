@@ -82,6 +82,7 @@ builder.Services.AddSignalR()
 
 builder.Services.AddAutoDI();
 builder.Services.AddCache(builder.Configuration);
+builder.Services.AddSaveChatMessageJob();
 
 builder.Services.AddMediatR(x => x.AsScoped(), typeof(Program));
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
