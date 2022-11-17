@@ -1,3 +1,5 @@
+using AutoMapper;
+
 using EasyCaching.Core;
 
 using Microsoft.AspNetCore.SignalR;
@@ -7,6 +9,7 @@ using QianShiChat.Models;
 using QianShiChat.WebApi.Models.Entity;
 using QianShiChat.WebApi.Services;
 
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -21,11 +24,13 @@ public class ChatHub : Hub<IChatClient>
 
     private readonly IFriendService _friendService;
     private readonly IRedisCachingProvider _redisCachingProvider;
+    private readonly IMapper _mapper;
 
-    public ChatHub(IFriendService friendService, IRedisCachingProvider redisCachingProvider)
+    public ChatHub(IFriendService friendService, IRedisCachingProvider redisCachingProvider, IMapper mapper)
     {
         _friendService = friendService;
         _redisCachingProvider = redisCachingProvider;
+        _mapper = mapper;
     }
 
     public override async Task OnConnectedAsync()
@@ -67,17 +72,8 @@ public class ChatHub : Hub<IChatClient>
     public async Task SendMessage(string user, string message)
       => await Clients.All.ReceiveMessage(user, message);
 
-    public async Task<PrivateChatMessage> PrivateChatSend(PrivateChatMessageRequest request)
+    public async Task<ChatMessageDto> PrivateChatSend(PrivateChatMessageRequest request)
     {
-        var message = new PrivateChatMessage(
-            YitIdHelper.NextId(),
-            request.UserId,
-            request.Message);
-
-        await Clients.User(request.UserId.ToString()).PrivateChat(message);
-        var cacheKey = GetPrivateCacheKey(request.UserId);
-        await _redisCachingProvider.HSetAsync(cacheKey, Timestamp.Now.ToString(), JsonSerializer.Serialize(message));
-
         var now = Timestamp.Now;
 
         var chatMessage = new ChatMessage()
@@ -85,16 +81,36 @@ public class ChatHub : Hub<IChatClient>
             Id = YitIdHelper.NextId(),
             Content = request.Message,
             CreateTime = now,
-            FormId = CurrentUserId,
+            FromId = CurrentUserId,
             ToId = request.UserId,
             LastUpdateTime = now,
-            MessageType = Common.Models.ChatMessageType.Text,
-            SendType = Common.Models.ChatMessageSendType.Personal
+            MessageType = ChatMessageType.Text,
+            SendType = ChatMessageSendType.Personal
         };
+        var chatMessageDto = _mapper.Map<ChatMessageDto>(chatMessage);
 
+        // send message.
+        await Clients.User(request.UserId.ToString()).PrivateChat(chatMessageDto);
+
+        // cache message max 30 times;
+        var cacheKey = GetPrivateCacheKey(request.UserId);
+
+        var cacheValue = await _redisCachingProvider.HGetAllAsync(cacheKey);
+        if (cacheValue == null) cacheValue = new Dictionary<string, string>();
+
+        cacheValue.Add(chatMessageDto.Id.ToString(), JsonSerializer.Serialize(chatMessageDto));
+
+        if (cacheValue.Count > 30)
+        {
+            cacheValue.Remove(cacheValue.Keys.Min());
+        }
+
+        await _redisCachingProvider.HMSetAsync(cacheKey, cacheValue, TimeSpan.FromDays(1));
+
+        // cache save message queue.
         await _redisCachingProvider.HSetAsync(AppConsts.ChatMessageCacheKey, chatMessage.Id.ToString(), JsonSerializer.Serialize(chatMessage));
 
-        return message;
+        return chatMessageDto;
     }
 
     private string GetPrivateCacheKey(int userId)

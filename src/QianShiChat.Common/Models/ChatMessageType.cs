@@ -1,4 +1,4 @@
-﻿namespace QianShiChat.Common.Models
+﻿namespace QianShiChat.Models
 {
     public enum ChatMessageType : sbyte
     {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-using QianShiChat.Common.Models;
+using QianShiChat.Models;
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -16,7 +16,7 @@ namespace QianShiChat.WebApi.Models.Entity
         public long Id { get; set; }
 
         [Required]
-        public int FormId { get; set; }
+        public int FromId { get; set; }
 
         [Required]
         public int ToId { get; set; }
@@ -38,5 +38,12 @@ namespace QianShiChat.WebApi.Models.Entity
 
         [Required]
         public bool IsDeleted { get; set; }
+
+
+        [ForeignKey(nameof(FromId))]
+        public UserInfo FromUser { get; set; }
+
+        [NotMapped]
+        public UserInfo ToUser { get; set; }
     }
 }

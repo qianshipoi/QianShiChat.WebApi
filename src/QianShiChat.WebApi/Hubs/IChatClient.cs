@@ -8,6 +8,6 @@ namespace QianShiChat.WebApi.Hubs
 
         Task Notification(NotificationMessage message);
 
-        Task PrivateChat(PrivateChatMessage message);
+        Task PrivateChat(ChatMessageDto message);
     }
 }
