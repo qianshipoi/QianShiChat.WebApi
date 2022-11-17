@@ -66,16 +66,18 @@ public class ChatHub : Hub<IChatClient>
     public async Task SendMessage(string user, string message)
       => await Clients.All.ReceiveMessage(user, message);
 
-    public async Task PrivateChatSend(PrivateChatMessageRequest request)
+    public async Task<PrivateChatMessage> PrivateChatSend(PrivateChatMessageRequest request)
     {
         var message = new PrivateChatMessage(
             YitIdHelper.NextId(),
-            CurrentUserId,
+            request.UserId,
             request.Message);
 
         await Clients.User(request.UserId.ToString()).PrivateChat(message);
-        var cacheKey = GetPrivateCacheKey(message.UserId);
+        var cacheKey = GetPrivateCacheKey(request.UserId);
         await _redisCachingProvider.HSetAsync(cacheKey, Timestamp.Now.ToString(), JsonSerializer.Serialize(message));
+
+        return message;
     }
 
     private string GetPrivateCacheKey(int userId)
