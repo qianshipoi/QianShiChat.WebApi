@@ -14,6 +14,8 @@ namespace QianShiChat.WebApi.Models
         public DbSet<FriendApply> FriendApplies { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
 
+        public DbSet<MessageCursor> MessageCursors { get; set; }
+
         public ChatDbContext(DbContextOptions options) : base(options)
         {
         }

@@ -15,6 +15,10 @@ namespace QianShiChat.WebApi
 
             CreateMap<UserInfo, UserDto>()
                 .ReverseMap();
+
+            CreateMap<UserDto, UserWithMessage>()
+                .ReverseMap();
+
         }
     }
 }

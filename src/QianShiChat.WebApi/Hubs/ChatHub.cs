@@ -93,7 +93,7 @@ public class ChatHub : Hub<IChatClient>
         await Clients.User(request.UserId.ToString()).PrivateChat(chatMessageDto);
 
         // cache message max 30 times;
-        var cacheKey = GetPrivateCacheKey(request.UserId);
+        var cacheKey = AppConsts.GetPrivateChatCacheKey(request.UserId, CurrentUserId);
 
         var cacheValue = await _redisCachingProvider.HGetAllAsync(cacheKey);
         if (cacheValue == null) cacheValue = new Dictionary<string, string>();
@@ -108,14 +108,25 @@ public class ChatHub : Hub<IChatClient>
         await _redisCachingProvider.HMSetAsync(cacheKey, cacheValue, TimeSpan.FromDays(1));
 
         // cache save message queue.
-        await _redisCachingProvider.HSetAsync(AppConsts.ChatMessageCacheKey, chatMessage.Id.ToString(), JsonSerializer.Serialize(chatMessage));
+        await _redisCachingProvider.HSetAsync(
+            AppConsts.ChatMessageCacheKey,
+            chatMessage.Id.ToString(),
+            JsonSerializer.Serialize(chatMessage));
+
+        // cache update message cursor
+        await _redisCachingProvider.HSetAsync(
+            AppConsts.MessageCursorCacheKey,
+            AppConsts.GetMessageCursorCacheKey(CurrentUserId, request.UserId, ChatMessageSendType.Personal),
+            chatMessage.Id.ToString());
 
         return chatMessageDto;
     }
 
-    private string GetPrivateCacheKey(int userId)
+    public async Task UpdateMesssageCursor(UpdateCursorRequest request)
     {
-        return CurrentUserId > userId ? $"{userId}-{CurrentUserId}" : $"{CurrentUserId}-{userId}";
+        await _redisCachingProvider.HSetAsync(
+            AppConsts.MessageCursorCacheKey,
+            AppConsts.GetMessageCursorCacheKey(CurrentUserId, request.ToId, request.Type),
+            request.Position.ToString());
     }
-
 }
