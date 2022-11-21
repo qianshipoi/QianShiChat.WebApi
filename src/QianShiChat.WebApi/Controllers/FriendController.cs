@@ -27,17 +27,9 @@ namespace QianShiChat.WebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<List<UserWithMessage>>> GetAllFriends(CancellationToken cancellationToken = default)
         {
-            var userWithMessages = new List<UserWithMessage>();
-            var friends = await _friendService.GetFriendsAsync(CurrentUserId, cancellationToken);
-
-            foreach (var friend in friends)
-            {
-                var userWithMessage = _mapper.Map<UserWithMessage>(friend);
-                userWithMessage.Messages = await _chatMessageService.GetNewMessageAndCacheAsync(friend.Id, CurrentUserId, cancellationToken);
-                userWithMessages.Add(userWithMessage);
-            }
-
-            return Ok(userWithMessages);
+            var friends = await _friendService
+                .GetNewMessageFriendsAsync(CurrentUserId, cancellationToken);
+            return Ok(friends);
         }
     }
 }

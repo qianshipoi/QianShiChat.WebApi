@@ -13,9 +13,7 @@ namespace QianShiChat.WebApi.Profiles
             CreateMap<ChatMessage, ChatMessageDto>();
 
             CreateMap<UpdateCursorRequest, MessageCursor>()
-                .ForMember(d => d.CurrentPosition, m => m.MapFrom(s => s.Position))
-                .ForMember(d => d.LastUpdateTime, m => m.MapFrom(s => Timestamp.Now))
-                .ForMember(d => d.SendType, m => m.MapFrom(s => s.Type));
+                .ForMember(d => d.LastUpdateTime, m => m.MapFrom(s => Timestamp.Now));
         }
     }
 }

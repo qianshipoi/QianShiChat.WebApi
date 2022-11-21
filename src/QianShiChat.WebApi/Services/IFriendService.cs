@@ -21,6 +21,14 @@ namespace QianShiChat.WebApi.Services
         Task<List<UserDto>> GetFriendsAsync(int userId, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// get all new message friends.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<List<UserWithMessage>> GetNewMessageFriendsAsync(int userId, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// 判断是否为好友
         /// </summary>
         /// <param name="userId"></param>

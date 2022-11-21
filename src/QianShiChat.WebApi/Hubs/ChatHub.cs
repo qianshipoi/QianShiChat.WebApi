@@ -9,9 +9,7 @@ using QianShiChat.Models;
 using QianShiChat.WebApi.Models.Entity;
 using QianShiChat.WebApi.Services;
 
-using System.Collections.Generic;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 using Yitter.IdGenerator;
 
@@ -114,10 +112,7 @@ public class ChatHub : Hub<IChatClient>
             JsonSerializer.Serialize(chatMessage));
 
         // cache update message cursor
-        await _redisCachingProvider.HSetAsync(
-            AppConsts.MessageCursorCacheKey,
-            AppConsts.GetMessageCursorCacheKey(CurrentUserId, request.UserId, ChatMessageSendType.Personal),
-            chatMessage.Id.ToString());
+        await UpdateMesssageCursor(new UpdateCursorRequest { Position = chatMessage.Id });
 
         return chatMessageDto;
     }
@@ -126,7 +121,7 @@ public class ChatHub : Hub<IChatClient>
     {
         await _redisCachingProvider.HSetAsync(
             AppConsts.MessageCursorCacheKey,
-            AppConsts.GetMessageCursorCacheKey(CurrentUserId, request.ToId, request.Type),
+            CurrentUserId.ToString(),
             request.Position.ToString());
     }
 }

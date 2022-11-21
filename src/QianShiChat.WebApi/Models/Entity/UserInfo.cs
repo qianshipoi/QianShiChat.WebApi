@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using QianShiChat.Common.Extensions;
+using QianShiChat.WebApi.Models.Entity;
 
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
@@ -36,6 +37,7 @@ namespace QianShiChat.WebApi.Models
         [InverseProperty(nameof(FriendApply.Friend))]
         public List<FriendApply> FriendApplyFriends { get; set; } = new();
 
+        public MessageCursor Cursor { get; set; }
     }
 
     public class UserInfoEntityTypeConfiguration : IEntityTypeConfiguration<UserInfo>

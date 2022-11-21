@@ -22,9 +22,9 @@ namespace QianShiChat.WebApi.Services
         private readonly IMapper _mapper;
 
         public ChatMessageService(
-            IRedisCachingProvider redisCachingProvider, 
-            ChatDbContext context, 
-            ILogger<ChatMessageService> logger, 
+            IRedisCachingProvider redisCachingProvider,
+            ChatDbContext context,
+            ILogger<ChatMessageService> logger,
             IMapper mapper)
         {
             _redisCachingProvider = redisCachingProvider;
@@ -32,9 +32,10 @@ namespace QianShiChat.WebApi.Services
             _logger = logger;
             _mapper = mapper;
         }
+
         public async Task<List<ChatMessageDto>> GetNewMessageAndCacheAsync(
-            int userId1, 
-            int userId2, 
+            int userId1,
+            int userId2,
             CancellationToken cancellationToken = default)
         {
             var cacheKey = AppConsts.GetPrivateChatCacheKey(userId1, userId2);
@@ -56,7 +57,7 @@ namespace QianShiChat.WebApi.Services
 
             if (messages.Count < 10)
             {
-                var minId = messages.Min(x => x.Id);
+                var minId = messages.Count > 0 ? messages.Min(x => x.Id) : long.MaxValue;
 
                 var data = await _context.ChatMessages.AsNoTracking()
                      .Where(x => x.SendType == ChatMessageSendType.Personal)
@@ -65,6 +66,7 @@ namespace QianShiChat.WebApi.Services
                      .OrderByDescending(x => x.Id)
                      .Take(10 - messages.Count)
                      .ToListAsync(cancellationToken);
+
                 if (data.Count > 0)
                 {
                     messages.AddRange(data);
@@ -85,7 +87,7 @@ namespace QianShiChat.WebApi.Services
             CancellationToken cancellationToken = default)
         {
             var cursorInfo = await _context.MessageCursors
-                .FindAsync(new object[] { userId, request.ToId, request.Type }, cancellationToken);
+                .FindAsync(new object[] { userId }, cancellationToken);
 
             if (cursorInfo == null)
             {

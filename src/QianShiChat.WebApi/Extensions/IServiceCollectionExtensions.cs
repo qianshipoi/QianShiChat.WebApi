@@ -104,6 +104,13 @@ namespace Microsoft.Extensions.DependencyInjection
                     .WithIdentity(jobKey + "_trigger")
                     .WithDailyTimeIntervalSchedule(opt => opt.WithIntervalInMinutes(5))
                 );
+
+                var messageCursorJobKey = nameof(SaveMessageCursorJob);
+                q.AddJob<SaveMessageCursorJob>(options => options.WithIdentity(messageCursorJobKey));
+                q.AddTrigger(options => options
+                    .ForJob(messageCursorJobKey)
+                    .WithIdentity(jobKey + "_trigger")
+                    .WithDailyTimeIntervalSchedule(opt => opt.WithIntervalInMinutes(2)));
             });
 
             // ASP.NET Core hosting

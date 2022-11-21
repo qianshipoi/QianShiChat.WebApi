@@ -10,7 +10,7 @@ using QianShiChat.WebApi.Models;
 namespace QianShiChat.WebApi.Migrations
 {
     [DbContext(typeof(ChatDbContext))]
-    [Migration("20221118133308_v1.0.3")]
+    [Migration("20221121060332_v1.0.3")]
     partial class v103
     {
         /// <inheritdoc />
@@ -64,29 +64,18 @@ namespace QianShiChat.WebApi.Migrations
             modelBuilder.Entity("QianShiChat.WebApi.Models.Entity.MessageCursor", b =>
                 {
                     b.Property<int>("UserId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasComment("sender user id");
-
-                    b.Property<int>("ToId")
-                        .HasColumnType("int")
-                        .HasComment("receiver id (user or group)");
-
-                    b.Property<sbyte>("SendType")
-                        .HasColumnType("tinyint")
-                        .HasComment("ToId type");
-
-                    b.Property<long>("CurrentPosition")
-                        .HasColumnType("bigint")
-                        .HasComment("message current position");
+                        .HasComment("user id");
 
                     b.Property<long>("LastUpdateTime")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("StartPosition")
+                    b.Property<long>("Postiton")
                         .HasColumnType("bigint")
-                        .HasComment("message start position");
+                        .HasComment("message position");
 
-                    b.HasKey("UserId", "ToId", "SendType");
+                    b.HasKey("UserId");
 
                     b.ToTable("MessageCursor");
                 });
