@@ -104,6 +104,8 @@ if (app.Environment.IsDevelopment())
 }
 app.UseCors("MyAllowSpecificOrigins");
 
+app.UseStaticFiles();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

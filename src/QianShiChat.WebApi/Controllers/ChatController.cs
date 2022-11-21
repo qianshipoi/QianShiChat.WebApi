@@ -2,39 +2,79 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.StaticFiles;
+
+using QianShiChat.Common.Extensions;
+using QianShiChat.WebApi.Hubs;
+using QianShiChat.WebApi.Models.Requests;
+
+using static System.Net.Mime.MediaTypeNames;
 
 namespace QianShiChat.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class ChatController : BaseController
     {
         private readonly IRedisCachingProvider _redisCachingProvider;
-        public ChatController(IRedisCachingProvider redisCachingProvider)
+        private readonly IHubContext<ChatHub, IChatClient> _hubContext;
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        public ChatController(
+            IRedisCachingProvider redisCachingProvider,
+            IHubContext<ChatHub, IChatClient> hubContext,
+            IWebHostEnvironment webHostEnvironment)
         {
             _redisCachingProvider = redisCachingProvider;
+            _hubContext = hubContext;
+            _webHostEnvironment = webHostEnvironment;
         }
 
-        private const string LUA_SCRIPT_DELETE_KEY = "local current = redis.call('hget', KEYS[1], ARGV[1]);" +
-           "if current == false then " +
-           "    return nil;" +
-           "end " +
-           "if current == ARGV[2] then " +
-           "    return redis.call('hdel', KEYS[1], ARGV[1]);" +
-           "else " +
-           "    return 0;" +
-           "end";
-
-        [HttpGet]
-        public async Task<IActionResult> Get(string field, string val)
+        [HttpGet("{filename}")]
+        public async Task<IActionResult> GetFile(string filename)
         {
-            var result = await _redisCachingProvider.EvalAsync(LUA_SCRIPT_DELETE_KEY, "1",
-                  new List<object> { field, val });
+            var wwwroot = _webHostEnvironment.WebRootPath;
 
-            return Ok(result);
+            var filePath = Path.Combine(wwwroot, filename);
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound();
+            }
+
+            new FileExtensionContentTypeProvider()
+                .Mappings.TryGetValue(Path.GetExtension(filePath), out var contenttype);
+
+            return PhysicalFile(filePath, contenttype ?? "application/octet-stream");
         }
 
+        [HttpPost("file")]
+        public async Task<IActionResult> SendFile(
+            [FromForm] ShedFileRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            // save to wwwroot
+            var wwwroot = _webHostEnvironment.WebRootPath;
 
+            var fileExt = Path.GetExtension(request.File.FileName);
+            using var stream = request.File.OpenReadStream();
+            var md5 = stream.ToMd5();
+
+            var saveFilePath = Path.Combine(wwwroot, md5 + fileExt);
+
+            using var fileStream = new FileStream(saveFilePath, FileMode.OpenOrCreate, FileAccess.Write);
+            stream.CopyTo(fileStream);
+            await fileStream.FlushAsync();
+
+            // send message
+            //await _hubContext.Clients.User(request.ToId.ToString()).PrivateChat(new QianShiChat.Models.ChatMessageDto
+            //{
+            //    Id = Yitter.IdGenerator.YitIdHelper.NextId(),
+            //    Content = 
+            //});
+
+            return CreatedAtAction(nameof(GetFile), new { filename = md5 + fileExt }, "");
+        }
     }
 }
