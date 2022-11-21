@@ -24,12 +24,20 @@ namespace QianShiChat.WebApi.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<List<UserWithMessage>>> GetAllFriends(CancellationToken cancellationToken = default)
+        [HttpGet("unread")]
+        public async Task<ActionResult<List<UserWithMessage>>> GetAllUnreadMessageFriends(CancellationToken cancellationToken = default)
         {
             var friends = await _friendService
                 .GetNewMessageFriendsAsync(CurrentUserId, cancellationToken);
             return Ok(friends);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<UserDto>>> GetAllFriends(CancellationToken cancellationToken
+            = default)
+        {
+            var result = await _friendService.GetFriendsAsync(CurrentUserId, cancellationToken);
+            return Ok(result);
         }
     }
 }
