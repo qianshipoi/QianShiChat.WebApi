@@ -1,13 +1,15 @@
 ﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
+using QianShiChat.WebApi.Core.AutoDI;
+
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
 namespace QianShiChat.WebApi.Services
 {
-    public class JwtService : IJwtService
+    public class JwtService : IJwtService, IScoped
     {
         private JwtOptions _jwtOptions;
 

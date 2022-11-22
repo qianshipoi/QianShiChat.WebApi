@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 using QianShiChat.WebApi;
 using QianShiChat.WebApi.BackgroundHost;
@@ -11,6 +12,7 @@ using QianShiChat.WebApi.Models;
 
 using Quartz;
 
+using System.Reflection;
 using System.Text;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -118,6 +120,55 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 // when shutting down we want jobs to complete gracefully
                 options.WaitForJobsToComplete = true;
+            });
+
+            return services;
+        }
+
+        /// <summary>
+        /// Add open api
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddOpenApi(this IServiceCollection services)
+        {
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "QianShiChat API",
+                });
+
+                // using System.Reflection;
+                var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
+                //添加授权
+                var schemeName = "Bearer";
+                options.AddSecurityDefinition(schemeName, new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "请输入不带有Bearer的Token",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = schemeName.ToLowerInvariant(),
+                    BearerFormat = "JWT"
+                });
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = schemeName
+                            }
+                        },
+                        new string[0]
+                    }
+                });
             });
 
             return services;

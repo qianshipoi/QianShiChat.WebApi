@@ -61,7 +61,7 @@ namespace QianShiChat.WebApi.Controllers
             using var stream = request.File.OpenReadStream();
             var md5 = stream.ToMd5();
 
-            var saveFilePath = Path.Combine(wwwroot, md5 + fileExt);
+            var saveFilePath = Path.Combine(wwwroot, "chat", md5 + fileExt);
 
             using var fileStream = new FileStream(saveFilePath, FileMode.OpenOrCreate, FileAccess.Write);
             stream.CopyTo(fileStream);
