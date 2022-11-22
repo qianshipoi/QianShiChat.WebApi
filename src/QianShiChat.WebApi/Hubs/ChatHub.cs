@@ -4,14 +4,8 @@ using EasyCaching.Core;
 
 using Microsoft.AspNetCore.SignalR;
 
-using QianShiChat.Common.Extensions;
 using QianShiChat.Models;
-using QianShiChat.WebApi.Models.Entity;
 using QianShiChat.WebApi.Services;
-
-using System.Text.Json;
-
-using Yitter.IdGenerator;
 
 namespace QianShiChat.WebApi.Hubs;
 
@@ -65,63 +59,5 @@ public class ChatHub : Hub<IChatClient>
         {
             await _redisCachingProvider.HDelAsync(OnlineCacheKey, new string[] { CurrentUserId.ToString() });
         }
-    }
-
-    public async Task SendMessage(string user, string message)
-      => await Clients.All.ReceiveMessage(user, message);
-
-    public async Task<ChatMessageDto> PrivateChatSend(PrivateChatMessageRequest request)
-    {
-        var now = Timestamp.Now;
-
-        var chatMessage = new ChatMessage()
-        {
-            Id = YitIdHelper.NextId(),
-            Content = request.Message,
-            CreateTime = now,
-            FromId = CurrentUserId,
-            ToId = request.UserId,
-            LastUpdateTime = now,
-            MessageType = ChatMessageType.Text,
-            SendType = ChatMessageSendType.Personal
-        };
-        var chatMessageDto = _mapper.Map<ChatMessageDto>(chatMessage);
-
-        // send message.
-        await Clients.User(request.UserId.ToString()).PrivateChat(chatMessageDto);
-
-        // cache message max 30 times;
-        var cacheKey = AppConsts.GetPrivateChatCacheKey(request.UserId, CurrentUserId);
-
-        var cacheValue = await _redisCachingProvider.HGetAllAsync(cacheKey);
-        if (cacheValue == null) cacheValue = new Dictionary<string, string>();
-
-        cacheValue.Add(chatMessageDto.Id.ToString(), JsonSerializer.Serialize(chatMessageDto));
-
-        if (cacheValue.Count > 30)
-        {
-            cacheValue.Remove(cacheValue.Keys.Min());
-        }
-
-        await _redisCachingProvider.HMSetAsync(cacheKey, cacheValue, TimeSpan.FromDays(1));
-
-        // cache save message queue.
-        await _redisCachingProvider.HSetAsync(
-            AppConsts.ChatMessageCacheKey,
-            chatMessage.Id.ToString(),
-            JsonSerializer.Serialize(chatMessage));
-
-        // cache update message cursor
-        await UpdateMesssageCursor(new UpdateCursorRequest { Position = chatMessage.Id });
-
-        return chatMessageDto;
-    }
-
-    public async Task UpdateMesssageCursor(UpdateCursorRequest request)
-    {
-        await _redisCachingProvider.HSetAsync(
-            AppConsts.MessageCursorCacheKey,
-            CurrentUserId.ToString(),
-            request.Position.ToString());
     }
 }

@@ -2,6 +2,8 @@ using FluentValidation;
 
 using MediatR;
 
+using Microsoft.Extensions.FileProviders;
+
 using QianShiChat.WebApi.Hubs;
 
 using System.Reflection;
@@ -47,13 +49,22 @@ builder.Services
     .AddAutoDI()
     .AddSaveChatMessageJob();
 
+builder.Services.AddDirectoryBrowser();
+
+
 var app = builder.Build();
 
 app.UseOpenApi();
 
 app.UseCors("MyAllowSpecificOrigins");
 
+app.UseDefaultFiles();
 app.UseStaticFiles();
+app.UseDirectoryBrowser(new DirectoryBrowserOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Raw")),
+    RequestPath = new PathString("/Raw")
+});
 
 app.UseAuthentication();
 app.UseAuthorization();

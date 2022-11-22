@@ -1,6 +1,18 @@
-﻿namespace QianShiChat.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace QianShiChat.Models
 {
-    public record PrivateChatMessageRequest(int UserId, string Message);
+    public class PrivateChatMessageRequest
+    {
+        [Required]
+        public int ToId { get; set; }
+
+        [Required, MaxLength(255)]
+        public string Message { get; set; }
+
+        [Required]
+        public ChatMessageSendType SendType { get; set; }
+    }
 
     public record PrivateChatMessage(long Id, int UserId, string Message);
 
