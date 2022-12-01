@@ -1,18 +1,25 @@
-﻿using QianShiChat.Models;
+﻿namespace QianShiChat.WebApi.Models.Requests;
 
-using System.ComponentModel.DataAnnotations;
-
-namespace QianShiChat.WebApi.Models.Requests
+/// <summary>
+/// send file request.
+/// </summary>
+public class SendFileRequest
 {
-    public class ShedFileRequest
-    {
-        [Required]
-        public int ToId { get; set; }
+    /// <summary>
+    /// send id.
+    /// </summary>
+    [Required]
+    public int ToId { get; set; }
 
-        [Required]
-        public ChatMessageSendType SendType { get; set; }
+    /// <summary>
+    /// send type.
+    /// </summary>
+    [Required]
+    public ChatMessageSendType SendType { get; set; }
 
-        [Required]
-        public IFormFile File { get; set; }
-    }
+    /// <summary>
+    /// file.
+    /// </summary>
+    [Required]
+    public IFormFile File { get; set; }
 }

@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QianShiChat.WebApi.Models
@@ -19,18 +17,21 @@ namespace QianShiChat.WebApi.Models
         [Key]
         [Comment("用户关系表主键")]
         public int Id { get; set; }
+
         /// <summary>
         /// 用户编号
         /// </summary>
         [Required]
         [Comment("用户编号")]
         public int UserId { get; set; }
+
         /// <summary>
         /// 朋友编号
         /// </summary>
         [Required]
         [Comment("朋友编号")]
         public int FriendId { get; set; }
+
         /// <summary>
         /// 创建时间
         /// </summary>

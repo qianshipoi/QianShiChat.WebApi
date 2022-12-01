@@ -1,8 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-using QianShiChat.Models;
-
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QianShiChat.WebApi.Models.Entity
@@ -38,7 +34,6 @@ namespace QianShiChat.WebApi.Models.Entity
 
         [Required]
         public bool IsDeleted { get; set; }
-
 
         [ForeignKey(nameof(FromId))]
         public UserInfo FromUser { get; set; }

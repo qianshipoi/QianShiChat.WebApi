@@ -1,9 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-using QianShiChat.Common.Extensions;
-using QianShiChat.WebApi.Models.Entity;
-
-namespace QianShiChat.WebApi.Models
+﻿namespace QianShiChat.WebApi.Models
 {
     public class ChatDbContext : DbContext
     {

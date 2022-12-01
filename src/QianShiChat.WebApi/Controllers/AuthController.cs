@@ -1,77 +1,83 @@
-﻿using AutoMapper;
+﻿namespace QianShiChat.WebApi.Controllers;
 
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-
-using QianShiChat.Models;
-using QianShiChat.WebApi.Models;
-using QianShiChat.WebApi.Services;
-
-using System.Security.Claims;
-
-namespace QianShiChat.WebApi.Controllers
+/// <summary>
+/// auth controller
+/// </summary>
+[Route("api/[controller]")]
+[ApiController]
+public class AuthController : BaseController
 {
+    private readonly ILogger<AuthController> _logger;
+    private readonly IMapper _mapper;
+    private readonly IJwtService _jwtService;
+    private readonly IUserService _userService;
+
     /// <summary>
     /// auth controller
     /// </summary>
-    [Route("api/[controller]")]
-    [ApiController]
-    public class AuthController : BaseController
+    public AuthController(
+        ILogger<AuthController> logger, 
+        IMapper mapper, 
+        IJwtService jwtService, 
+        IUserService userService)
     {
-        private readonly ILogger<AuthController> _logger;
-        private readonly IMapper _mapper;
-        private readonly IJwtService _jwtService;
-        private readonly IUserService _userService;
+        _logger = logger;
+        _mapper = mapper;
+        _jwtService = jwtService;
+        _userService = userService;
+    }
 
-        public AuthController(ILogger<AuthController> logger, IMapper mapper, IJwtService jwtService, IUserService userService)
+    /// <summary>
+    /// auth.
+    /// </summary>
+    [HttpPost]
+    public async Task<ActionResult<UserDto>> Auth(
+        [FromBody] UserAuthDto dto, 
+        CancellationToken cancellationToken = default)
+    {
+        var userInfo = await _userService.GetUserByAccountAsync(dto.Account, cancellationToken);
+
+        if (userInfo == null)
         {
-            _logger = logger;
-            _mapper = mapper;
-            _jwtService = jwtService;
-            _userService = userService;
+            return BadRequest("Unknown user.");
         }
 
-        [HttpPost]
-        public async Task<ActionResult<UserDto>> Auth([FromBody] UserAuthDto dto, CancellationToken cancellationToken = default)
+        if (string.Compare(userInfo.Password, dto.Password, true) != 0)
         {
-            var userInfo = await _userService.GetUserByAccountAsync(dto.Account, cancellationToken);
-
-            if (userInfo == null)
-            {
-                return BadRequest("Unknown user.");
-            }
-
-            if (string.Compare(userInfo.Password, dto.Password, true) != 0)
-            {
-                return BadRequest("The password is incorrect.");
-            }
-
-            var token = _jwtService.CreateToken(new List<Claim>
-            {
-                new Claim(ClaimTypes.Name , userInfo.NickName),
-                new Claim(ClaimTypes.NameIdentifier, userInfo.Id.ToString()),
-            });
-
-            var userDto = _mapper.Map<UserDto>(userInfo);
-            Response.Headers.Add("X-Access-Token", token);
-            return Ok(userDto);
+            return BadRequest("The password is incorrect.");
         }
 
-        [HttpGet]
-        [Authorize]
-        public async Task<ActionResult<UserDto>> CheckAuth(CancellationToken cancellationToken = default)
+        var token = _jwtService.CreateToken(new List<Claim>
         {
-            var user = await _userService.GetUserByIdAsync(CurrentUserId, cancellationToken);
+            new Claim(ClaimTypes.Name , userInfo.NickName),
+            new Claim(ClaimTypes.NameIdentifier, userInfo.Id.ToString()),
+        });
 
-            var token = _jwtService.CreateToken(new List<Claim>
-            {
-                new Claim(ClaimTypes.Name , user.NickName),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            });
+        var userDto = _mapper.Map<UserDto>(userInfo);
+        Response.Headers.Add("X-Access-Token", token);
+        return Ok(userDto);
+    }
 
-            var userDto = _mapper.Map<UserDto>(user);
-            Response.Headers.Add("X-Access-Token", token);
-            return Ok(userDto);
-        }
+    /// <summary>
+    /// check auth.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [Authorize]
+    public async Task<ActionResult<UserDto>> CheckAuth(
+        CancellationToken cancellationToken = default)
+    {
+        var user = await _userService.GetUserByIdAsync(CurrentUserId, cancellationToken);
+
+        var token = _jwtService.CreateToken(new List<Claim>
+        {
+            new Claim(ClaimTypes.Name , user.NickName),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        });
+
+        var userDto = _mapper.Map<UserDto>(user);
+        Response.Headers.Add("X-Access-Token", token);
+        return Ok(userDto);
     }
 }

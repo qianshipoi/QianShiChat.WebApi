@@ -1,11 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-using QianShiChat.Common.Extensions;
-using QianShiChat.WebApi.Models.Entity;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.CompilerServices;
 
 namespace QianShiChat.WebApi.Models
 {

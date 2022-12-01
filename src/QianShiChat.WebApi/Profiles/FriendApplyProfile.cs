@@ -1,23 +1,16 @@
-﻿using AutoMapper;
+﻿namespace QianShiChat.WebApi.Profiles;
 
-using QianShiChat.Common.Extensions;
-using QianShiChat.Models;
-using QianShiChat.WebApi.Models;
-
-namespace QianShiChat.WebApi.Profiles
+public class FriendApplyProfile : Profile
 {
-    public class FriendApplyProfile : Profile
+    public FriendApplyProfile()
     {
-        public FriendApplyProfile()
-        {
-            CreateMap<FriendApply, FriendApplyDto>()
-                .ReverseMap();
+        CreateMap<FriendApply, FriendApplyDto>()
+            .ReverseMap();
 
-            CreateMap<CreateFriendApplyDto, FriendApply>()
-                .ForMember(d => d.CreateTime, m => m.MapFrom(s => Timestamp.Now))
-                .ForMember(d => d.LaseUpdateTime, m => m.MapFrom((s, d) => d.CreateTime))
-                .ForMember(d => d.FriendId, m => m.MapFrom(s => s.UserId))
-                .ForMember(d => d.Status, m => m.MapFrom(s => ApplyStatus.Applied));
-        }
+        CreateMap<CreateFriendApplyDto, FriendApply>()
+            .ForMember(d => d.CreateTime, m => m.MapFrom(s => Timestamp.Now))
+            .ForMember(d => d.LaseUpdateTime, m => m.MapFrom((s, d) => d.CreateTime))
+            .ForMember(d => d.FriendId, m => m.MapFrom(s => s.UserId))
+            .ForMember(d => d.Status, m => m.MapFrom(s => ApplyStatus.Applied));
     }
 }

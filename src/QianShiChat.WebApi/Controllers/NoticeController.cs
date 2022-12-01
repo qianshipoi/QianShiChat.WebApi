@@ -1,42 +1,38 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
+﻿namespace QianShiChat.WebApi.Controllers;
 
-using QianShiChat.Models;
-using QianShiChat.WebApi.Hubs;
-
-namespace QianShiChat.WebApi.Controllers
+/// <summary>
+/// notice api.
+/// </summary>
+[Route("api/[controller]")]
+[ApiController]
+public class NoticeController : BaseController
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class NoticeController : BaseController
+    private readonly IHubContext<ChatHub, IChatClient> _hubContext;
+
+    public NoticeController(IHubContext<ChatHub, IChatClient> hubContext)
     {
-        private readonly IHubContext<ChatHub, IChatClient> _hubContext;
+        _hubContext = hubContext;
+    }
 
-        public NoticeController(IHubContext<ChatHub, IChatClient> hubContext)
+    [HttpPost]
+    public async Task Send(string msg, int[]? userIds = null, NotificationType type = NotificationType.FriendApply)
+    {
+        if (userIds is not null && userIds.Length > 0)
         {
-            _hubContext = hubContext;
+            await _hubContext.Clients.Users(userIds.Select(x => x.ToString()))
+                       .Notification(new NotificationMessage(default, default)
+                       {
+                           Type = type,
+                           Message = msg
+                       });
         }
-
-        [HttpPost]
-        public async Task Send(string msg, int[]? userIds = null, NotificationType type = NotificationType.FriendApply)
+        else
         {
-            if (userIds is not null && userIds.Length > 0)
+            await _hubContext.Clients.All.Notification(new NotificationMessage(default, default)
             {
-                await _hubContext.Clients.Users(userIds.Select(x => x.ToString()))
-                           .Notification(new NotificationMessage(default, default)
-                           {
-                               Type = type,
-                               Message = msg
-                           });
-            }
-            else
-            {
-                await _hubContext.Clients.All.Notification(new NotificationMessage(default, default)
-                {
-                    Type = type,
-                    Message = msg
-                });
-            }
+                Type = type,
+                Message = msg
+            });
         }
     }
 }

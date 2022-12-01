@@ -1,27 +1,19 @@
-﻿using AutoMapper;
+﻿namespace QianShiChat.WebApi;
 
-using QianShiChat.Common.Extensions;
-using QianShiChat.Models;
-using QianShiChat.WebApi.Models;
-
-namespace QianShiChat.WebApi
+public class UserProfile : Profile
 {
-    public class UserProfile : Profile
+    public UserProfile()
     {
-        public UserProfile()
-        {
-            CreateMap<CreateUserDto, UserInfo>()
-                .ForMember(d => d.CreateTime, m => m.MapFrom(s => Timestamp.Now));
+        CreateMap<CreateUserDto, UserInfo>()
+            .ForMember(d => d.CreateTime, m => m.MapFrom(s => Timestamp.Now));
 
-            CreateMap<UserInfo, UserDto>()
-                .ReverseMap();
+        CreateMap<UserInfo, UserDto>()
+            .ReverseMap();
 
-            CreateMap<UserInfo, UserWithMessage>()
-                 .ReverseMap();
+        CreateMap<UserInfo, UserWithMessage>()
+             .ReverseMap();
 
-            CreateMap<UserDto, UserWithMessage>()
-                .ReverseMap();
-
-        }
+        CreateMap<UserDto, UserWithMessage>()
+            .ReverseMap();
     }
 }

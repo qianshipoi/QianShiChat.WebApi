@@ -7,5 +7,3 @@ public class UpdateCursorRequest
     [Required]
     public long Position { get; set; }
 }
-
-

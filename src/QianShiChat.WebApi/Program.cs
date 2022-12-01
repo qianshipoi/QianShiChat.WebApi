@@ -1,24 +1,11 @@
-using FluentValidation;
-
-using MediatR;
-
-using Microsoft.Extensions.FileProviders;
-
-using QianShiChat.WebApi.Hubs;
-
-using System.Reflection;
-
-using Yitter.IdGenerator;
-
-const string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
+// config distributed id.
 var options = new IdGeneratorOptions(1);
 YitIdHelper.SetIdGenerator(options);
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
 
-// config mvc builder
+// config mvc builder.
 builder.Services
     .AddControllers()
     .AddJsonOptions(options =>
@@ -26,15 +13,15 @@ builder.Services
         //options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter());
     });
 
-// config signalr server builder
+// config signalr server builder.
 builder.Services.AddSignalR()
     .AddStackExchangeRedis(builder.Configuration.GetConnectionString("Redis")!);
 
-// config infrastructure
+// config infrastructure.
 builder.Services
     .AddCors(options =>
     {
-        options.AddPolicy(MyAllowSpecificOrigins, builder =>
+        options.AddPolicy(AppConsts.MyAllowSpecificOrigins, builder =>
         {
             builder.WithOrigins("https://www.kuriyama.top");
         });
@@ -51,12 +38,11 @@ builder.Services
 
 builder.Services.AddDirectoryBrowser();
 
-
 var app = builder.Build();
 
 app.UseOpenApi();
 
-app.UseCors("MyAllowSpecificOrigins");
+app.UseCors(AppConsts.MyAllowSpecificOrigins);
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
@@ -74,4 +60,3 @@ app.MapControllers();
 app.MapHub<ChatHub>("/Hubs/Chat").RequireAuthorization();
 
 app.Run();
-
