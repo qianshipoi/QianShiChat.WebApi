@@ -145,7 +145,7 @@ public class ChatMessageService : IChatMessageService, ITransient
         // cache update message cursor
         await _redisCachingProvider.HSetAsync(
             AppConsts.MessageCursorCacheKey,
-            CurrentUserId.ToString(),
+            chatMessageDto.FromId.ToString(),
             chatMessage.Id.ToString());
 
         return chatMessageDto;
