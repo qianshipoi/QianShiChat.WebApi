@@ -94,7 +94,7 @@ public static class IServiceCollectionExtensions
             q.AddJob<SaveMessageCursorJob>(options => options.WithIdentity(messageCursorJobKey));
             q.AddTrigger(options => options
                 .ForJob(messageCursorJobKey)
-                .WithIdentity(jobKey + "_trigger")
+                .WithIdentity(messageCursorJobKey + "_trigger")
                 .WithDailyTimeIntervalSchedule(opt => opt.WithIntervalInMinutes(2)));
         });
 

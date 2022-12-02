@@ -27,7 +27,7 @@ public class SaveMessageCursorJob : IJob
 
     public async Task Execute(IJobExecutionContext context)
     {
-        _logger.LogInformation("Start saving chat message data.");
+        _logger.LogInformation("Start saving message cursor data.");
 
         using var scoped = _serviceProvider.CreateScope();
         var redisCachingProvider = scoped.ServiceProvider.GetRequiredService<IRedisCachingProvider>();
@@ -39,21 +39,34 @@ public class SaveMessageCursorJob : IJob
         {
             foreach (var cacheValue in cacheValues)
             {
-                if (long.TryParse(cacheValue.Key, out var userId)
+                if (int.TryParse(cacheValue.Key, out var userId)
                     && long.TryParse(cacheValue.Value, out var position))
                 {
-                    var cursor = await dbContext.MessageCursors.FindAsync(cacheValue);
+                    var now = DateTimeOffset.Now.ToTimestamp();
+                    var cursor = await dbContext.MessageCursors.FindAsync(userId);
                     if (cursor != null)
                     {
-                        try
+                        cursor.Postiton = position;
+                        cursor.LastUpdateTime = now;
+                    }
+                    else
+                    {
+                        cursor = new MessageCursor()
                         {
-                            cursor.Postiton = position;
-                            await dbContext.SaveChangesAsync();
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, "saving [{0}] error.", JsonSerializer.Serialize(cacheValue));
-                        }
+                            UserId = userId,
+                            LastUpdateTime = now,
+                            Postiton = position
+                        };
+                        await dbContext.MessageCursors.AddAsync(cursor);
+                    }
+
+                    try
+                    {
+                        await dbContext.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "saving [{0}] error.", JsonSerializer.Serialize(cacheValue));
                     }
                 }
 
