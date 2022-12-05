@@ -1,10 +1,7 @@
+
+
 // config distributed id.
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Web.Caching;
-using SixLabors.ImageSharp.Web.Commands;
 using SixLabors.ImageSharp.Web.DependencyInjection;
-using SixLabors.ImageSharp.Web.Processors;
-using SixLabors.ImageSharp.Web.Providers;
 
 var options = new IdGeneratorOptions(1);
 YitIdHelper.SetIdGenerator(options);
@@ -41,40 +38,11 @@ builder.Services
     .AddCache(builder.Configuration)
     .AddChatDbContext(builder.Configuration)
     .AddAutoDI()
-    .AddSaveChatMessageJob();
+    .AddSaveChatMessageJob()
+    .AddImageConversion();
 
 builder.Services.AddDirectoryBrowser();
-builder.Services.AddImageSharp(options =>
-{
-    options.Configuration = Configuration.Default;
-    options.BrowserMaxAge = TimeSpan.FromDays(7);
-    options.CacheMaxAge = TimeSpan.FromDays(365);
-    options.CacheHashLength = 8;
-    options.OnParseCommandsAsync = _ => Task.CompletedTask;
-    options.OnBeforeSaveAsync = _ => Task.CompletedTask;
-    options.OnProcessedAsync = _ => Task.CompletedTask;
-    options.OnPrepareResponseAsync = _ => Task.CompletedTask;
-})
-                .SetRequestParser<QueryCollectionRequestParser>()
-                .Configure<PhysicalFileSystemCacheOptions>(options =>
-                {
-                    options.CacheRootPath = null;
-                    options.CacheFolder = "is-cache";
-                    options.CacheFolderDepth = 8;
-                })
-                .SetCache<PhysicalFileSystemCache>()
-                .SetCacheKey<UriRelativeLowerInvariantCacheKey>()
-                .SetCacheHash<SHA256CacheHash>()
-                .Configure<PhysicalFileSystemProviderOptions>(options =>
-                {
-                    options.ProviderRootPath = null;
-                })
-                .AddProvider<PhysicalFileSystemProvider>()
-                .AddProcessor<ResizeWebProcessor>()
-                .AddProcessor<FormatWebProcessor>()
-                .AddProcessor<BackgroundColorWebProcessor>()
-                .AddProcessor<QualityWebProcessor>()
-                .AddProcessor<AutoOrientWebProcessor>();
+
 
 var app = builder.Build();
 
