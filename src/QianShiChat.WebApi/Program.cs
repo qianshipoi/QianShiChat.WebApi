@@ -55,7 +55,7 @@ app.UseImageSharp();
 app.UseStaticFiles();
 app.UseDirectoryBrowser(new DirectoryBrowserOptions
 {
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Raw")),
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Raw")),
     RequestPath = new PathString("/Raw")
 });
 
