@@ -3,7 +3,8 @@
     public class ChatDbContext : DbContext
     {
         public DbSet<UserInfo> UserInfos { get; set; }
-
+        public DbSet<UserAvatar> UserAvatars { get; set; }
+        public DbSet<DefaultAvatar> DefaultAvatars { get; set; }
         public DbSet<UserRealtion> UserRealtions { get; set; }
 
         public DbSet<FriendApply> FriendApplies { get; set; }
@@ -25,18 +26,115 @@
 
             var userInfos = new List<UserInfo>()
             {
-                new UserInfo() { Id = 1, Account = "admin", CreateTime = nowTime, Password = password, NickName = "Admin" },
-                new UserInfo() { Id = 2, Account = "qianshi", CreateTime = nowTime, Password = password, NickName = "千矢" },
-                new UserInfo() { Id = 3, Account = "kuriyama", CreateTime = nowTime, Password = password, NickName = "栗山未来" },
-                new UserInfo() { Id = 4, Account = "admin1", CreateTime = nowTime, Password = password, NickName = "Admin1" },
-                new UserInfo() { Id = 5, Account = "qianshi1", CreateTime = nowTime, Password = password, NickName = "千矢1" },
-                new UserInfo() { Id = 6, Account = "kuriyama1", CreateTime = nowTime, Password = password, NickName = "栗山未来1" },
-                new UserInfo() { Id = 7, Account = "admin2", CreateTime = nowTime, Password = password, NickName = "Admin2" },
-                new UserInfo() { Id = 8, Account = "qianshi2", CreateTime = nowTime, Password = password, NickName = "千矢2" },
-                new UserInfo() { Id = 9, Account = "kuriyama2", CreateTime = nowTime, Password = password, NickName = "栗山未来2" },
+                new UserInfo() {
+                    Id = 1,
+                    Account = "admin",
+                    Avatar = "/raw/DefaultAvatar/1.jpg",
+                    CreateTime = nowTime,
+                    Password = password,
+                    NickName = "Admin"
+                },
+                new UserInfo() {
+                    Id = 2,
+                    Account = "qianshi",
+                    Avatar="/raw/DefaultAvatar/2.jpg",
+                    CreateTime = nowTime,
+                    Password = password,
+                    NickName = "千矢"
+                },
+                new UserInfo() {
+                    Id = 3,
+                    Account = "kuriyama",
+                    Avatar="/raw/DefaultAvatar/3.jpg",
+                    CreateTime = nowTime,
+                    Password = password,
+                    NickName = "栗山未来"
+                },
+                new UserInfo() {
+                    Id = 4,
+                    Account = "admin1",
+                    Avatar="/raw/DefaultAvatar/4.jpg",
+                    CreateTime = nowTime,
+                    Password = password,
+                    NickName = "Admin1"
+                },
+                new UserInfo() {
+                    Id = 5,
+                    Account = "qianshi1",
+                    Avatar="/raw/DefaultAvatar/5.jpg",
+                    CreateTime = nowTime,
+                    Password = password,
+                    NickName = "千矢1"
+                },
+                new UserInfo() {
+                    Id = 6,
+                    Account = "kuriyama1",
+                    Avatar="/raw/DefaultAvatar/6.jpg",
+                    CreateTime = nowTime,
+                    Password = password,
+                    NickName = "栗山未来1"
+                },
+                new UserInfo() {
+                    Id = 7,
+                    Account = "admin2",
+                    Avatar="/raw/DefaultAvatar/7.jpg",
+                    CreateTime = nowTime,
+                    Password = password,
+                    NickName = "Admin2"
+                },
+                new UserInfo() {
+                    Id = 8,
+                    Account = "qianshi2",
+                    Avatar="/raw/DefaultAvatar/8.jpg",
+                    CreateTime = nowTime,
+                    Password = password,
+                    NickName = "千矢2"
+                },
+                new UserInfo() {
+                    Id = 9,
+                    Account = "kuriyama2",
+                    Avatar="/raw/DefaultAvatar/9.jpg",
+                    CreateTime = nowTime,
+                    Password = password,
+                    NickName = "栗山未来2"
+                },
             };
 
             modelBuilder.Entity<UserInfo>().HasData(userInfos);
+
+            var userAvatars = new List<UserAvatar>()
+            {
+                new UserAvatar(){ Id = 1, UserId = 1, CreateTime = nowTime, Path = "/raw/DefaultAvatar/1.jpg", Size = 204*1024 },
+                new UserAvatar(){ Id = 2, CreateTime = nowTime, Path = "/raw/DefaultAvatar/2.jpg", Size = 30*1024 },
+                new UserAvatar(){ Id = 3, CreateTime = nowTime, Path = "/raw/DefaultAvatar/3.jpg", Size = (ulong)Math.Ceiling(85.7*1024) },
+                new UserAvatar(){ Id = 4, CreateTime = nowTime, Path = "/raw/DefaultAvatar/4.jpg", Size = 156*1024 },
+                new UserAvatar(){ Id = 5, CreateTime = nowTime, Path = "/raw/DefaultAvatar/5.jpg", Size = (ulong)Math.Ceiling(71.5*1024) },
+                new UserAvatar(){ Id = 6, CreateTime = nowTime, Path = "/raw/DefaultAvatar/6.jpg", Size = 106*1024 },
+                new UserAvatar(){ Id = 7, CreateTime = nowTime, Path = "/raw/DefaultAvatar/7.jpg", Size = (ulong)Math.Ceiling(91.6*1024) },
+                new UserAvatar(){ Id = 8, CreateTime = nowTime, Path = "/raw/DefaultAvatar/8.jpg", Size = 110*1024 },
+                new UserAvatar(){ Id = 9, CreateTime = nowTime, Path = "/raw/DefaultAvatar/9.jpg", Size = 106*1024 },
+            };
+
+            modelBuilder.Entity<UserAvatar>().HasData(userAvatars);
+
+            var defaultAvatars = new List<DefaultAvatar>()
+            {
+                new DefaultAvatar(){ Id = 1, CreateTime = nowTime, Path = "/raw/DefaultAvatar/1.jpg", Size = 204*1024, },
+                new DefaultAvatar(){ Id = 2, CreateTime = nowTime, Path = "/raw/DefaultAvatar/2.jpg", Size = 30*1024, },
+                new DefaultAvatar(){ Id = 3, CreateTime = nowTime, Path = "/raw/DefaultAvatar/3.jpg", Size = (ulong)Math.Ceiling(85.7*1024), },
+                new DefaultAvatar(){ Id = 4, CreateTime = nowTime, Path = "/raw/DefaultAvatar/4.jpg", Size = 156*1024,  },
+                new DefaultAvatar(){ Id = 5, CreateTime = nowTime, Path = "/raw/DefaultAvatar/5.jpg", Size = (ulong)Math.Ceiling(71.5*1024), },
+                new DefaultAvatar(){ Id = 6, CreateTime = nowTime, Path = "/raw/DefaultAvatar/6.jpg", Size = 106*1024, },
+                new DefaultAvatar(){ Id = 7, CreateTime = nowTime, Path = "/raw/DefaultAvatar/7.jpg", Size = (ulong)Math.Ceiling(91.6*1024), },
+                new DefaultAvatar(){ Id = 8, CreateTime = nowTime, Path = "/raw/DefaultAvatar/8.jpg", Size = 110*1024, },
+                new DefaultAvatar(){ Id = 9, CreateTime = nowTime, Path = "/raw/DefaultAvatar/9.jpg", Size = 106*1024,  },
+                new DefaultAvatar(){ Id = 10, CreateTime = nowTime, Path = "/raw/DefaultAvatar/10.jpg", Size = 111*1024,  },
+                new DefaultAvatar(){ Id = 11, CreateTime = nowTime, Path = "/raw/DefaultAvatar/11.png", Size = 664*1024,  },
+                new DefaultAvatar(){ Id = 12, CreateTime = nowTime, Path = "/raw/DefaultAvatar/12.gif", Size = 879*1024,  },
+                new DefaultAvatar(){ Id = 13, CreateTime = nowTime, Path = "/raw/DefaultAvatar/13.gif", Size = 731*1024,  },
+            };
+
+            modelBuilder.Entity<DefaultAvatar>().HasData(defaultAvatars);
 
             var friendApplys = new List<FriendApply>()
             {

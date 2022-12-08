@@ -7,15 +7,17 @@
 [ApiController]
 public class UserController : BaseController
 {
-    private readonly ILogger<UserController> _logger;
-    private readonly IMapper _mapper;
-    private readonly IUserService _userService;
-    private readonly IRedisCachingProvider _redisCachingProvider;
+    readonly ILogger<UserController> _logger;
+    readonly IMapper _mapper;
+    readonly IUserService _userService;
+    readonly IRedisCachingProvider _redisCachingProvider;
+    readonly IAvatarService _avatarService;
 
     /// <summary>
     /// user controller
     /// </summary>
     public UserController(
+        IAvatarService avatarService,
         IMapper mapper,
         ILogger<UserController> logger,
         IUserService userService,
@@ -25,6 +27,7 @@ public class UserController : BaseController
         _logger = logger;
         _userService = userService;
         _redisCachingProvider = redisCachingProvider;
+        _avatarService = avatarService;
     }
 
     /// <summary>
@@ -87,13 +90,19 @@ public class UserController : BaseController
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateUserDto dto, CancellationToken cancellationToken = default)
     {
+        var avatarPath = await _avatarService.GetDefaultAvatarByIdAsync(dto.DefaultAvatarId, cancellationToken);
+        if(string.IsNullOrWhiteSpace(avatarPath))
+        {
+            return BadRequest("default avatar not found.");
+        }
+
         if (await _userService.AccountExistsAsync(dto.Account, cancellationToken))
         {
             return BadRequest("The account already exists.");
         }
 
-        var user = await _userService.AddAsync(dto, cancellationToken);
+        var user = await _userService.AddAsync(dto, avatarPath, cancellationToken);
 
-        return CreatedAtAction(nameof(GetUser), new { Id = user.Id });
+        return CreatedAtAction(nameof(GetUser), new { Id = user.Id }, user);
     }
 }

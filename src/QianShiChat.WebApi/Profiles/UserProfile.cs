@@ -17,3 +17,12 @@ public class UserProfile : Profile
             .ReverseMap();
     }
 }
+
+public class AvatarProfile :Profile
+{
+    public AvatarProfile()
+    {
+        CreateMap<DefaultAvatar, AvatarDto>();
+        CreateMap<UserAvatar, AvatarDto>();
+    }
+}

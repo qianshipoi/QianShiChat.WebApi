@@ -6,6 +6,15 @@ namespace QianShiChat.WebApi.Models
 {
     public class UserInfo
     {
+        public UserInfo()
+        {
+            Realtions = new HashSet<UserRealtion>();
+            Friends = new HashSet<UserRealtion>();
+            FriendApplyUsers = new HashSet<FriendApply>();
+            FriendApplyFriends = new HashSet<FriendApply>();
+            UserAvatars = new HashSet<UserAvatar>();
+        }
+
         public int Id { get; set; }
 
         public string Account { get; set; } = null!;
@@ -21,16 +30,19 @@ namespace QianShiChat.WebApi.Models
         public bool IsDeleted { get; set; }
 
         [InverseProperty(nameof(UserRealtion.User))]
-        public List<UserRealtion> Realtions { get; set; } = new();
+        public virtual ICollection<UserRealtion> Realtions { get; set; }
 
         [InverseProperty(nameof(UserRealtion.Friend))]
-        public List<UserRealtion> Friends { get; set; } = new();
+        public virtual ICollection<UserRealtion> Friends { get; set; }
 
         [InverseProperty(nameof(FriendApply.User))]
-        public List<FriendApply> FriendApplyUsers { get; set; } = new();
+        public virtual ICollection<FriendApply> FriendApplyUsers { get; set; }
 
         [InverseProperty(nameof(FriendApply.Friend))]
-        public List<FriendApply> FriendApplyFriends { get; set; } = new();
+        public virtual ICollection<FriendApply> FriendApplyFriends { get; set; }
+
+        [InverseProperty(nameof(UserAvatar.User))]
+        public virtual ICollection<UserAvatar> UserAvatars { get; set; }
 
         public MessageCursor Cursor { get; set; }
     }
@@ -46,10 +58,12 @@ namespace QianShiChat.WebApi.Models
                 .IsRequired()
                 .ValueGeneratedOnAdd()
                 .HasComment("用户表主键");
+
             builder.Property(x => x.Account)
                 .IsRequired()
                 .HasMaxLength(32)
                 .HasComment("账号");
+
             builder.Property(x => x.NickName)
                 .IsRequired()
                 .HasMaxLength(32)

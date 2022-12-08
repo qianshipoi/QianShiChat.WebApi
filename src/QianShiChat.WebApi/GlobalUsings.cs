@@ -43,3 +43,4 @@ global using System.Text.Json;
 global using System.Text.Json.Serialization;
 
 global using Yitter.IdGenerator;
+global using SixLabors.ImageSharp.Web.DependencyInjection;

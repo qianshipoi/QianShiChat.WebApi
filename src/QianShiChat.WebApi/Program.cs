@@ -1,8 +1,4 @@
-
-
 // config distributed id.
-using SixLabors.ImageSharp.Web.DependencyInjection;
-
 var options = new IdGeneratorOptions(1);
 YitIdHelper.SetIdGenerator(options);
 

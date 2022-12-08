@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.Models
+﻿using System.Drawing;
+
+namespace QianShiChat.Models
 {
     public class PagedList<T> where T : class
     {
@@ -39,6 +41,18 @@
                 CurrentSize = items.Count(),
                 CurrentPage = 0,
                 HasNext = items.Count() == size,
+            };
+        }
+
+        public static PagedList<T> Create<T>(IEnumerable<T> items, int size) where T : class
+        {
+            return new PagedList<T>
+            {
+                Items = items.Count() <= size ? items : items.Take(size),
+                Total = 0,
+                CurrentSize = items.Count(),
+                CurrentPage = 0,
+                HasNext = items.Count() > size,
             };
         }
     }

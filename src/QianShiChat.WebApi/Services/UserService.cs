@@ -1,19 +1,34 @@
-﻿namespace QianShiChat.WebApi.Services;
+﻿using QianShiChat.Common.Extensions;
+
+namespace QianShiChat.WebApi.Services;
 
 /// <summary>
 /// user service.
 /// </summary>
 public class UserService : IUserService, ITransient
 {
-    private readonly ILogger<UserService> _logger;
-    private readonly IMapper _mapper;
-    private readonly ChatDbContext _context;
+    readonly ILogger<UserService> _logger;
+    readonly IMapper _mapper;
+    readonly ChatDbContext _context;
+    readonly IWebHostEnvironment _webHostEnvironment;
 
-    public UserService(ChatDbContext context, IMapper mapper, ILogger<UserService> logger)
+    const string AvatarPrefix = "/Raw/Avatar";
+
+    public UserService(
+        ChatDbContext context,
+        IMapper mapper,
+        ILogger<UserService> logger,
+        IWebHostEnvironment webHostEnvironment)
     {
         _context = context;
         _mapper = mapper;
         _logger = logger;
+        _webHostEnvironment = webHostEnvironment;
+        var avatarPath = Path.Combine(webHostEnvironment.WebRootPath, AvatarPrefix.Trim(new char[] { '/', '\\' }));
+        if (!Directory.Exists(avatarPath))
+        {
+            Directory.CreateDirectory(avatarPath);
+        }
     }
 
     public async Task<UserDto?> GetUserByIdAsync(int id, CancellationToken cancellationToken = default)
@@ -38,12 +53,33 @@ public class UserService : IUserService, ITransient
              .AnyAsync(x => x.Account.Equals(account), cancellationToken);
     }
 
-    public async Task<UserDto> AddAsync(CreateUserDto dto, CancellationToken cancellationToken = default)
+    public async Task<UserDto> AddAsync(
+        CreateUserDto dto, 
+        string avatarPath, 
+        CancellationToken cancellationToken = default)
     {
+        var uuid = YitIdHelper.NextId();
         var user = _mapper.Map<UserInfo>(dto);
-        await _context.AddAsync(user, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
-        return _mapper.Map<UserDto>(user);
+        user.Password = user.Password.ToMd5();
+
+        // save avatar.
+        var defaultAvatarPath = Path.Combine(_webHostEnvironment.WebRootPath, avatarPath.Trim('/').Trim('\\'));
+        var newPath = Path.Combine(AvatarPrefix, uuid + Path.GetExtension(avatarPath));
+        var newAvatarPath = Path.Combine(_webHostEnvironment.WebRootPath, newPath.Trim('/').Trim('\\'));
+        try
+        {
+            File.Copy(defaultAvatarPath, newAvatarPath);
+            user.Avatar = newPath.Replace('\\', '/');
+            await _context.AddAsync(user, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+            return _mapper.Map<UserDto>(user);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
+            if (File.Exists(newAvatarPath)) File.Delete(newAvatarPath);
+            return null;
+        }
     }
 
     public async Task<List<UserDto>> GetUserByAccontAsync(string account, CancellationToken cancellationToken = default)

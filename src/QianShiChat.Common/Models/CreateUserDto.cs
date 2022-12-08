@@ -4,6 +4,9 @@ namespace QianShiChat.Models
 {
     public class CreateUserDto : IValidatableObject
     {
+        [Required, Range(1, int.MaxValue)]
+        public int DefaultAvatarId { get; set; }
+
         [Required, MaxLength(32)]
         public string Account { get; set; } = null!;
 
