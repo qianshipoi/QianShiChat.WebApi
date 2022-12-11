@@ -1,4 +1,9 @@
 // config distributed id.
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
+
+using QianShiChat.WebApi.Extensions;
+
 var options = new IdGeneratorOptions(1);
 YitIdHelper.SetIdGenerator(options);
 
@@ -23,7 +28,9 @@ builder.Services
     {
         options.AddPolicy(AppConsts.MyAllowSpecificOrigins, builder =>
         {
-            builder.WithOrigins("https://www.kuriyama.top");
+            builder.WithOrigins("https://www.kuriyama.top", "http://127.0.0.1:5173")
+            .WithHeaders("*")
+            .WithMethods("*");
         });
     })
     .AddMediatR(x => x.AsScoped(), typeof(Program))
@@ -57,6 +64,11 @@ app.UseDirectoryBrowser(new DirectoryBrowserOptions
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapGet("/", async (context) =>
+{
+    await context.Response.WriteAsync(context.Request.GetBaseUrl());
+});
 
 app.MapControllers();
 

@@ -33,6 +33,7 @@ public interface IUserService
     /// add user.
     /// </summary>
     /// <param name="dto"></param>
+    /// <param name="avatarPath"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<UserDto> AddAsync(CreateUserDto dto, string avatarPath, CancellationToken cancellationToken = default);

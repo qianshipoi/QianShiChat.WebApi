@@ -35,16 +35,32 @@
         /// </summary>
         public const string GroupChatMessageCacheKey = "GroupMessages";
 
+        /// <summary>
+        /// get privatie chat cache key.
+        /// </summary>
+        /// <param name="id1"></param>
+        /// <param name="id2"></param>
+        /// <returns></returns>
         public static string GetPrivateChatCacheKey(int id1, int id2)
         {
             return id1 > id2 ? $"{id2}-{id1}" : $"{id1}-{id2}";
         }
 
+        /// <summary>
+        /// get group chat cache key.
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
         public static string GetGroupChatCacheKey(int groupId)
         {
             return $"{GroupChatMessageCacheKey}:{groupId}";
         }
 
+        /// <summary>
+        /// get message curosr cache key.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public static string GetMessageCursorCacheKey(int userId)
         {
             return $"{MessageCursorCacheKey}:{userId}";

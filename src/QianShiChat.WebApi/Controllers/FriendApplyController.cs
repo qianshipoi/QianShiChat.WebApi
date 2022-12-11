@@ -87,8 +87,7 @@ public class FriendApplyController : BaseController
     /// <summary>
     /// 待处理
     /// </summary>
-    /// <param name="page"></param>
-    /// <param name="size"></param>
+    /// <param name="dto"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet("Pending")]
