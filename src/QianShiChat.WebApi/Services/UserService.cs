@@ -1,6 +1,4 @@
-﻿using QianShiChat.Common.Extensions;
-
-namespace QianShiChat.WebApi.Services;
+﻿namespace QianShiChat.WebApi.Services;
 
 /// <summary>
 /// user service.

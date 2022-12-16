@@ -32,7 +32,8 @@
                     Avatar = "/Raw/DefaultAvatar/1.jpg",
                     CreateTime = nowTime,
                     Password = password,
-                    NickName = "Admin"
+                    NickName = "Admin",
+                    Description = "炒鸡管理员！"
                 },
                 new UserInfo() {
                     Id = 2,
@@ -40,7 +41,8 @@
                     Avatar="/Raw/DefaultAvatar/2.jpg",
                     CreateTime = nowTime,
                     Password = password,
-                    NickName = "千矢"
+                    NickName = "千矢",
+                    Description = "道歉的时候露出肚皮才是常识！"
                 },
                 new UserInfo() {
                     Id = 3,
@@ -48,7 +50,8 @@
                     Avatar="/Raw/DefaultAvatar/3.jpg",
                     CreateTime = nowTime,
                     Password = password,
-                    NickName = "栗山未来"
+                    NickName = "栗山未来",
+                    Description = "不愉快です"
                 },
                 new UserInfo() {
                     Id = 4,

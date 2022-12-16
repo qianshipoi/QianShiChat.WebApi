@@ -25,6 +25,8 @@ namespace QianShiChat.WebApi.Models
 
         public string? Avatar { get; set; }
 
+        public string? Description { get; set; }
+
         public long CreateTime { get; set; }
 
         public bool IsDeleted { get; set; }
@@ -72,6 +74,11 @@ namespace QianShiChat.WebApi.Models
                 .IsRequired()
                 .HasMaxLength(32)
                 .HasComment("密码");
+
+            builder.Property(x => x.Description)
+                .HasMaxLength(128)
+                .HasComment("描述");
+
             builder.Property(x => x.CreateTime)
                 .IsRequired()
                 .HasComment("创建时间");
