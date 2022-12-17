@@ -1,11 +1,17 @@
 ﻿namespace QianShiChat.WebApi.Services;
 
+/// <summary>
+/// firend apply service.
+/// </summary>
 public class FriendApplyService : IFriendApplyService, ITransient
 {
     private readonly ILogger<FriendApplyService> _logger;
     private readonly ChatDbContext _context;
     private readonly IMapper _mapper;
 
+    /// <summary>
+    /// firend apply service.
+    /// </summary>
     public FriendApplyService(ILogger<FriendApplyService> logger, ChatDbContext context, IMapper mapper)
     {
         _logger = logger;

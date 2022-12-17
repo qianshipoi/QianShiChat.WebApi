@@ -1,9 +1,4 @@
-// config distributed id.
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
-
-using QianShiChat.WebApi.Extensions;
-
+// config distributed id.s
 var options = new IdGeneratorOptions(1);
 YitIdHelper.SetIdGenerator(options);
 

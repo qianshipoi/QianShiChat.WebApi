@@ -5,12 +5,12 @@
 /// </summary>
 public class UserService : IUserService, ITransient
 {
-    readonly ILogger<UserService> _logger;
-    readonly IMapper _mapper;
-    readonly ChatDbContext _context;
-    readonly IWebHostEnvironment _webHostEnvironment;
+    private readonly ILogger<UserService> _logger;
+    private readonly IMapper _mapper;
+    private readonly ChatDbContext _context;
+    private readonly IWebHostEnvironment _webHostEnvironment;
 
-    const string AvatarPrefix = "/Raw/Avatar";
+    private const string AvatarPrefix = "/Raw/Avatar";
 
     public UserService(
         ChatDbContext context,
@@ -52,8 +52,8 @@ public class UserService : IUserService, ITransient
     }
 
     public async Task<UserDto> AddAsync(
-        CreateUserDto dto, 
-        string avatarPath, 
+        CreateUserDto dto,
+        string avatarPath,
         CancellationToken cancellationToken = default)
     {
         var uuid = YitIdHelper.NextId();

@@ -1,8 +1,4 @@
-﻿using QianShiChat.WebApi.Extensions;
-
-using QRCoder;
-
-namespace QianShiChat.WebApi.Controllers;
+﻿namespace QianShiChat.WebApi.Controllers;
 
 /// <summary>
 /// auth controller

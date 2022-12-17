@@ -1,20 +1,19 @@
-﻿namespace QianShiChat.WebApi.Extensions
+﻿namespace QianShiChat.WebApi.Extensions;
+
+public static class HttpRequestExtensions
 {
-    public static class HttpRequestExtensions
+    /// <summary>
+    /// 获取 Scheme://Host:Port
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    public static string GetBaseUrl(this HttpRequest request)
     {
-        /// <summary>
-        /// 获取 Scheme://Host:Port
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public static string GetBaseUrl(this HttpRequest request)
-        {
-            return new StringBuilder()
-                .Append(request.Scheme)
-                .Append("://")
-                .Append(request.Host)
-                .Append(request.PathBase)
-                .ToString();
-        }
+        return new StringBuilder()
+            .Append(request.Scheme)
+            .Append("://")
+            .Append(request.Host)
+            .Append(request.PathBase)
+            .ToString();
     }
 }

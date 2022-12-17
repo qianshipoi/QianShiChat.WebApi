@@ -1,8 +1,7 @@
-﻿namespace QianShiChat.WebApi.Models.Entity
+﻿namespace QianShiChat.WebApi.Models;
+
+public interface ISafeDelete
 {
-    public interface ISafeDelete
-    {
-        public bool IsDeleted { get; set; }
-        public long DeleteTime { get; set; }
-    }
+    public bool IsDeleted { get; set; }
+    public long DeleteTime { get; set; }
 }

@@ -10,7 +10,6 @@ public class FriendApplyController : BaseController
 {
     private readonly ChatDbContext _context;
     private readonly IHubContext<ChatHub, IChatClient> _hubContext;
-    private readonly IMapper _mapper;
     private readonly IUserService _userService;
     private readonly IFriendApplyService _friendApplyService;
     private readonly IFriendService _friendService;
@@ -19,16 +18,14 @@ public class FriendApplyController : BaseController
     /// friend apply api.
     /// </summary>
     public FriendApplyController(
-        ChatDbContext context, 
-        IHubContext<ChatHub, IChatClient> hubContext, 
-        IMapper mapper, 
-        IUserService userService, 
-        IFriendApplyService friendApplyService, 
+        ChatDbContext context,
+        IHubContext<ChatHub, IChatClient> hubContext,
+        IUserService userService,
+        IFriendApplyService friendApplyService,
         IFriendService friendService)
     {
         _context = context;
         _hubContext = hubContext;
-        _mapper = mapper;
         _userService = userService;
         _friendApplyService = friendApplyService;
         _friendService = friendService;
@@ -74,12 +71,9 @@ public class FriendApplyController : BaseController
         applyDto.User = user;
         applyDto.Friend = friend;
 
-        await _hubContext.Clients.User(applyDto.FriendId.ToString())
-            .Notification(new NotificationMessage(default, default)
-            {
-                Type = NotificationType.FriendApply,
-                Message = JsonSerializer.Serialize(applyDto)
-            });
+        await _hubContext.Clients
+            .User(applyDto.FriendId.ToString())
+            .Notification(new NotificationMessage(NotificationType.FriendApply, JsonSerializer.Serialize(applyDto)));
 
         return Ok(applyDto);
     }
@@ -125,11 +119,9 @@ public class FriendApplyController : BaseController
 
         var dto = await _friendApplyService.ApprovalAsync(CurrentUserId, id, status, cancellationToken);
 
-        await _hubContext.Clients.Users(dto.UserId.ToString(), dto.FriendId.ToString()).Notification(new NotificationMessage(default, default)
-        {
-            Type = NotificationType.NewFriend,
-            Message = JsonSerializer.Serialize(dto)
-        });
+        await _hubContext.Clients
+            .Users(dto.UserId.ToString(), dto.FriendId.ToString())
+            .Notification(new NotificationMessage(NotificationType.NewFriend, JsonSerializer.Serialize(dto)));
 
         return Ok("处理成功");
     }

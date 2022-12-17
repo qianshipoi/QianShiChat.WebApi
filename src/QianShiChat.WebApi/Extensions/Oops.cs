@@ -1,12 +1,11 @@
-﻿namespace QianShiChat.WebApi.Extensions
+﻿namespace QianShiChat.WebApi.Extensions;
+
+public static class Oops
 {
-    public static class Oops
-    {
 
-    }
+}
 
-    public class BusinessException : Exception
-    {
+public class BusinessException : Exception
+{
 
-    }
 }

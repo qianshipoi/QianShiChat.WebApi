@@ -3,7 +3,7 @@
 public class QrAuthResponse
 {
     /// <summary>
-    /// 800 二维码不存在或已过期 801 等待扫码 802 授权中 803 授权成功
+    /// 800 二维码不存在或已过期 801 等待扫码 802 授权中 200 授权成功
     /// </summary>
     public int Code { get; set; }
 
