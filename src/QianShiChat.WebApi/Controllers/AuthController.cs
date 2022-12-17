@@ -118,8 +118,8 @@ public class AuthController : BaseController
         {
             using var qrCodeGenerator = new QRCodeGenerator();
             using var qrCodeData = qrCodeGenerator.CreateQrCode(response.Url, QRCodeGenerator.ECCLevel.M, true);
-            using var qrCode = new Base64QRCode(qrCodeData);
-            response.Image = "data:image/png;base64," + qrCode.GetGraphic(3);
+            using var qrCode = new PngByteQRCode(qrCodeData);
+            response.Image = "data:image/png;base64," + Convert.ToBase64String(qrCode.GetGraphic(20));
         }
 
         return Ok(response);
