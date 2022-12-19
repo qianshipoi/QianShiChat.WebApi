@@ -1,6 +1,8 @@
-﻿namespace QianShiChat.WebApi.Models;
+﻿using QianShiChat.WebApi.Core.Interceptors;
 
-public class ApplyBase
+namespace QianShiChat.WebApi.Models;
+
+public class ApplyBase: IAuditable
 {
     /// <summary>
     /// 申请编号
@@ -35,10 +37,9 @@ public class ApplyBase
     public string Remark { get; set; }
 
     /// <summary>
-    /// 最后更新时间
+    /// 修改时间
     /// </summary>
-    [Required]
-    public long LaseUpdateTime { get; set; }
+    public long UpdateTime { get; set; }
 
     /// <summary>
     /// 目标

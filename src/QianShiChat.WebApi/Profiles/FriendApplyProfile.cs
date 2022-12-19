@@ -9,7 +9,7 @@ public class FriendApplyProfile : Profile
 
         CreateMap<CreateFriendApplyDto, FriendApply>()
             .ForMember(d => d.CreateTime, m => m.MapFrom(s => Timestamp.Now))
-            .ForMember(d => d.LaseUpdateTime, m => m.MapFrom((s, d) => d.CreateTime))
+            .ForMember(d => d.UpdateTime, m => m.MapFrom((s, d) => d.CreateTime))
             .ForMember(d => d.FriendId, m => m.MapFrom(s => s.UserId))
             .ForMember(d => d.Status, m => m.MapFrom(s => ApplyStatus.Applied));
     }

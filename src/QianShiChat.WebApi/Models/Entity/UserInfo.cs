@@ -1,6 +1,8 @@
-﻿namespace QianShiChat.WebApi.Models;
+﻿using QianShiChat.WebApi.Core.Interceptors;
 
-public class UserInfo
+namespace QianShiChat.WebApi.Models;
+
+public class UserInfo : IAuditable, ISoftDelete
 {
     public UserInfo()
     {
@@ -26,6 +28,8 @@ public class UserInfo
     public long CreateTime { get; set; }
 
     public bool IsDeleted { get; set; }
+    public long UpdateTime { get; set; }
+    public long DeleteTime { get; set; }
 
     [InverseProperty(nameof(UserRealtion.User))]
     public virtual ICollection<UserRealtion> Realtions { get; set; }
@@ -78,9 +82,15 @@ public class UserInfoEntityTypeConfiguration : IEntityTypeConfiguration<UserInfo
         builder.Property(x => x.CreateTime)
             .IsRequired()
             .HasComment("创建时间");
+        builder.Property(x => x.UpdateTime)
+            .IsRequired()
+            .HasComment("修改时间");
         builder.Property(x => x.IsDeleted)
             .IsRequired()
             .HasDefaultValue(false)
             .HasComment("是否已删除");
+        builder.Property(x => x.DeleteTime)
+            .IsRequired()
+            .HasComment("删除时间");
     }
 }

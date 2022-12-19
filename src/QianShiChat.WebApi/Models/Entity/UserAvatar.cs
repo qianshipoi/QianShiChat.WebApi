@@ -1,6 +1,8 @@
-﻿namespace QianShiChat.WebApi.Models;
+﻿using QianShiChat.WebApi.Core.Interceptors;
 
-public class UserAvatar
+namespace QianShiChat.WebApi.Models;
+
+public class UserAvatar : ISoftDelete, IAuditable
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -12,6 +14,9 @@ public class UserAvatar
     [Required]
     [Comment("create time.")]
     public long CreateTime { get; set; }
+    [Required]
+    [Comment("update time.")]
+    public long UpdateTime { get; set; }
     [Required]
     [MaxLength(255)]
     [Comment("file path.")]

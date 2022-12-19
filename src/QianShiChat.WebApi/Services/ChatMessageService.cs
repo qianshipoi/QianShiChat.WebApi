@@ -10,6 +10,7 @@ public class ChatMessageService : IChatMessageService, ITransient
     private readonly IRedisCachingProvider _redisCachingProvider;
     private readonly IMapper _mapper;
     private readonly IHubContext<ChatHub, IChatClient> _hubContext;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
     /// <summary>
     /// chat message service
@@ -100,29 +101,35 @@ public class ChatMessageService : IChatMessageService, ITransient
     public async Task<ChatMessageDto> SendMessageAsync(ChatMessage chatMessage)
     {
         var chatMessageDto = _mapper.Map<ChatMessageDto>(chatMessage);
+
+        if(chatMessageDto.MessageType != ChatMessageType.Text)
+        {
+            chatMessageDto.Content  = _httpContextAccessor.HttpContext!.Request.GetBaseUrl() + chatMessageDto.Content;
+        }
+        
         // send message.
-        if (chatMessage.SendType == ChatMessageSendType.Personal)
+        if (chatMessageDto.SendType == ChatMessageSendType.Personal)
         {
             await _hubContext.Clients
-                .User(chatMessage.ToId.ToString())
+                .User(chatMessageDto.ToId.ToString())
                 .PrivateChat(chatMessageDto);
         }
-        else if (chatMessage.SendType == ChatMessageSendType.Group)
+        else if (chatMessageDto.SendType == ChatMessageSendType.Group)
         {
             await _hubContext.Clients
-                .Group(chatMessage.ToId.ToString())
+                .Group(chatMessageDto.ToId.ToString())
                 .PrivateChat(chatMessageDto);
         }
 
         // cache message max 30 times;
         string? cacheKey;
-        if (chatMessage.SendType == ChatMessageSendType.Personal)
+        if (chatMessageDto.SendType == ChatMessageSendType.Personal)
         {
-            cacheKey = AppConsts.GetPrivateChatCacheKey(chatMessage.ToId, chatMessage.FromId);
+            cacheKey = AppConsts.GetPrivateChatCacheKey(chatMessageDto.ToId, chatMessageDto.FromId);
         }
         else
         {
-            cacheKey = AppConsts.GetGroupChatCacheKey(chatMessage.ToId);
+            cacheKey = AppConsts.GetGroupChatCacheKey(chatMessageDto.ToId);
         }
         var cacheValue = await _redisCachingProvider.HGetAllAsync(cacheKey);
         if (cacheValue == null) cacheValue = new Dictionary<string, string>();
@@ -139,14 +146,14 @@ public class ChatMessageService : IChatMessageService, ITransient
         // cache save message queue.
         await _redisCachingProvider.HSetAsync(
             AppConsts.ChatMessageCacheKey,
-            chatMessage.Id.ToString(),
+            chatMessageDto.Id.ToString(),
             JsonSerializer.Serialize(chatMessage));
 
         // cache update message cursor
         await _redisCachingProvider.HSetAsync(
             AppConsts.MessageCursorCacheKey,
             chatMessageDto.FromId.ToString(),
-            chatMessage.Id.ToString());
+            chatMessageDto.Id.ToString());
 
         return chatMessageDto;
     }

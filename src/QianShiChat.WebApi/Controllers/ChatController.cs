@@ -107,7 +107,7 @@ public class ChatController : BaseController
             CreateTime = now,
             FromId = CurrentUserId,
             ToId = request.ToId,
-            LastUpdateTime = now,
+            UpdateTime = now,
             MessageType = messageType,
             SendType = request.SendType
         };
@@ -136,7 +136,7 @@ public class ChatController : BaseController
             CreateTime = now,
             FromId = CurrentUserId,
             ToId = request.ToId,
-            LastUpdateTime = now,
+            UpdateTime = now,
             MessageType = ChatMessageType.Text,
             SendType = request.SendType
         };

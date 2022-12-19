@@ -1,7 +1,9 @@
-﻿namespace QianShiChat.WebApi.Models;
+﻿using QianShiChat.WebApi.Core.Interceptors;
+
+namespace QianShiChat.WebApi.Models;
 
 [Index(nameof(Id))]
-public class Todo : ISafeDelete
+public class Todo : ISoftDelete , IAuditable
 {
     [Key]
     [Required]
@@ -24,6 +26,8 @@ public class Todo : ISafeDelete
 
     [Required]
     public long CreateTime { get; set; }
+    [Required]
+    public long UpdateTime { get; set; }
 
     [Required, Comment("是否以删除")]
     public bool IsDeleted { get; set; }
@@ -45,7 +49,7 @@ public enum TodoStatus
 }
 
 [Index(nameof(Id))]
-public class TodoGroup : ISafeDelete
+public class TodoGroup : ISoftDelete
 {
     [Key]
     public Guid Id { get; set; }

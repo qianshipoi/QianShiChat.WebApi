@@ -1,6 +1,8 @@
-﻿namespace QianShiChat.WebApi.Models;
+﻿using QianShiChat.WebApi.Core.Interceptors;
 
-public class DefaultAvatar
+namespace QianShiChat.WebApi.Models;
+
+public class DefaultAvatar : ISoftDelete, IAuditable
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -23,4 +25,8 @@ public class DefaultAvatar
 
     [Comment("delete time.")]
     public long DeleteTime { get; set; }
+
+    [Required]
+    [Comment("update time.")]
+    public long UpdateTime { get; set; }
 }

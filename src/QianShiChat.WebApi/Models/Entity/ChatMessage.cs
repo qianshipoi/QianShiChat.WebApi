@@ -1,8 +1,10 @@
-﻿namespace QianShiChat.WebApi.Models.Entity;
+﻿using QianShiChat.WebApi.Core.Interceptors;
+
+namespace QianShiChat.WebApi.Models.Entity;
 
 [Table(nameof(ChatMessage))]
 [Index(nameof(Id))]
-public class ChatMessage
+public class ChatMessage : IAuditable
 {
     [Key]
     [Required]
@@ -27,7 +29,7 @@ public class ChatMessage
     public long CreateTime { get; set; }
 
     [Required]
-    public long LastUpdateTime { get; set; }
+    public long UpdateTime { get; set; }
 
     [Required]
     public bool IsDeleted { get; set; }

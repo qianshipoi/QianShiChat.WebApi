@@ -1,6 +1,6 @@
-﻿namespace QianShiChat.WebApi.Models;
+﻿namespace QianShiChat.WebApi.Core.Interceptors;
 
-public interface ISafeDelete
+public interface ISoftDelete
 {
     public bool IsDeleted { get; set; }
     public long DeleteTime { get; set; }

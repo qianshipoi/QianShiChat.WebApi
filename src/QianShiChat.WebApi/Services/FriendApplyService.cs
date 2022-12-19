@@ -49,7 +49,7 @@ public class FriendApplyService : IFriendApplyService, ITransient
             .SingleOrDefaultAsync(cancellationToken);
 
         apply.Remark = dto.Remark;
-        apply.LaseUpdateTime = Timestamp.Now;
+        apply.UpdateTime = Timestamp.Now;
         await _context.SaveChangesAsync(cancellationToken);
 
         return _mapper.Map<FriendApplyDto>(apply);
@@ -61,7 +61,7 @@ public class FriendApplyService : IFriendApplyService, ITransient
               .AsNoTracking()
               .Where(x => x.UserId == userId)
               .Where(x => x.CreateTime > beforeTime)
-              .OrderByDescending(x => x.LaseUpdateTime)
+              .OrderByDescending(x => x.UpdateTime)
               .ThenByDescending(x => x.Id)
               .Take(size)
               .ProjectTo<FriendApplyDto>(_mapper.ConfigurationProvider)
@@ -72,7 +72,7 @@ public class FriendApplyService : IFriendApplyService, ITransient
     {
         return await _context.FriendApplies
             .Where(x => x.UserId == userId)
-            .OrderByDescending(x => x.LaseUpdateTime)
+            .OrderByDescending(x => x.UpdateTime)
             .CountAsync(cancellationToken);
     }
 
@@ -85,7 +85,7 @@ public class FriendApplyService : IFriendApplyService, ITransient
             .FirstAsync(cancellationToken);
 
         apply.Status = status;
-        apply.LaseUpdateTime = Timestamp.Now;
+        apply.UpdateTime = Timestamp.Now;
 
         if (status == ApplyStatus.Passed
             && !await _context.UserRealtions.AnyAsync(x => x.UserId == apply.UserId && x.FriendId == apply.FriendId, cancellationToken))
@@ -94,14 +94,14 @@ public class FriendApplyService : IFriendApplyService, ITransient
             {
                 UserId = apply.FriendId,
                 FriendId = apply.UserId,
-                CreateTime = apply.LaseUpdateTime
+                CreateTime = apply.UpdateTime
             });
 
             _context.UserRealtions.Add(new UserRealtion
             {
                 UserId = apply.UserId,
                 FriendId = apply.FriendId,
-                CreateTime = apply.LaseUpdateTime
+                CreateTime = apply.UpdateTime
             });
         }
 

@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.WebApi.Models;
+﻿using QianShiChat.WebApi.Core.Interceptors;
+
+namespace QianShiChat.WebApi.Models;
 
 public class ChatDbContext : DbContext
 {
@@ -141,9 +143,9 @@ public class ChatDbContext : DbContext
 
         var friendApplys = new List<FriendApply>()
         {
-            new(){ Id = 1, CreateTime = nowTime, UserId = 1, FriendId = 2, LaseUpdateTime = nowTime, Remark = "很高兴认识你。", Status = QianShiChat.Models.ApplyStatus.Rejected },
-            new(){ Id = 2, CreateTime = nowTime, UserId = 1, FriendId = 2, LaseUpdateTime = nowTime, Remark = "Nice to meet you.", Status = QianShiChat.Models.ApplyStatus.Passed },
-            new() {Id = 3, CreateTime = nowTime, UserId = 1, FriendId = 3, LaseUpdateTime = nowTime, Remark = "hi!", Status = QianShiChat.Models.ApplyStatus.Applied }
+            new(){ Id = 1, CreateTime = nowTime, UserId = 1, FriendId = 2, UpdateTime = nowTime, Remark = "很高兴认识你。", Status = ApplyStatus.Rejected },
+            new(){ Id = 2, CreateTime = nowTime, UserId = 1, FriendId = 2, UpdateTime = nowTime, Remark = "Nice to meet you.", Status = ApplyStatus.Passed },
+            new() {Id = 3, CreateTime = nowTime, UserId = 1, FriendId = 3, UpdateTime = nowTime, Remark = "hi!", Status = ApplyStatus.Applied }
         };
 
         modelBuilder.Entity<FriendApply>().HasData(friendApplys);
@@ -155,7 +157,17 @@ public class ChatDbContext : DbContext
             new () { Id = 3, CreateTime = nowTime, UserId = 2, FriendId = 3 },
             new () { Id = 4, CreateTime = nowTime, UserId = 3, FriendId = 2 },
         };
-
         modelBuilder.Entity<UserRealtion>().HasData(urs);
+
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            if (typeof(ISoftDelete).IsAssignableFrom(entityType.ClrType))
+            {
+                // p => p.IsDeleted == false
+                var parameter = Expression.Parameter(entityType.ClrType, "p");
+                var deletedCheck = Expression.Lambda(Expression.Equal(Expression.Property(parameter, nameof(ISoftDelete.IsDeleted)), Expression.Constant(false)), parameter);
+                modelBuilder.Entity(entityType.ClrType).HasQueryFilter(deletedCheck);
+            }
+        }
     }
 }

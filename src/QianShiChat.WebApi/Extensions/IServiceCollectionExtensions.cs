@@ -1,4 +1,6 @@
-﻿namespace Microsoft.Extensions.DependencyInjection;
+﻿using QianShiChat.WebApi.Core.Interceptors;
+
+namespace Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
 /// Service Extension
@@ -47,9 +49,16 @@ public static class IServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddChatDbContext(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<ChatDbContext>(options =>
+
+        services.AddScoped<SoftDeleteInterceptor>();
+        services.AddScoped<IAuditableInterceptor>();
+
+        services.AddDbContext<ChatDbContext>((sp, options) =>
         {
-            options.UseMySql(configuration.GetConnectionString("Default"), ServerVersion.Parse("8.0.31"));
+            var safeDeleteInterceptor = sp.GetRequiredService<SoftDeleteInterceptor>();
+            var auditableInterceptor = sp.GetRequiredService<IAuditableInterceptor>();
+
+            options.UseMySql(configuration.GetConnectionString("Default"), ServerVersion.Parse("8.0.31")).AddInterceptors(safeDeleteInterceptor, auditableInterceptor);
         });
         return services;
     }

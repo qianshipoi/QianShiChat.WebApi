@@ -56,3 +56,5 @@ global using System.Text.Json.Serialization;
 global using System.Linq.Expressions;
 
 global using Yitter.IdGenerator;
+
+global using QianShiChat.WebApi.Core;
