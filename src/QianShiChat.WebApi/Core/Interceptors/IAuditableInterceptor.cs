@@ -9,7 +9,6 @@ namespace QianShiChat.WebApi.Core.Interceptors
             var dbContext = eventData.Context;
             if (dbContext is null)
             {
-
                 return base.SavingChangesAsync(eventData, result, cancellationToken);
             }
 

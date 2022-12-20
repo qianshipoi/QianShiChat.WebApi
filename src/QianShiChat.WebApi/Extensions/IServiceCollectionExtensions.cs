@@ -1,6 +1,4 @@
-﻿using QianShiChat.WebApi.Core.Interceptors;
-
-namespace Microsoft.Extensions.DependencyInjection;
+﻿namespace Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
 /// Service Extension
@@ -49,7 +47,6 @@ public static class IServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddChatDbContext(this IServiceCollection services, IConfiguration configuration)
     {
-
         services.AddScoped<SoftDeleteInterceptor>();
         services.AddScoped<IAuditableInterceptor>();
 

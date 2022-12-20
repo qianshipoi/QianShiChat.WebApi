@@ -5,16 +5,16 @@
 /// </summary>
 public class AvatarService : IAvatarService, ITransient
 {
-    readonly ILogger<AvatarService> _logger;
-    readonly IMapper _mapper;
-    readonly ChatDbContext _context;
-    readonly string _avatarPath;
-    readonly IWebHostEnvironment _webHostEnvironment;
+    private readonly ILogger<AvatarService> _logger;
+    private readonly IMapper _mapper;
+    private readonly ChatDbContext _context;
+    private readonly string _avatarPath;
+    private readonly IWebHostEnvironment _webHostEnvironment;
 
-    const long AvatarMaxLenght = 1024 * 1024 * 4;
-    const string AvatarPrefix = "/Raw/Avatar";
+    private const long AvatarMaxLenght = 1024 * 1024 * 4;
+    private const string AvatarPrefix = "/Raw/Avatar";
 
-    static string[] AllowAvatarExts = new string[] { ".png", ".jpg", ".jpeg", ".gif" };
+    private static string[] AllowAvatarExts = new string[] { ".png", ".jpg", ".jpeg", ".gif" };
 
     public AvatarService(
         ChatDbContext context,

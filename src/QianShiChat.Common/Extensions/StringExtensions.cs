@@ -5,7 +5,7 @@ namespace QianShiChat.Common.Extensions
 {
     public static class StringExtensions
     {
-       public static string ToMd5(this string input)
+        public static string ToMd5(this string input)
         {
             StringBuilder hash = new StringBuilder();
             var md5provider = MD5.Create();

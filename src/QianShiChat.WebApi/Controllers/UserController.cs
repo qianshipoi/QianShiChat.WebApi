@@ -7,11 +7,11 @@
 [ApiController]
 public class UserController : BaseController
 {
-    readonly ILogger<UserController> _logger;
-    readonly IMapper _mapper;
-    readonly IUserService _userService;
-    readonly IRedisCachingProvider _redisCachingProvider;
-    readonly IAvatarService _avatarService;
+    private readonly ILogger<UserController> _logger;
+    private readonly IMapper _mapper;
+    private readonly IUserService _userService;
+    private readonly IRedisCachingProvider _redisCachingProvider;
+    private readonly IAvatarService _avatarService;
 
     /// <summary>
     /// user controller
@@ -91,7 +91,7 @@ public class UserController : BaseController
     public async Task<IActionResult> Create([FromBody] CreateUserDto dto, CancellationToken cancellationToken = default)
     {
         var avatarPath = await _avatarService.GetDefaultAvatarByIdAsync(dto.DefaultAvatarId, cancellationToken);
-        if(string.IsNullOrWhiteSpace(avatarPath))
+        if (string.IsNullOrWhiteSpace(avatarPath))
         {
             return BadRequest("default avatar not found.");
         }

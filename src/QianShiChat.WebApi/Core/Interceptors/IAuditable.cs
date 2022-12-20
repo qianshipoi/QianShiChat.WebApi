@@ -6,5 +6,3 @@ public interface IAuditable
 
     public long UpdateTime { get; set; }
 }
-
-

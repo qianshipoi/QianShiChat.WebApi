@@ -10,7 +10,7 @@ public static class HttpRequestExtensions
     public static string GetBaseUrl(this HttpRequest request)
     {
         return new StringBuilder()
-            .Append(request.IsHttps ? "https": "http")
+            .Append(request.IsHttps ? "https" : "http")
             .Append("://")
             .Append(request.Host)
             .Append(request.PathBase)

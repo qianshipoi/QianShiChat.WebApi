@@ -7,10 +7,10 @@
 [ApiController]
 public class AuthController : BaseController
 {
-    readonly IMapper _mapper;
-    readonly IJwtService _jwtService;
-    readonly IUserService _userService;
-    readonly IRedisCachingProvider _redisCachingProvider;
+    private readonly IMapper _mapper;
+    private readonly IJwtService _jwtService;
+    private readonly IUserService _userService;
+    private readonly IRedisCachingProvider _redisCachingProvider;
 
     /// <summary>
     /// auth controller
@@ -277,5 +277,5 @@ public class AuthController : BaseController
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    string GetQrKeyCacheKey(string key) => $"qr-key:{key}";
+    private string GetQrKeyCacheKey(string key) => $"qr-key:{key}";
 }

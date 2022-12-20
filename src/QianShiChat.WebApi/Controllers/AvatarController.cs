@@ -7,7 +7,7 @@
 [ApiController]
 public class AvatarController : BaseController
 {
-    readonly IAvatarService _avatarService;
+    private readonly IAvatarService _avatarService;
 
     public AvatarController(IAvatarService avatarService)
     {
@@ -29,7 +29,7 @@ public class AvatarController : BaseController
 
     [HttpPost]
     [Authorize]
-    public async Task<ActionResult<string>> UpdateAvatar([Required]IFormFile file, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<string>> UpdateAvatar([Required] IFormFile file, CancellationToken cancellationToken = default)
     {
         var (success, msg) = await _avatarService.UploadAvatarAsync(CurrentUserId, file, cancellationToken);
 

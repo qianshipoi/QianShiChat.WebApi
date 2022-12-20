@@ -2,10 +2,8 @@
 
 public static class Oops
 {
-
 }
 
 public class BusinessException : Exception
 {
-
 }

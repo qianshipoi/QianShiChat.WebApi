@@ -18,7 +18,7 @@ public class UserProfile : Profile
     }
 }
 
-public class AvatarProfile :Profile
+public class AvatarProfile : Profile
 {
     public AvatarProfile()
     {

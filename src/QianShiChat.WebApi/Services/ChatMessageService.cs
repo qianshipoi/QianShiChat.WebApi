@@ -102,11 +102,11 @@ public class ChatMessageService : IChatMessageService, ITransient
     {
         var chatMessageDto = _mapper.Map<ChatMessageDto>(chatMessage);
 
-        if(chatMessageDto.MessageType != ChatMessageType.Text)
+        if (chatMessageDto.MessageType != ChatMessageType.Text)
         {
-            chatMessageDto.Content  = _httpContextAccessor.HttpContext!.Request.GetBaseUrl() + chatMessageDto.Content;
+            chatMessageDto.Content = _httpContextAccessor.HttpContext!.Request.GetBaseUrl() + chatMessageDto.Content;
         }
-        
+
         // send message.
         if (chatMessageDto.SendType == ChatMessageSendType.Personal)
         {

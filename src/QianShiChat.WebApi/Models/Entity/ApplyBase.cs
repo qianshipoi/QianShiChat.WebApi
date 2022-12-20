@@ -1,8 +1,6 @@
-﻿using QianShiChat.WebApi.Core.Interceptors;
+﻿namespace QianShiChat.WebApi.Models;
 
-namespace QianShiChat.WebApi.Models;
-
-public class ApplyBase: IAuditable
+public class ApplyBase : IAuditable
 {
     /// <summary>
     /// 申请编号

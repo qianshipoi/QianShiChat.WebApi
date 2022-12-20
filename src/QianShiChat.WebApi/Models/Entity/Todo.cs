@@ -1,9 +1,7 @@
-﻿using QianShiChat.WebApi.Core.Interceptors;
-
-namespace QianShiChat.WebApi.Models;
+﻿namespace QianShiChat.WebApi.Models;
 
 [Index(nameof(Id))]
-public class Todo : ISoftDelete , IAuditable
+public class Todo : ISoftDelete, IAuditable
 {
     [Key]
     [Required]
@@ -26,6 +24,7 @@ public class Todo : ISoftDelete , IAuditable
 
     [Required]
     public long CreateTime { get; set; }
+
     [Required]
     public long UpdateTime { get; set; }
 

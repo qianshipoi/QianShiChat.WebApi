@@ -41,7 +41,6 @@ builder.Services
 
 builder.Services.AddDirectoryBrowser();
 
-
 var app = builder.Build();
 
 app.UseOpenApi();

@@ -1,6 +1,4 @@
-﻿using QianShiChat.WebApi.Core.Interceptors;
-
-namespace QianShiChat.WebApi.Models;
+﻿namespace QianShiChat.WebApi.Models;
 
 public class UserInfo : IAuditable, ISoftDelete
 {

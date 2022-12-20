@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace QianShiChat.Models
+﻿namespace QianShiChat.Models
 {
     public class PagedList<T> where T : class
     {

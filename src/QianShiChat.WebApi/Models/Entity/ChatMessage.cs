@@ -1,6 +1,4 @@
-﻿using QianShiChat.WebApi.Core.Interceptors;
-
-namespace QianShiChat.WebApi.Models.Entity;
+﻿namespace QianShiChat.WebApi.Models.Entity;
 
 [Table(nameof(ChatMessage))]
 [Index(nameof(Id))]

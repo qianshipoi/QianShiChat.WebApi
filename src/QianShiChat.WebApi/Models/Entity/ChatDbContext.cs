@@ -1,6 +1,4 @@
-﻿using QianShiChat.WebApi.Core.Interceptors;
-
-namespace QianShiChat.WebApi.Models;
+﻿namespace QianShiChat.WebApi.Models;
 
 public class ChatDbContext : DbContext
 {
@@ -8,10 +6,8 @@ public class ChatDbContext : DbContext
     public DbSet<UserAvatar> UserAvatars { get; set; }
     public DbSet<DefaultAvatar> DefaultAvatars { get; set; }
     public DbSet<UserRealtion> UserRealtions { get; set; }
-
     public DbSet<FriendApply> FriendApplies { get; set; }
     public DbSet<ChatMessage> ChatMessages { get; set; }
-
     public DbSet<MessageCursor> MessageCursors { get; set; }
 
     public ChatDbContext(DbContextOptions options) : base(options)
