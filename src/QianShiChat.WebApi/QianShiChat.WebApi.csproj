@@ -36,6 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\QianShiChat.Application\QianShiChat.Application.csproj" />
     <ProjectReference Include="..\QianShiChat.Common\QianShiChat.Common.csproj" />
   </ItemGroup>
 

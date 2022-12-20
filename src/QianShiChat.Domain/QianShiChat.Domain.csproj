@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.1" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0-silver.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\QianShiChat.Common\QianShiChat.Common.csproj" />
+    <ProjectReference Include="..\QianShiChat.Domain.Shared\QianShiChat.Domain.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

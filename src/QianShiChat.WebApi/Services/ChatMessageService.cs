@@ -57,7 +57,7 @@ public class ChatMessageService : IChatMessageService, ITransient
 
             var data = await _context.ChatMessages.AsNoTracking()
                  .Where(x => x.SendType == ChatMessageSendType.Personal)
-                 .Where(x => (x.ToId == userId1 && x.FromId == userId2) || (x.ToId == userId2 && x.FromId == userId1))
+                 .Where(x => x.ToId == userId1 && x.FromId == userId2 || x.ToId == userId2 && x.FromId == userId1)
                  .Where(x => x.Id < minId)
                  .OrderByDescending(x => x.Id)
                  .Take(10 - messages.Count)

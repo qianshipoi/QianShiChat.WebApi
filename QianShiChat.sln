@@ -9,6 +9,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QianShiChat.Common", "src\Q
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QianShiChat.WebApi", "src\QianShiChat.WebApi\QianShiChat.WebApi.csproj", "{083696EF-D9F3-4B78-8BF4-3AB5E937BD84}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QianShiChat.Domain", "src\QianShiChat.Domain\QianShiChat.Domain.csproj", "{D06DB836-C5F5-47F4-BC71-1DDBC3B80CB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QianShiChat.Domain.Shared", "src\QianShiChat.Domain.Shared\QianShiChat.Domain.Shared.csproj", "{81932CCC-0FF6-463F-A952-A77A9137483B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QianShiChat.Application", "src\QianShiChat.Application\QianShiChat.Application.csproj", "{3C7978FA-6817-40A1-AC9C-C12E7C8C4103}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QainShiChat.Application.Contracts", "src\QainShiChat.Application.Contracts\QainShiChat.Application.Contracts.csproj", "{294C7617-4584-4E23-8516-9EFEDD20C9B9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +31,22 @@ Global
 		{083696EF-D9F3-4B78-8BF4-3AB5E937BD84}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{083696EF-D9F3-4B78-8BF4-3AB5E937BD84}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{083696EF-D9F3-4B78-8BF4-3AB5E937BD84}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D06DB836-C5F5-47F4-BC71-1DDBC3B80CB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D06DB836-C5F5-47F4-BC71-1DDBC3B80CB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D06DB836-C5F5-47F4-BC71-1DDBC3B80CB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D06DB836-C5F5-47F4-BC71-1DDBC3B80CB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81932CCC-0FF6-463F-A952-A77A9137483B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81932CCC-0FF6-463F-A952-A77A9137483B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81932CCC-0FF6-463F-A952-A77A9137483B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81932CCC-0FF6-463F-A952-A77A9137483B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C7978FA-6817-40A1-AC9C-C12E7C8C4103}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C7978FA-6817-40A1-AC9C-C12E7C8C4103}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C7978FA-6817-40A1-AC9C-C12E7C8C4103}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C7978FA-6817-40A1-AC9C-C12E7C8C4103}.Release|Any CPU.Build.0 = Release|Any CPU
+		{294C7617-4584-4E23-8516-9EFEDD20C9B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{294C7617-4584-4E23-8516-9EFEDD20C9B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{294C7617-4584-4E23-8516-9EFEDD20C9B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{294C7617-4584-4E23-8516-9EFEDD20C9B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -30,6 +54,10 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{F643FA6D-FAD0-4B61-A646-1AE44BBBA375} = {B475C797-8EB0-4B97-BD77-8B025695FCAE}
 		{083696EF-D9F3-4B78-8BF4-3AB5E937BD84} = {B475C797-8EB0-4B97-BD77-8B025695FCAE}
+		{D06DB836-C5F5-47F4-BC71-1DDBC3B80CB2} = {B475C797-8EB0-4B97-BD77-8B025695FCAE}
+		{81932CCC-0FF6-463F-A952-A77A9137483B} = {B475C797-8EB0-4B97-BD77-8B025695FCAE}
+		{3C7978FA-6817-40A1-AC9C-C12E7C8C4103} = {B475C797-8EB0-4B97-BD77-8B025695FCAE}
+		{294C7617-4584-4E23-8516-9EFEDD20C9B9} = {B475C797-8EB0-4B97-BD77-8B025695FCAE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {57A682C3-B712-4D9B-A254-3F4A806CCA46}

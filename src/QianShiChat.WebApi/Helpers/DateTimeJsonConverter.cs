@@ -1,4 +1,4 @@
-﻿namespace QianShiChat.WebApi;
+﻿namespace QianShiChat.WebApi.Helpers;
 
 /// <summary>
 /// json formatter datetime.

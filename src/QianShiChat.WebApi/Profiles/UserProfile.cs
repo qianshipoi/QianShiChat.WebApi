@@ -1,4 +1,4 @@
-﻿namespace QianShiChat.WebApi;
+﻿namespace QianShiChat.WebApi.Profiles;
 
 public class UserProfile : Profile
 {

@@ -103,6 +103,6 @@ public class UserController : BaseController
 
         var user = await _userService.AddAsync(dto, avatarPath, cancellationToken);
 
-        return CreatedAtAction(nameof(GetUser), new { Id = user.Id }, user);
+        return CreatedAtAction(nameof(GetUser), new { user.Id }, user);
     }
 }
