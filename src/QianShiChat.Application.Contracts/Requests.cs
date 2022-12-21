@@ -1,4 +1,6 @@
-﻿namespace QainShiChat.Application.Contracts;
+﻿using Microsoft.AspNetCore.Http;
+
+namespace QianShiChat.Application.Contracts;
 
 public class UpdateCursorRequest
 {

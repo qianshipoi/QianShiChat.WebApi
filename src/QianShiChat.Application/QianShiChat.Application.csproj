@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\QainShiChat.Application.Contracts\QainShiChat.Application.Contracts.csproj" />
+    <ProjectReference Include="..\QianShiChat.Application.Contracts\QianShiChat.Application.Contracts.csproj" />
     <ProjectReference Include="..\QianShiChat.Domain\QianShiChat.Domain.csproj" />
   </ItemGroup>
 

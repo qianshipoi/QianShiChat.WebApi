@@ -19,8 +19,7 @@ global using Microsoft.Extensions.Options;
 global using Microsoft.IdentityModel.Tokens;
 global using Microsoft.OpenApi.Models;
 
-global using QainShiChat.Application.Contracts;
-
+global using QianShiChat.Application.Contracts;
 global using QianShiChat.Common.Extensions;
 global using QianShiChat.Common.Helpers;
 global using QianShiChat.Domain;
@@ -28,7 +27,6 @@ global using QianShiChat.Domain.Core.AutoDI;
 global using QianShiChat.Domain.Core.Interceptors;
 global using QianShiChat.Domain.Models;
 global using QianShiChat.Domain.Shared;
-global using QianShiChat.Models;
 global using QianShiChat.WebApi;
 global using QianShiChat.WebApi.BackgroundHost;
 global using QianShiChat.WebApi.Extensions;

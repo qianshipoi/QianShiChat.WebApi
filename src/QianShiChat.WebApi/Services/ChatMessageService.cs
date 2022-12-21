@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.WebApi.Services;
+﻿using QianShiChat.Application.Contracts;
+
+namespace QianShiChat.WebApi.Services;
 
 /// <summary>
 /// chat message service

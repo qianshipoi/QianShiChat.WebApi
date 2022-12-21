@@ -1,4 +1,4 @@
-﻿namespace QainShiChat.Application.Contracts;
+﻿namespace QianShiChat.Application.Contracts;
 
 public class PagedList<T> where T : class
 {
