@@ -20,19 +20,12 @@ public class NoticeController : BaseController
         if (userIds is not null && userIds.Length > 0)
         {
             await _hubContext.Clients.Users(userIds.Select(x => x.ToString()))
-                       .Notification(new NotificationMessage(default, default)
-                       {
-                           Type = type,
-                           Message = msg
-                       });
+                       .Notification(new NotificationMessage(type, msg));
         }
         else
         {
-            await _hubContext.Clients.All.Notification(new NotificationMessage(default, default)
-            {
-                Type = type,
-                Message = msg
-            });
+            await _hubContext.Clients.All
+                .Notification(new NotificationMessage(type, msg));
         }
     }
 }

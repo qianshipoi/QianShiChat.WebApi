@@ -4,7 +4,6 @@
 /// 好友申请
 /// </summary>
 [Table(nameof(FriendApply))]
-[Index(nameof(Id))]
 public class FriendApply : ApplyBase
 {
     /// <summary>
@@ -18,4 +17,22 @@ public class FriendApply : ApplyBase
     /// </summary>
     [ForeignKey(nameof(FriendId))]
     public UserInfo Friend { get; set; }
+}
+
+/// <summary>
+/// 加群申请
+/// </summary>
+public class GroupApply : ApplyBase
+{
+    /// <summary>
+    /// 群编号
+    /// </summary>
+    [Required]
+    public int GroupId { get; set; }
+
+    /// <summary>
+    /// 群组
+    /// </summary>
+    [ForeignKey(nameof(GroupId))]
+    public Group Group { get; set; }
 }

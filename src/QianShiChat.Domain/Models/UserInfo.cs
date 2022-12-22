@@ -9,6 +9,8 @@ public class UserInfo : IAuditable, ISoftDelete
         FriendApplyUsers = new HashSet<FriendApply>();
         FriendApplyFriends = new HashSet<FriendApply>();
         UserAvatars = new HashSet<UserAvatar>();
+        Groups = new HashSet<Group>();
+        UserGroups = new HashSet<UserGroupRealtion>();
     }
 
     public int Id { get; set; }
@@ -45,6 +47,10 @@ public class UserInfo : IAuditable, ISoftDelete
     public virtual ICollection<UserAvatar> UserAvatars { get; set; }
 
     public MessageCursor Cursor { get; set; }
+
+    public virtual ICollection<Group> Groups { get; set; } = null!;
+
+    public virtual ICollection<UserGroupRealtion> UserGroups { get; set; } = null!;
 }
 
 public class UserInfoEntityTypeConfiguration : IEntityTypeConfiguration<UserInfo>

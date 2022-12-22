@@ -10,6 +10,11 @@ public class ChatDbContext : DbContext
     public DbSet<ChatMessage> ChatMessages { get; set; }
     public DbSet<MessageCursor> MessageCursors { get; set; }
 
+    public DbSet<Group> Groups { get; set; }
+    public DbSet<UserGroupRealtion> UserGroupRealtions { get; set; }
+    public DbSet<GroupApply> GroupApplies { get; set; }
+
+
     public ChatDbContext(DbContextOptions options) : base(options)
     {
     }
