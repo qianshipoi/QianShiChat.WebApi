@@ -1,6 +1,4 @@
-﻿using QianShiChat.Application.Contracts;
-
-namespace QianShiChat.Application.Contracts;
+﻿namespace QianShiChat.Application.Contracts;
 
 public class UserDto
 {

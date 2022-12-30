@@ -16,8 +16,8 @@ public class FriendController : BaseController
     /// friend api.
     /// </summary>
     public FriendController(
-        IFriendService friendService, 
-        IChatMessageService chatMessageService, 
+        IFriendService friendService,
+        IChatMessageService chatMessageService,
         IMapper mapper)
     {
         _friendService = friendService;

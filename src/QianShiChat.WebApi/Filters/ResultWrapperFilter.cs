@@ -21,7 +21,7 @@ public class ResultWrapperFilter : ActionFilterAttribute
             }
             else
             {
-                if (objectResult.DeclaredType?.IsGenericType ?? false && objectResult.DeclaredType?.GetGenericTypeDefinition() == typeof(GlobalResult<>))
+                if ((objectResult.DeclaredType?.IsGenericType ?? false) && objectResult.DeclaredType?.GetGenericTypeDefinition() == typeof(GlobalResult<>))
                 {
                     return;
                 }

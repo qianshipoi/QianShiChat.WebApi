@@ -1,5 +1,4 @@
 ﻿global using AutoMapper;
-global using AutoMapper.QueryableExtensions;
 
 global using EasyCaching.Core;
 global using EasyCaching.Serialization.SystemTextJson.Configurations;
@@ -11,25 +10,28 @@ global using MediatR;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Mvc.Controllers;
+global using Microsoft.AspNetCore.Mvc.Filters;
 global using Microsoft.AspNetCore.SignalR;
 global using Microsoft.AspNetCore.StaticFiles;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.FileProviders;
-global using Microsoft.Extensions.Options;
 global using Microsoft.IdentityModel.Tokens;
 global using Microsoft.OpenApi.Models;
 
 global using QianShiChat.Application.Contracts;
+global using QianShiChat.Application.Hubs;
+global using QianShiChat.Application.Services;
 global using QianShiChat.Common.Extensions;
 global using QianShiChat.Common.Helpers;
 global using QianShiChat.Domain;
-global using QianShiChat.Domain.Core.AutoDI;
+global using QianShiChat.Domain.Core.AppOops;
 global using QianShiChat.Domain.Core.Interceptors;
 global using QianShiChat.Domain.Models;
+global using QianShiChat.Domain.Options;
 global using QianShiChat.Domain.Shared;
 global using QianShiChat.WebApi.BackgroundHost;
-global using QianShiChat.Domain.Options;
-global using QianShiChat.Application.Services;
+global using QianShiChat.WebApi.Filters;
 
 global using QRCoder;
 
@@ -43,7 +45,6 @@ global using SixLabors.ImageSharp.Web.Providers;
 
 global using System.ComponentModel.DataAnnotations;
 global using System.Globalization;
-global using System.IdentityModel.Tokens.Jwt;
 global using System.Reflection;
 global using System.Security.Claims;
 global using System.Text;
@@ -51,10 +52,3 @@ global using System.Text.Json;
 global using System.Text.Json.Serialization;
 
 global using Yitter.IdGenerator;
-global using QianShiChat.Application.Hubs;
-global using QianShiChat.WebApi.Filters;
-
-global using Microsoft.AspNetCore.Mvc.Controllers;
-global using Microsoft.AspNetCore.Mvc.Filters;
-
-global using QianShiChat.Domain.Core.AppOops;

@@ -93,9 +93,7 @@ public class GroupService : IGroupService, ITransient
         _context.UserGroupRealtions.Remove(group);
         await _context.SaveChangesAsync(cancellationToken);
     }
-
 }
-
 
 public interface IGroupService
 {

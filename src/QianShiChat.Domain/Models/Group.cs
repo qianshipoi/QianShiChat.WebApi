@@ -10,14 +10,19 @@ public class Group : ISoftDelete
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
+
     [Required]
     public int UserId { get; set; }
+
     [Required, MaxLength(128)]
     public string Name { get; set; } = null!;
+
     [Required]
     public int TotalUser { get; set; }
+
     [Required]
     public long CreateTime { get; set; }
+
     public bool IsDeleted { get; set; }
     public long DeleteTime { get; set; }
 

@@ -14,7 +14,6 @@ public class ChatDbContext : DbContext
     public DbSet<UserGroupRealtion> UserGroupRealtions { get; set; }
     public DbSet<GroupApply> GroupApplies { get; set; }
 
-
     public ChatDbContext(DbContextOptions options) : base(options)
     {
     }

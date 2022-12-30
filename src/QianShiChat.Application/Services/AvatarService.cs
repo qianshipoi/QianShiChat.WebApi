@@ -10,6 +10,7 @@ public class AvatarService : IAvatarService, ITransient
     private readonly ChatDbContext _context;
     private readonly string _avatarPath;
     private readonly IWebHostEnvironment _webHostEnvironment;
+    private readonly IFileService _fileService;
 
     private const long AvatarMaxLenght = 1024 * 1024 * 4;
     private const string AvatarPrefix = "/Raw/Avatar";
@@ -20,7 +21,8 @@ public class AvatarService : IAvatarService, ITransient
         ChatDbContext context,
         ILogger<AvatarService> logger,
         IMapper mapper,
-        IWebHostEnvironment webHostEnvironment)
+        IWebHostEnvironment webHostEnvironment,
+        IFileService fileService)
     {
         _context = context;
         _logger = logger;
@@ -31,6 +33,7 @@ public class AvatarService : IAvatarService, ITransient
         {
             Directory.CreateDirectory(_avatarPath);
         }
+        _fileService = fileService;
     }
 
     public async Task<PagedList<AvatarDto>> GetUserAvatarsAsync(int userId, QueryUserAvatar query, CancellationToken cancellationToken = default)
@@ -45,6 +48,11 @@ public class AvatarService : IAvatarService, ITransient
             .ProjectTo<AvatarDto>(_mapper.ConfigurationProvider)
             .ToListAsync(cancellationToken);
 
+        data.ForEach(item =>
+        {
+            item.Path = _fileService.FormatWwwRootFile(item.Path);
+        });
+
         return PagedList.Create(data, query.Count);
     }
 
@@ -58,6 +66,11 @@ public class AvatarService : IAvatarService, ITransient
            .Take(query.Count + 1)
            .ProjectTo<AvatarDto>(_mapper.ConfigurationProvider)
            .ToListAsync(cancellationToken);
+
+        data.ForEach(item =>
+        {
+            item.Path = _fileService.FormatWwwRootFile(item.Path);
+        });
 
         return PagedList.Create(data, query.Count);
     }

@@ -40,4 +40,3 @@ public class GlobalExceptionFilter : IExceptionFilter
         context.ExceptionHandled = true;
     }
 }
-

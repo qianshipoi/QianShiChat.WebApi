@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace QianShiChat.Domain.Core.AppOops;
+﻿namespace QianShiChat.Domain.Core.AppOops;
 
 public static class Oops
 {
@@ -10,7 +8,6 @@ public static class Oops
         friendlyException.ValidationException = true;
         return friendlyException;
     }
-
 
     public static BusinessException Oh(string errorMessage, params object[] args)
     {

@@ -1,6 +1,4 @@
-﻿using QianShiChat.Application.Contracts;
-
-namespace QianShiChat.WebApi.Profiles;
+﻿namespace QianShiChat.WebApi.Profiles;
 
 public class UserProfile : Profile
 {

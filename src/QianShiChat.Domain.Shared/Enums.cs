@@ -26,7 +26,6 @@ public enum ApplyStatus : sbyte
     Ignored
 }
 
-
 public enum ChatMessageType : sbyte
 {
     /// <summary> 文字 </summary>
