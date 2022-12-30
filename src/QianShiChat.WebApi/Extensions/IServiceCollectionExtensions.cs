@@ -1,4 +1,8 @@
-﻿namespace Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.OpenApi.Any;
+
+using Swashbuckle.AspNetCore.SwaggerGen;
+
+namespace Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
 /// Service Extension
@@ -134,6 +138,7 @@ public static class IServiceCollectionExtensions
             var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 
+            options.OperationFilter<AddClientTypeHeaderFilter>();
             //添加授权
             var schemeName = "Bearer";
             options.AddSecurityDefinition(schemeName, new OpenApiSecurityScheme
@@ -161,6 +166,25 @@ public static class IServiceCollectionExtensions
         });
 
         return services;
+    }
+
+    public class AddClientTypeHeaderFilter : IOperationFilter
+    {
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
+        {
+            operation.Parameters.Add(new OpenApiParameter
+            {
+                Name = "Client-Type",
+                In = ParameterLocation.Header,
+                Description = "客户端类型",
+                Required = true,
+                Schema = new OpenApiSchema
+                {
+                    Type = "string",
+                    Default = new OpenApiString("OpenApiClient")
+                }
+            });
+        }
     }
 
     /// <summary>

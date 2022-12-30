@@ -5,9 +5,10 @@
 /// </summary>
 public class JwtService : IJwtService, IScoped
 {
+    private readonly ILogger<JwtService> _logger;
     private JwtOptions _jwtOptions;
 
-    public JwtService(IOptionsMonitor<JwtOptions> jwtOptionsMonitor)
+    public JwtService(IOptionsMonitor<JwtOptions> jwtOptionsMonitor, ILogger<JwtService> logger)
     {
         _jwtOptions = jwtOptionsMonitor.CurrentValue;
 
@@ -15,6 +16,7 @@ public class JwtService : IJwtService, IScoped
         {
             _jwtOptions = options;
         });
+        _logger = logger;
     }
 
     public string CreateToken(IEnumerable<Claim> claims)
@@ -27,7 +29,7 @@ public class JwtService : IJwtService, IScoped
                audience: _jwtOptions.Audience,    //接收者
                claims: claims,                                         //存放的用户信息
                notBefore: DateTime.UtcNow,                             //发布时间
-               expires: DateTime.UtcNow.AddDays(1),                      //有效期设置为1天
+               expires: DateTime.UtcNow.AddSeconds(_jwtOptions.Expires),                      //有效期设置为1天
                signingCredentials                                      //数字签名
            );
 
@@ -60,8 +62,9 @@ public class JwtService : IJwtService, IScoped
         {
             var result = jwtHander.ValidateToken(token, parameters, out _);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, ex.Message);
             return false;
         }
         return true;

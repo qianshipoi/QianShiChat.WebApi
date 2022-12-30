@@ -9,6 +9,7 @@ builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, relo
 builder.Services
     .AddControllers(setup =>
     {
+        setup.Filters.Add<ClientAuthotizationFilter>();
         setup.Filters.Add<ResultWrapperFilter>();
         setup.Filters.Add<GlobalExceptionFilter>();
     })
@@ -41,7 +42,8 @@ builder.Services
     .AddChatDbContext(builder.Configuration)
     .AddAutoDI()
     .AddSaveChatMessageJob()
-    .AddImageConversion();
+    .AddImageConversion()
+    .AddHttpContextAccessor();
 
 builder.Services.AddDirectoryBrowser();
 

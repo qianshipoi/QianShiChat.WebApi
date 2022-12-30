@@ -60,13 +60,16 @@ public class ChatHub : Hub<IChatClient>
                 isOnline ? NotificationType.FriendOnline : NotificationType.FriendOffline,
                 CurrentUserId.ToString()));
 
+        Context.GetHttpContext()!.TryGetHeaderFirstValue(AppConsts.ClientType, out string? clientType);
+        var cacheKey = FormatOnlineUserKey(CurrentUserId.ToString(), clientType!);
         if (isOnline)
         {
-            await _redisCachingProvider.HSetAsync(AppConsts.OnlineCacheKey, CurrentUserId.ToString(), "1");
+            await _redisCachingProvider.HSetAsync(AppConsts.OnlineCacheKey, cacheKey, Context.ConnectionId);
         }
         else
         {
-            await _redisCachingProvider.HDelAsync(AppConsts.OnlineCacheKey, new string[] { CurrentUserId.ToString() });
+            await _redisCachingProvider.HDelAsync(AppConsts.OnlineCacheKey, new string[] { cacheKey });
         }
     }
+    string FormatOnlineUserKey(string userId, string clientType) => $"{userId}_{clientType}";
 }

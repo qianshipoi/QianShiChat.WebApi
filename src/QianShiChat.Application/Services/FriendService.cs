@@ -6,13 +6,15 @@ public class FriendService : IFriendService, ITransient
     private readonly ILogger<FriendService> _logger;
     private readonly IMapper _mapper;
     private readonly IRedisCachingProvider _redisCachingProvider;
+    private readonly IFileService _fileService;
 
-    public FriendService(ChatDbContext context, ILogger<FriendService> logger, IMapper mapper, IRedisCachingProvider redisCachingProvider)
+    public FriendService(ChatDbContext context, ILogger<FriendService> logger, IMapper mapper, IRedisCachingProvider redisCachingProvider, IFileService fileService)
     {
         _context = context;
         _logger = logger;
         _mapper = mapper;
         _redisCachingProvider = redisCachingProvider;
+        _fileService = fileService;
     }
 
     public async Task<bool> IsFriendAsync(int userId, int friendId, CancellationToken cancellationToken = default)
@@ -36,9 +38,15 @@ public class FriendService : IFriendService, ITransient
             .Where(x => x.UserId == userId)
             .Include(x => x.Friend)
             .Select(x => x.Friend)
+            .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
             .ToListAsync(cancellationToken);
 
-        return _mapper.Map<List<UserDto>>(friends);
+        friends.ForEach(item =>
+        {
+            item.Avatar = _fileService.FormatWwwRootFile(item.Avatar);
+        });
+
+        return friends;
     }
 
     public async Task<List<UserWithMessage>> GetNewMessageFriendsAsync(int userId, CancellationToken cancellationToken = default)
@@ -94,6 +102,14 @@ public class FriendService : IFriendService, ITransient
         uwm.ForEach(item =>
         {
             item.Messages = msg.Where(x => x.FromId == item.Id).ToList();
+            item.Avatar = _fileService.FormatWwwRootFile(item.Avatar);
+            item.Messages.ForEach(message =>
+            {
+                if(message.MessageType != ChatMessageType.Text)
+                {
+                    message.Content = _fileService.FormatWwwRootFile(message.Content);
+                }
+            });
         });
 
         return uwm;

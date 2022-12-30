@@ -11,6 +11,7 @@ public class ChatMessageService : IChatMessageService, ITransient
     private readonly IMapper _mapper;
     private readonly IHubContext<ChatHub, IChatClient> _hubContext;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IFileService _fileService;
 
     /// <summary>
     /// chat message service
@@ -20,13 +21,15 @@ public class ChatMessageService : IChatMessageService, ITransient
         ChatDbContext context,
         ILogger<ChatMessageService> logger,
         IMapper mapper,
-        IHubContext<ChatHub, IChatClient> hubContext)
+        IHubContext<ChatHub, IChatClient> hubContext,
+        IFileService fileService)
     {
         _redisCachingProvider = redisCachingProvider;
         _context = context;
         _logger = logger;
         _mapper = mapper;
         _hubContext = hubContext;
+        _fileService = fileService;
     }
 
     public async Task<List<ChatMessageDto>> GetNewMessageAndCacheAsync(
@@ -74,6 +77,14 @@ public class ChatMessageService : IChatMessageService, ITransient
             }
         }
 
+        foreach (var message in messages)
+        {
+            if (message.MessageType != ChatMessageType.Text)
+            {
+                message.Content = _fileService.FormatWwwRootFile(message.Content);
+            }
+        }
+
         return _mapper.Map<List<ChatMessageDto>>(messages);
     }
 
@@ -104,7 +115,7 @@ public class ChatMessageService : IChatMessageService, ITransient
 
         if (chatMessageDto.MessageType != ChatMessageType.Text)
         {
-            chatMessageDto.Content = _httpContextAccessor.HttpContext!.Request.GetBaseUrl() + chatMessageDto.Content;
+            chatMessageDto.Content = _fileService.FormatWwwRootFile(_fileService.FormatWwwRootFile(chatMessageDto.Content));
         }
 
         // send message.

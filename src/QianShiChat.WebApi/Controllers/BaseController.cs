@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.WebApi.Controllers;
+﻿using Microsoft.Extensions.Primitives;
+
+namespace QianShiChat.WebApi.Controllers;
 
 public abstract class BaseController : ControllerBase
 {
@@ -22,4 +24,16 @@ public abstract class BaseController : ControllerBase
     /// is login
     /// </summary>
     protected bool IsLogin => CurrentUserId == 0;
+
+    /// <summary>
+    /// client type
+    /// </summary>
+    protected string? CurrentClientType
+    {
+        get
+        {
+            HttpContext.TryGetHeaderFirstValue(AppConsts.ClientType, out string? clientType);
+            return clientType;
+        }
+    }
 }

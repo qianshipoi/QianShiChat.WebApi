@@ -36,6 +36,11 @@ public class AppConsts
     public const string GroupChatMessageCacheKey = "GroupMessages";
 
     /// <summary>
+    /// 客户端类型
+    /// </summary>
+    public const string ClientType = "Client-Type";
+
+    /// <summary>
     /// get privatie chat cache key.
     /// </summary>
     /// <param name="id1"></param>
@@ -65,4 +70,6 @@ public class AppConsts
     {
         return $"{MessageCursorCacheKey}:{userId}";
     }
+
+    public static string GetAuthorizeCacheKey(string clientType, string id) => $"{clientType}:{id}";
 }

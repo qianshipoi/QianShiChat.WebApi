@@ -1,4 +1,10 @@
-﻿namespace QianShiChat.WebApi.Controllers;
+﻿using EasyCaching.Core;
+
+using Microsoft.Extensions.Options;
+
+using QianShiChat.Application.Contracts;
+
+namespace QianShiChat.WebApi.Controllers;
 
 /// <summary>
 /// auth controller
@@ -11,6 +17,7 @@ public class AuthController : BaseController
     private readonly IJwtService _jwtService;
     private readonly IUserService _userService;
     private readonly IRedisCachingProvider _redisCachingProvider;
+    private readonly JwtOptions _jwtOptions;
 
     /// <summary>
     /// auth controller
@@ -19,12 +26,14 @@ public class AuthController : BaseController
         IMapper mapper,
         IJwtService jwtService,
         IUserService userService,
-        IRedisCachingProvider redisCachingProvider)
+        IRedisCachingProvider redisCachingProvider,
+        IOptions<JwtOptions> jwtOptions)
     {
         _mapper = mapper;
         _jwtService = jwtService;
         _userService = userService;
         _redisCachingProvider = redisCachingProvider;
+        _jwtOptions = jwtOptions.Value;
     }
 
     /// <summary>
@@ -52,6 +61,10 @@ public class AuthController : BaseController
         });
 
         var userDto = _mapper.Map<UserDto>(userInfo);
+
+        // 存入redis
+        await _redisCachingProvider.StringSetAsync(AppConsts.GetAuthorizeCacheKey(CurrentClientType!, userDto.Id.ToString()), token, TimeSpan.FromSeconds(_jwtOptions.Expires + 60));
+
         Response.Headers.Add("X-Access-Token", token);
         return Ok(userDto);
     }
@@ -72,7 +85,8 @@ public class AuthController : BaseController
             new Claim(ClaimTypes.Name , user.NickName),
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
         });
-
+        // 存入redis
+        await _redisCachingProvider.StringSetAsync(AppConsts.GetAuthorizeCacheKey(CurrentClientType!, user.Id.ToString()), token, TimeSpan.FromSeconds(_jwtOptions.Expires + 60));
         Response.Headers.Add("X-Access-Token", token);
         return Ok(user);
     }

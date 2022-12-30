@@ -21,4 +21,8 @@ public class JwtOptions
     /// 接受者
     /// </summary>
     public string Audience { get; set; } = null!;
+    /// <summary>
+    /// 过期时间 秒
+    /// </summary>
+    public long Expires { get; set; }
 }
