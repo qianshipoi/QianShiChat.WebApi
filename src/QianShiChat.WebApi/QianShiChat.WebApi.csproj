@@ -9,11 +9,8 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
-    <PackageReference Include="EasyCaching.Redis" Version="1.7.0" />
-    <PackageReference Include="EasyCaching.Serialization.SystemTextJson" Version="1.7.0" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.4.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="7.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.1">
       <PrivateAssets>all</PrivateAssets>
@@ -26,7 +23,6 @@
     <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.5.0" />
     <PackageReference Include="SixLabors.ImageSharp.Web" Version="2.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-    <PackageReference Include="Yitter.IdGenerator" Version="1.0.14" />
   </ItemGroup>
 
   <ItemGroup>

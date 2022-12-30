@@ -1,4 +1,4 @@
-﻿namespace QianShiChat.WebApi.Extensions;
+﻿namespace QianShiChat.Domain.Shared;
 
 public static class HttpRequestExtensions
 {

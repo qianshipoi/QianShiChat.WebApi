@@ -1,4 +1,4 @@
-﻿namespace QianShiChat.WebApi.Services;
+﻿namespace QianShiChat.Application.Services;
 
 public interface IAvatarService
 {

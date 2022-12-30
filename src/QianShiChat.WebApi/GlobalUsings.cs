@@ -27,12 +27,9 @@ global using QianShiChat.Domain.Core.AutoDI;
 global using QianShiChat.Domain.Core.Interceptors;
 global using QianShiChat.Domain.Models;
 global using QianShiChat.Domain.Shared;
-global using QianShiChat.WebApi;
 global using QianShiChat.WebApi.BackgroundHost;
-global using QianShiChat.WebApi.Extensions;
-global using QianShiChat.WebApi.Hubs;
-global using QianShiChat.WebApi.Options;
-global using QianShiChat.WebApi.Services;
+global using QianShiChat.Domain.Options;
+global using QianShiChat.Application.Services;
 
 global using QRCoder;
 
@@ -47,7 +44,6 @@ global using SixLabors.ImageSharp.Web.Providers;
 global using System.ComponentModel.DataAnnotations;
 global using System.Globalization;
 global using System.IdentityModel.Tokens.Jwt;
-global using System.Linq.Expressions;
 global using System.Reflection;
 global using System.Security.Claims;
 global using System.Text;
@@ -55,3 +51,10 @@ global using System.Text.Json;
 global using System.Text.Json.Serialization;
 
 global using Yitter.IdGenerator;
+global using QianShiChat.Application.Hubs;
+global using QianShiChat.WebApi.Filters;
+
+global using Microsoft.AspNetCore.Mvc.Controllers;
+global using Microsoft.AspNetCore.Mvc.Filters;
+
+global using QianShiChat.Domain.Core.AppOops;

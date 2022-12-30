@@ -1,4 +1,4 @@
-﻿namespace QianShiChat.WebApi.Options;
+﻿namespace QianShiChat.Domain.Options;
 
 /// <summary>
 /// JWT选项

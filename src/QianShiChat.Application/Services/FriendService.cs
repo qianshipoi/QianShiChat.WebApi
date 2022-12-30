@@ -1,6 +1,4 @@
-﻿using QianShiChat.Application.Contracts;
-
-namespace QianShiChat.WebApi.Services;
+﻿namespace QianShiChat.Application.Services;
 
 public class FriendService : IFriendService, ITransient
 {

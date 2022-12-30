@@ -1,4 +1,6 @@
-namespace QianShiChat.WebApi.Hubs;
+using QianShiChat.Application.Services;
+
+namespace QianShiChat.Application.Hubs;
 
 /// <summary>
 /// chat hub.

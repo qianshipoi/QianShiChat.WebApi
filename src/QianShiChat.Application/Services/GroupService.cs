@@ -1,16 +1,4 @@
-﻿using AutoMapper;
-
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-
-using QianShiChat.Application.Contracts;
-using QianShiChat.Common.Extensions;
-using QianShiChat.Domain;
-using QianShiChat.Domain.Core.AppOops;
-using QianShiChat.Domain.Core.AutoDI;
-using QianShiChat.Domain.Models;
-
-namespace QianShiChat.Application;
+﻿namespace QianShiChat.Application.Services;
 
 public class GroupService : IGroupService, ITransient
 {
@@ -64,7 +52,7 @@ public class GroupService : IGroupService, ITransient
     /// <returns></returns>
     public async Task ApplyJoin(int userId, int id, string remark, CancellationToken cancellationToken = default)
     {
-        var apply = await _context.GroupApplies.FirstOrDefaultAsync(x => x.GroupId == id && x.UserId == userId && x.Status == Domain.Shared.ApplyStatus.Applied, cancellationToken);
+        var apply = await _context.GroupApplies.FirstOrDefaultAsync(x => x.GroupId == id && x.UserId == userId && x.Status == ApplyStatus.Applied, cancellationToken);
 
         if (apply is null)
         {
@@ -73,7 +61,7 @@ public class GroupService : IGroupService, ITransient
                 GroupId = id,
                 UserId = userId,
                 Remark = remark,
-                Status = Domain.Shared.ApplyStatus.Applied,
+                Status = ApplyStatus.Applied,
             };
 
             await _context.AddAsync(apply, cancellationToken);

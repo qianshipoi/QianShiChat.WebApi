@@ -1,9 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Mvc;
 
 namespace QianShiChat.Domain.Core.AppOops;
 
@@ -66,36 +61,9 @@ public static class ExceptionExtentions
         exception.StatusCode = status;
         return exception;
     }
-
-    public static IServiceCollection AddUnifyResult(this IServiceCollection services)
-    {
-        services.Configure<MvcOptions>(options =>
-        {
-            options.Filters.Add<BusinessExceptionFilter>();
-        });
-
-        return services;
-    }
 }
 
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
 public class NonUnifyAttribute : Attribute
 {
-}
-
-public class BusinessExceptionFilter : IAsyncExceptionFilter
-{
-    public async Task OnExceptionAsync(ExceptionContext context)
-    {
-        if (context.ExceptionHandled) return;
-        // 获取控制器信息
-        if (context.Exception is BusinessException friendlyException 
-            && context.ActionDescriptor is ControllerActionDescriptor actionDescriptor)
-        {
-            context.Result = new JsonResult(friendlyException.ErrorMessage)
-            {
-                StatusCode = friendlyException.StatusCode,
-            };
-        }
-    }
 }

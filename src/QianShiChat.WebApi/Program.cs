@@ -7,7 +7,11 @@ builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, relo
 
 // config mvc builder.
 builder.Services
-    .AddControllers()
+    .AddControllers(setup =>
+    {
+        setup.Filters.Add<ResultWrapperFilter>();
+        setup.Filters.Add<GlobalExceptionFilter>();
+    })
     .AddJsonOptions(options =>
     {
         //options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter());

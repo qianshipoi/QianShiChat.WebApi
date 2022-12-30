@@ -14,3 +14,6 @@ global using System.Linq.Expressions;
 global using QianShiChat.Domain.Core.AutoDI;
 global using Microsoft.EntityFrameworkCore.Diagnostics;
 global using QianShiChat.Common.Extensions;
+global using Microsoft.AspNetCore.Http;
+
+global using System.Text;
