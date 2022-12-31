@@ -48,9 +48,15 @@ public class UserService : IUserService, ITransient
 
     public async Task<UserInfo?> GetUserByAccountAsync(string account, CancellationToken cancellationToken = default)
     {
-        return await _context.UserInfos
+        var user = await _context.UserInfos
             .Where(x => x.Account == account)
             .FirstOrDefaultAsync(cancellationToken);
+
+        if (user == null) return user;
+
+        user.Avatar = _fileService.FormatWwwRootFile(user.Avatar!);
+
+        return user;
     }
 
     public async Task<bool> AccountExistsAsync(string account, CancellationToken cancellationToken = default)

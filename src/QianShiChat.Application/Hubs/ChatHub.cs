@@ -1,3 +1,7 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+using QianShiChat.Application.Filters;
 using QianShiChat.Application.Services;
 
 namespace QianShiChat.Application.Hubs;
@@ -5,9 +9,12 @@ namespace QianShiChat.Application.Hubs;
 /// <summary>
 /// chat hub.
 /// </summary>
+[Authorize]
+[ServiceFilter(typeof(ClientTypeAuthorize))]
 public class ChatHub : Hub<IChatClient>
 {
     private int CurrentUserId => int.Parse(Context.UserIdentifier!);
+    private string CurrentClientType => Context.User!.FindFirstValue(CustomClaim.ClientType)!;
 
     private readonly IFriendService _friendService;
     private readonly IRedisCachingProvider _redisCachingProvider;
@@ -60,8 +67,7 @@ public class ChatHub : Hub<IChatClient>
                 isOnline ? NotificationType.FriendOnline : NotificationType.FriendOffline,
                 CurrentUserId.ToString()));
 
-        Context.GetHttpContext()!.TryGetHeaderFirstValue(AppConsts.ClientType, out string? clientType);
-        var cacheKey = FormatOnlineUserKey(CurrentUserId.ToString(), clientType!);
+        var cacheKey = FormatOnlineUserKey(CurrentUserId.ToString(), CurrentClientType!);
         if (isOnline)
         {
             await _redisCachingProvider.HSetAsync(AppConsts.OnlineCacheKey, cacheKey, Context.ConnectionId);

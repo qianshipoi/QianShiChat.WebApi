@@ -18,6 +18,7 @@ global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.FileProviders;
 global using Microsoft.IdentityModel.Tokens;
 global using Microsoft.OpenApi.Models;
+global using Microsoft.Extensions.Options;
 
 global using QianShiChat.Application.Contracts;
 global using QianShiChat.Application.Hubs;

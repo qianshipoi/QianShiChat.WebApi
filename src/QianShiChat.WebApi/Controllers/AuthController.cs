@@ -1,10 +1,4 @@
-﻿using EasyCaching.Core;
-
-using Microsoft.Extensions.Options;
-
-using QianShiChat.Application.Contracts;
-
-namespace QianShiChat.WebApi.Controllers;
+﻿namespace QianShiChat.WebApi.Controllers;
 
 /// <summary>
 /// auth controller
@@ -27,13 +21,13 @@ public class AuthController : BaseController
         IJwtService jwtService,
         IUserService userService,
         IRedisCachingProvider redisCachingProvider,
-        IOptions<JwtOptions> jwtOptions)
+        IOptionsMonitor<JwtOptions> jwtOptions)
     {
         _mapper = mapper;
         _jwtService = jwtService;
         _userService = userService;
         _redisCachingProvider = redisCachingProvider;
-        _jwtOptions = jwtOptions.Value;
+        _jwtOptions = jwtOptions.CurrentValue;
     }
 
     /// <summary>
@@ -58,6 +52,7 @@ public class AuthController : BaseController
         {
             new Claim(ClaimTypes.Name , userInfo.NickName),
             new Claim(ClaimTypes.NameIdentifier, userInfo.Id.ToString()),
+            new Claim(CustomClaim.ClientType, CurrentClientType!)
         });
 
         var userDto = _mapper.Map<UserDto>(userInfo);
@@ -65,7 +60,8 @@ public class AuthController : BaseController
         // 存入redis
         await _redisCachingProvider.StringSetAsync(AppConsts.GetAuthorizeCacheKey(CurrentClientType!, userDto.Id.ToString()), token, TimeSpan.FromSeconds(_jwtOptions.Expires + 60));
 
-        Response.Headers.Add("X-Access-Token", token);
+        Response.Headers.Add(CustomResponseHeader.AccessToken, token);
+        Response.Headers.Add("Access-Control-Expose-Headers", CustomResponseHeader.AccessToken);
         return Ok(userDto);
     }
 
@@ -79,15 +75,20 @@ public class AuthController : BaseController
     public async Task<ActionResult<UserDto>> CheckAuth(CancellationToken cancellationToken = default)
     {
         var user = await _userService.GetUserByIdAsync(CurrentUserId, cancellationToken);
+        if (user == null)
+            return Unauthorized();
 
         var token = _jwtService.CreateToken(new List<Claim>
         {
             new Claim(ClaimTypes.Name , user.NickName),
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(CustomClaim.ClientType, CurrentClientType!)
         });
         // 存入redis
         await _redisCachingProvider.StringSetAsync(AppConsts.GetAuthorizeCacheKey(CurrentClientType!, user.Id.ToString()), token, TimeSpan.FromSeconds(_jwtOptions.Expires + 60));
-        Response.Headers.Add("X-Access-Token", token);
+
+        Response.Headers.Add(CustomResponseHeader.AccessToken, token);
+        Response.Headers.Add("Access-Control-Expose-Headers", CustomResponseHeader.AccessToken);
         return Ok(user);
     }
 

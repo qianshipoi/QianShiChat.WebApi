@@ -1,4 +1,4 @@
-// config distributed id.s
+// config distributed id.
 var options = new IdGeneratorOptions(1);
 YitIdHelper.SetIdGenerator(options);
 
@@ -72,6 +72,6 @@ app.MapGet("/", async (context) =>
 
 app.MapControllers();
 
-app.MapHub<ChatHub>("/Hubs/Chat").RequireAuthorization();
+app.MapHub<ChatHub>("/Hubs/Chat");
 
 app.Run();

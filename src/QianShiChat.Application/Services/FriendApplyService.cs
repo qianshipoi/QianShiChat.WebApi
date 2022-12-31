@@ -8,15 +8,17 @@ public class FriendApplyService : IFriendApplyService, ITransient
     private readonly ILogger<FriendApplyService> _logger;
     private readonly ChatDbContext _context;
     private readonly IMapper _mapper;
+    private readonly IFileService _fileService;
 
     /// <summary>
     /// firend apply service.
     /// </summary>
-    public FriendApplyService(ILogger<FriendApplyService> logger, ChatDbContext context, IMapper mapper)
+    public FriendApplyService(ILogger<FriendApplyService> logger, ChatDbContext context, IMapper mapper, IFileService fileService)
     {
         _logger = logger;
         _context = context;
         _mapper = mapper;
+        _fileService = fileService;
     }
 
     public async Task<bool> IsApplyAsync(int userId, int friendId, CancellationToken cancellationToken = default)
@@ -46,7 +48,7 @@ public class FriendApplyService : IFriendApplyService, ITransient
     {
         var apply = await _context.FriendApplies
             .Where(x => x.UserId == userId && x.FriendId == dto.UserId && x.Status == ApplyStatus.Applied)
-            .SingleOrDefaultAsync(cancellationToken);
+            .SingleAsync(cancellationToken);
 
         apply.Remark = dto.Remark;
         apply.UpdateTime = Timestamp.Now;
@@ -57,15 +59,26 @@ public class FriendApplyService : IFriendApplyService, ITransient
 
     public async Task<List<FriendApplyDto>> GetPendingListByUserAsync(int size, int userId, long beforeTime = 0, CancellationToken cancellationToken = default)
     {
-        return await _context.FriendApplies
+        var data = await _context.FriendApplies
               .AsNoTracking()
               .Where(x => x.UserId == userId)
               .Where(x => x.CreateTime > beforeTime)
+              .Include(x => x.User)
+              .Include(x => x.Friend)
               .OrderByDescending(x => x.UpdateTime)
               .ThenByDescending(x => x.Id)
               .Take(size)
               .ProjectTo<FriendApplyDto>(_mapper.ConfigurationProvider)
               .ToListAsync(cancellationToken);
+        data.ForEach(item =>
+        {
+            if (item.User != null)
+                item.User.Avatar = _fileService.FormatWwwRootFile(item.User.Avatar);
+            if (item.Friend != null)
+                item.Friend.Avatar = _fileService.FormatWwwRootFile(item.Friend.Avatar);
+        });
+
+        return data;
     }
 
     public async Task<long> GetPendingListCountByUserAsync(int userId, CancellationToken cancellationToken = default)

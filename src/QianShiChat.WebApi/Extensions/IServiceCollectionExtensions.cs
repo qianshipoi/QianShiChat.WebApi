@@ -1,5 +1,7 @@
 ﻿using Microsoft.OpenApi.Any;
 
+using QianShiChat.Application.Filters;
+
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -27,7 +29,7 @@ public static class IServiceCollectionExtensions
             .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
             {
                 var secretByte = Encoding.UTF8.GetBytes(jwtOptions.SecretKey);
-                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
                     ValidateAudience = true,
@@ -37,8 +39,24 @@ public static class IServiceCollectionExtensions
                     ClockSkew = TimeSpan.FromSeconds(5),
                     IssuerSigningKey = new SymmetricSecurityKey(secretByte)
                 };
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) &&
+                            (path.StartsWithSegments("/Hubs/Chat")))
+                        {
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
             });
         services.AddAuthorization();
+
+        services.AddSingleton<ClientTypeAuthorize>();
 
         return services;
     }
