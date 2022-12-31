@@ -1,4 +1,6 @@
 // config distributed id.
+using Microsoft.AspNetCore.HttpOverrides;
+
 var options = new IdGeneratorOptions(1);
 YitIdHelper.SetIdGenerator(options);
 
@@ -17,6 +19,14 @@ builder.Services
     {
         //options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter());
     });
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 // config signalr server builder.
 builder.Services.AddSignalR()
@@ -49,6 +59,7 @@ builder.Services.AddDirectoryBrowser();
 
 var app = builder.Build();
 
+app.UseForwardedHeaders();
 app.UseOpenApi();
 
 app.UseCors(AppConsts.MyAllowSpecificOrigins);
