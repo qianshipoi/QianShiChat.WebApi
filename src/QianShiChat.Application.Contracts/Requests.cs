@@ -20,7 +20,7 @@ public class AvatarDto
 
     public long CreateTime { get; set; }
 
-    public string Path { get; set; }
+    public string Path { get; set; } = default!;
 
     public ulong Size { get; set; }
 }
@@ -46,5 +46,5 @@ public class SendFileRequest
     /// file.
     /// </summary>
     [Required]
-    public IFormFile File { get; set; }
+    public IFormFile File { get; set; } = default!;
 }
