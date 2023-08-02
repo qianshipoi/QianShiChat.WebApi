@@ -1,7 +1,3 @@
-using Microsoft.AspNetCore.HttpOverrides;
-
-using tusdotnet;
-
 // config distributed id.
 var options = new IdGeneratorOptions(1);
 YitIdHelper.SetIdGenerator(options);

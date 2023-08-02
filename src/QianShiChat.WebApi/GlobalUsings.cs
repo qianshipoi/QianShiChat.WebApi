@@ -9,6 +9,7 @@ global using MediatR;
 
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.HttpOverrides;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Mvc.Controllers;
 global using Microsoft.AspNetCore.Mvc.Filters;
@@ -16,9 +17,9 @@ global using Microsoft.AspNetCore.SignalR;
 global using Microsoft.AspNetCore.StaticFiles;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.FileProviders;
+global using Microsoft.Extensions.Options;
 global using Microsoft.IdentityModel.Tokens;
 global using Microsoft.OpenApi.Models;
-global using Microsoft.Extensions.Options;
 
 global using QianShiChat.Application.Contracts;
 global using QianShiChat.Application.Hubs;
@@ -51,5 +52,7 @@ global using System.Security.Claims;
 global using System.Text;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;
+
+global using tusdotnet;
 
 global using Yitter.IdGenerator;
