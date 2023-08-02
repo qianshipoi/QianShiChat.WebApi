@@ -1,6 +1,8 @@
-// config distributed id.
 using Microsoft.AspNetCore.HttpOverrides;
 
+using tusdotnet;
+
+// config distributed id.
 var options = new IdGeneratorOptions(1);
 YitIdHelper.SetIdGenerator(options);
 
@@ -9,19 +11,16 @@ builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, relo
 
 // config mvc builder.
 builder.Services
-    .AddControllers(setup =>
-    {
+    .AddControllers(setup => {
         setup.Filters.Add<ClientAuthotizationFilter>();
         setup.Filters.Add<ResultWrapperFilter>();
         setup.Filters.Add<GlobalExceptionFilter>();
     })
-    .AddJsonOptions(options =>
-    {
+    .AddJsonOptions(options => {
         //options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter());
     });
 
-builder.Services.Configure<ForwardedHeadersOptions>(options =>
-{
+builder.Services.Configure<ForwardedHeadersOptions>(options => {
     options.ForwardedHeaders =
         ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
     options.KnownNetworks.Clear();
@@ -34,13 +33,13 @@ builder.Services.AddSignalR()
 
 // config infrastructure.
 builder.Services
-    .AddCors(options =>
-    {
-        options.AddPolicy(AppConsts.MyAllowSpecificOrigins, builder =>
-        {
-            builder.WithOrigins("https://www.kuriyama.top", "http://127.0.0.1:5173")
+    .AddCors(options => {
+        options.AddPolicy(AppConsts.MyAllowSpecificOrigins, builder => {
+            builder
+            .WithOrigins("https://www.kuriyama.top", "http://127.0.0.1:5173")
             .WithHeaders("*")
-            .WithMethods("*");
+            .WithMethods("*")
+            .WithExposedHeaders(tusdotnet.Helpers.CorsHelper.GetExposedHeaders());
         });
     })
     .AddMediatR(x => x.AsScoped(), typeof(Program))
@@ -76,10 +75,24 @@ app.UseDirectoryBrowser(new DirectoryBrowserOptions
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/", async (context) =>
-{
+app.MapGet("/", async (context) => {
     await context.Response.WriteAsync(context.Request.GetBaseUrl());
 });
+
+app.MapTus("/files", httpContext => Task.FromResult(new tusdotnet.Models.DefaultTusConfiguration()
+{
+    Store = new tusdotnet.Stores.TusDiskStore(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/tusfiles")),
+    Events = new()
+    {
+        //OnFileCompleteAsync = eventContext => {
+        //    tusdotnet.Interfaces.ITusFile file = await eventContext.GetFileAsync();
+        //    Dictionary<string, tusdotnet.Models.Metadata> metadata = await file.GetMetadataAsync(eventContext.CancellationToken);
+        //    using Stream content = await file.GetContentAsync(eventContext.CancellationToken);
+
+        //    await DoSomeProcessing(content, metadata);
+        //}
+    }
+}));
 
 app.MapControllers();
 
