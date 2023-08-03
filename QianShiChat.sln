@@ -15,7 +15,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QianShiChat.Domain.Shared",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QianShiChat.Application", "src\QianShiChat.Application\QianShiChat.Application.csproj", "{3C7978FA-6817-40A1-AC9C-C12E7C8C4103}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QianShiChat.Application.Contracts", "src\QianShiChat.Application.Contracts\QianShiChat.Application.Contracts.csproj", "{DB529FBB-09E8-4389-B041-421F50159881}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QianShiChat.Application.Contracts", "src\QianShiChat.Application.Contracts\QianShiChat.Application.Contracts.csproj", "{DB529FBB-09E8-4389-B041-421F50159881}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F913559D-A44C-41C3-9FF8-15AB80A7308B}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -127,7 +127,7 @@ public static class IServiceCollectionExtensions
         });
 
         // ASP.NET Core hosting
-        services.AddQuartzServer(options =>
+        services.AddQuartzHostedService(options =>
         {
             // when shutting down we want jobs to complete gracefully
             options.WaitForJobsToComplete = true;

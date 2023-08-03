@@ -38,7 +38,7 @@ builder.Services
             .WithExposedHeaders(tusdotnet.Helpers.CorsHelper.GetExposedHeaders());
         });
     })
-    .AddMediatR(x => x.AsScoped(), typeof(Program))
+    .AddMediatR(configure => configure.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()))
     .AddValidatorsFromAssemblyContaining<Program>()
     .AddAutoMapper(Assembly.GetExecutingAssembly())
     .AddOpenApi()
@@ -48,9 +48,10 @@ builder.Services
     .AddAutoDI()
     .AddSaveChatMessageJob()
     .AddImageConversion()
-    .AddHttpContextAccessor();
+    .AddHttpContextAccessor()
+    .AddDirectoryBrowser();
 
-builder.Services.AddDirectoryBrowser();
+builder.Services.AddSingleton<TusDiskStorageOptionHelper>();
 
 var app = builder.Build();
 
@@ -75,20 +76,16 @@ app.MapGet("/", async (context) => {
     await context.Response.WriteAsync(context.Request.GetBaseUrl());
 });
 
-app.MapTus("/files", httpContext => Task.FromResult(new tusdotnet.Models.DefaultTusConfiguration()
-{
-    Store = new tusdotnet.Stores.TusDiskStore(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/tusfiles")),
-    Events = new()
-    {
-        //OnFileCompleteAsync = eventContext => {
-        //    tusdotnet.Interfaces.ITusFile file = await eventContext.GetFileAsync();
-        //    Dictionary<string, tusdotnet.Models.Metadata> metadata = await file.GetMetadataAsync(eventContext.CancellationToken);
-        //    using Stream content = await file.GetContentAsync(eventContext.CancellationToken);
-
-        //    await DoSomeProcessing(content, metadata);
-        //}
-    }
-}));
+app.MapTus("/api/tusfiles", HttpContextExtensions.TusConfigurationFactory)
+    .RequireAuthorization()
+    .AddEndpointFilter(async (context, next) => {
+        var isAuthorization = await context.HttpContext.ExistsLegalTokenAsync();
+        if (!isAuthorization)
+        {
+            return Results.Unauthorized();
+        }
+        return await next(context);
+    });
 
 app.MapControllers();
 

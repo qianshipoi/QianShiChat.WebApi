@@ -18,6 +18,7 @@ global using Microsoft.AspNetCore.StaticFiles;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.FileProviders;
 global using Microsoft.Extensions.Options;
+global using Microsoft.Extensions.Primitives;
 global using Microsoft.IdentityModel.Tokens;
 global using Microsoft.OpenApi.Models;
 
@@ -33,7 +34,9 @@ global using QianShiChat.Domain.Models;
 global using QianShiChat.Domain.Options;
 global using QianShiChat.Domain.Shared;
 global using QianShiChat.WebApi.BackgroundHost;
+global using QianShiChat.WebApi.Extensions;
 global using QianShiChat.WebApi.Filters;
+global using QianShiChat.WebApi.Helpers;
 
 global using QRCoder;
 
@@ -47,6 +50,7 @@ global using SixLabors.ImageSharp.Web.Providers;
 
 global using System.ComponentModel.DataAnnotations;
 global using System.Globalization;
+global using System.Net;
 global using System.Reflection;
 global using System.Security.Claims;
 global using System.Text;
@@ -54,5 +58,10 @@ global using System.Text.Json;
 global using System.Text.Json.Serialization;
 
 global using tusdotnet;
+global using tusdotnet.Models;
+global using tusdotnet.Models.Concatenation;
+global using tusdotnet.Models.Configuration;
+global using tusdotnet.Models.Expiration;
+global using tusdotnet.Stores;
 
 global using Yitter.IdGenerator;
