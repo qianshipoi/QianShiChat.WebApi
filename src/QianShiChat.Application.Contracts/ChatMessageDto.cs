@@ -16,5 +16,5 @@ public class ChatMessageDto
 
     public long CreateTime { get; set; }
 
-    public UserDto FromUser { get; set; }
+    public UserDto? FromUser { get; set; }
 }

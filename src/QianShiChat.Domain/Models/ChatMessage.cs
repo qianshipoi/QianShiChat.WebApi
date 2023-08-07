@@ -20,7 +20,7 @@ public class ChatMessage : IAuditable
     public ChatMessageType MessageType { get; set; }
 
     [Required]
-    public string Content { get; set; }
+    public string Content { get; set; } = default!;
 
     [Required]
     public long CreateTime { get; set; }
@@ -32,8 +32,8 @@ public class ChatMessage : IAuditable
     public bool IsDeleted { get; set; }
 
     [ForeignKey(nameof(FromId))]
-    public UserInfo FromUser { get; set; }
+    public UserInfo? FromUser { get; set; }
 
     [NotMapped]
-    public UserInfo ToUser { get; set; }
+    public UserInfo? ToUser { get; set; }
 }

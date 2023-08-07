@@ -46,7 +46,7 @@ public class UserInfo : IAuditable, ISoftDelete
     [InverseProperty(nameof(UserAvatar.User))]
     public virtual ICollection<UserAvatar> UserAvatars { get; set; }
 
-    public MessageCursor Cursor { get; set; }
+    public MessageCursor Cursor { get; set; } = default!;
 
     public virtual ICollection<Group> Groups { get; set; } = null!;
 

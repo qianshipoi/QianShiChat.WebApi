@@ -134,4 +134,14 @@ public class UserService : IUserService, ITransient
                 .Where(x => EF.Functions.Like(x.NickName, $"%{nickName}%"))
                 .CountAsync(cancellationToken);
     }
+
+    public async Task<string?> GetNickNameByIdAsync(int userId, CancellationToken cancellationToken= default)
+    {
+        return await _context.UserInfos.Where(x => x.Id == userId).Select(x => x.NickName).FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public async Task<bool> IsFriendAsync(int userId, int friendId,CancellationToken cancellationToken= default)
+    {
+        return await _context.UserRealtions.AnyAsync(x => x.UserId == userId && x.FriendId == friendId, cancellationToken);
+    }
 }

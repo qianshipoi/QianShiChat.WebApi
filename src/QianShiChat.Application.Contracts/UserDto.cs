@@ -4,16 +4,16 @@ public class UserDto
 {
     public int Id { get; set; }
 
-    public string Account { get; set; }
+    public string Account { get; set; } = default!;
 
-    public string Avatar { get; set; }
+    public string Avatar { get; set; } = default!;
 
-    public string NickName { get; set; }
+    public string NickName { get; set; } = default!;
 
     public long CreateTime { get; set; }
 }
 
 public class UserWithMessage : UserDto
 {
-    public List<ChatMessageDto> Messages { get; set; }
+    public List<ChatMessageDto> Messages { get; set; } = new List<ChatMessageDto>();
 }

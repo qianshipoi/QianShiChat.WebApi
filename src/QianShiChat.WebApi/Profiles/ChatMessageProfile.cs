@@ -9,4 +9,12 @@ public class ChatMessageProfile : Profile
         CreateMap<UpdateCursorRequest, MessageCursor>()
             .ForMember(d => d.LastUpdateTime, m => m.MapFrom(s => Timestamp.Now));
     }
+
+    public class GroupProfile : Profile
+    {
+        public GroupProfile()
+        {
+            CreateMap<Group, GroupDto>();
+        }
+    }
 }

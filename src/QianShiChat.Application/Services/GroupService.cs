@@ -1,16 +1,20 @@
-﻿namespace QianShiChat.Application.Services;
+﻿using System.Net;
+
+namespace QianShiChat.Application.Services;
 
 public class GroupService : IGroupService, ITransient
 {
     private readonly ChatDbContext _context;
     private readonly ILogger<GroupService> _logger;
     private readonly IMapper _mapper;
+    private readonly IUserService _userService;
 
-    public GroupService(ChatDbContext context, ILogger<GroupService> logger, IMapper mapper)
+    public GroupService(ChatDbContext context, ILogger<GroupService> logger, IMapper mapper, IUserService userService)
     {
         _context = context;
         _logger = logger;
         _mapper = mapper;
+        _userService = userService;
     }
 
     /// <summary>
@@ -42,6 +46,55 @@ public class GroupService : IGroupService, ITransient
         return _mapper.Map<GroupDto>(group);
     }
 
+    public async Task<GroupDto> CreateByFriendAsync(int userId, CreateGroupRequest request, CancellationToken cancellationToken = default)
+    {
+        if (!request.FriendIds.Any())
+        {
+            throw Oops.Bah("choose at least one friend.");
+        }
+
+        foreach (var friendId in request.FriendIds)
+        {
+            var isFriend = await _userService.IsFriendAsync(userId, friendId, cancellationToken);
+
+            if (!isFriend)
+            {
+                throw Oops.Bah("no access.").StatusCode(HttpStatusCode.Forbidden);
+            }
+        }
+
+        var currentUserName = await _userService.GetNickNameByIdAsync(userId, cancellationToken);
+        var friendName = await _userService.GetNickNameByIdAsync(request.FriendIds.First(), cancellationToken);
+
+        var now = Timestamp.Now;
+        var group = new Group()
+        {
+            Name = $"{currentUserName}、{friendName}",
+            UserId = userId,
+            TotalUser = 1,
+            CreateTime = now
+        };
+        group.UserGroupRealtions.Add(new UserGroupRealtion()
+        {
+            CreateTime = now,
+            UserId = userId,
+        });
+
+        foreach (var friendId in request.FriendIds)
+        {
+            group.UserGroupRealtions.Add(new UserGroupRealtion
+            {
+                CreateTime = now,
+                UserId = friendId
+            });
+        }
+
+        await _context.AddAsync(group, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return _mapper.Map<GroupDto>(group);
+    }
+
     /// <summary>
     /// 申请加入
     /// </summary>
@@ -50,9 +103,10 @@ public class GroupService : IGroupService, ITransient
     /// <param name="remark"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task ApplyJoin(int userId, int id, string remark, CancellationToken cancellationToken = default)
+    public async Task ApplyJoin(int userId, int id, JoinGroupRequest request, CancellationToken cancellationToken = default)
     {
-        var apply = await _context.GroupApplies.FirstOrDefaultAsync(x => x.GroupId == id && x.UserId == userId && x.Status == ApplyStatus.Applied, cancellationToken);
+        var apply = await _context.GroupApplies
+            .FirstOrDefaultAsync(x => x.GroupId == id && x.UserId == userId && x.Status == ApplyStatus.Applied, cancellationToken);
 
         if (apply is null)
         {
@@ -60,7 +114,7 @@ public class GroupService : IGroupService, ITransient
             {
                 GroupId = id,
                 UserId = userId,
-                Remark = remark,
+                Remark = request.Remark,
                 Status = ApplyStatus.Applied,
             };
 
@@ -68,7 +122,7 @@ public class GroupService : IGroupService, ITransient
         }
         else
         {
-            apply.Remark = remark;
+            apply.Remark = request.Remark;
             apply.UpdateTime = Timestamp.Now;
         }
         await _context.SaveChangesAsync(cancellationToken);
@@ -81,7 +135,7 @@ public class GroupService : IGroupService, ITransient
     /// <param name="id"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task Exit(int userId, int id, CancellationToken cancellationToken = default)
+    public async Task Leave(int userId, int id, CancellationToken cancellationToken = default)
     {
         var group = await _context.UserGroupRealtions.FindAsync(new object[] { userId, id }, cancellationToken);
 
@@ -93,8 +147,58 @@ public class GroupService : IGroupService, ITransient
         _context.UserGroupRealtions.Remove(group);
         await _context.SaveChangesAsync(cancellationToken);
     }
+
+    /// <summary>
+    /// dissolve group.
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="id"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public async Task Delete(int userId, int id, CancellationToken cancellationToken = default)
+    {
+        var group = await _context.Groups.FindAsync(new object[] { id }, cancellationToken);
+
+        if (group is null)
+        {
+            throw Oops.Bah("group not exists.");
+        }
+
+        if (group.UserId != userId)
+        {
+            throw Oops.Bah("no access.").StatusCode(HttpStatusCode.Forbidden);
+        }
+
+        try
+        {
+            _context.Remove(group);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "delete group error");
+            throw Oops.Oh();
+        }
+    }
+
+    public async Task<List<GroupDto>> GetAllByUserIdAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.UserGroupRealtions
+             .AsNoTracking()
+             .Include(x => x.Group)
+             .Where(x => x.UserId == userId && !x.Group.IsDeleted)
+             .Select(x => x.Group)
+             .ProjectTo<GroupDto>(_mapper.ConfigurationProvider)
+             .ToListAsync(cancellationToken);
+    }
 }
 
 public interface IGroupService
 {
+    Task ApplyJoin(int userId, int id, JoinGroupRequest request, CancellationToken cancellationToken = default);
+    Task<GroupDto> Create(int userId, string name, CancellationToken cancellationToken = default);
+    Task<GroupDto> CreateByFriendAsync(int userId, CreateGroupRequest request, CancellationToken cancellationToken = default);
+    Task Delete(int userId, int id, CancellationToken cancellationToken = default);
+    Task<List<GroupDto>> GetAllByUserIdAsync(int userId, CancellationToken cancellationToken = default);
+    Task Leave(int userId, int id, CancellationToken cancellationToken = default);
 }

@@ -7,20 +7,20 @@ public class QrAuthResponse
     /// </summary>
     public int Code { get; set; }
 
-    public string Message { get; set; }
+    public string Message { get; set; } = default!;
 }
 
 public class QrKeyResponse
 {
     public int Code { get; set; }
 
-    public string Key { get; set; }
+    public string Key { get; set; } = default!;
 }
 
 public class QrCreateRequset
 {
     [Required, MaxLength(32)]
-    public string Key { get; set; }
+    public string Key { get; set; } = default!;
 
     public bool Qrimg { get; set; }
 }
@@ -39,7 +39,7 @@ public class QrCheckResponse
     /// </summary>
     public int Code { get; set; }
 
-    public string Message { get; set; }
+    public string Message { get; set; } = default!;
 
     /// <summary>
     /// 802 有值

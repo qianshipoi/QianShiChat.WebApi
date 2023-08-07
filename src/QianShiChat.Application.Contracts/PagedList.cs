@@ -2,7 +2,7 @@
 
 public class PagedList<T> where T : class
 {
-    public IEnumerable<T> Items { get; set; }
+    public IEnumerable<T> Items { get; set; } = default!;
 
     public long Total { get; set; }
 

@@ -17,5 +17,5 @@ public class MessageCursor
     public long LastUpdateTime { get; set; }
 
     [ForeignKey(nameof(UserId))]
-    public UserInfo User { get; set; }
+    public UserInfo User { get; set; } = default!;
 }

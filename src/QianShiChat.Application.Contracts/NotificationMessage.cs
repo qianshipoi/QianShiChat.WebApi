@@ -6,7 +6,7 @@ public class PrivateChatMessageRequest
     public int ToId { get; set; }
 
     [Required, MaxLength(255)]
-    public string Message { get; set; }
+    public string Message { get; set; } = default!;
 
     [Required]
     public ChatMessageSendType SendType { get; set; }

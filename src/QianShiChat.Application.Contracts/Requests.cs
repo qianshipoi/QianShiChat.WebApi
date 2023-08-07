@@ -48,3 +48,7 @@ public class SendFileRequest
     [Required]
     public IFormFile File { get; set; } = default!;
 }
+
+public record CreateGroupRequest([property: Required] List<int> FriendIds, [property: MaxLength(32)] string? Name);
+
+public record JoinGroupRequest([property: Required, MaxLength(32)] string Remark);

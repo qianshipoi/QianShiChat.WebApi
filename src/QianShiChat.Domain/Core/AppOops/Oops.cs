@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.Domain.Core.AppOops;
+﻿using System.Net;
+
+namespace QianShiChat.Domain.Core.AppOops;
 
 public static class Oops
 {
@@ -12,8 +14,12 @@ public static class Oops
     public static BusinessException Oh(string errorMessage, params object[] args)
     {
         var friendlyException = new BusinessException(string.Format(errorMessage, args));
-
         return friendlyException;
+    }
+
+    public static BusinessException Oh()
+    {
+        return Oh("Server error.");
     }
 
     public static BusinessException Oh<TException>(string errorMessage, params object[] args)
@@ -56,6 +62,12 @@ public static class ExceptionExtentions
     public static BusinessException StatusCode(this BusinessException exception, int status)
     {
         exception.StatusCode = status;
+        return exception;
+    }
+
+    public static BusinessException StatusCode (this BusinessException exception, HttpStatusCode httpStatusCode)
+    {
+        exception.StatusCode = (int)httpStatusCode;
         return exception;
     }
 }
