@@ -1,4 +1,7 @@
-﻿namespace QianShiChat.WebApi.Controllers;
+﻿using QianShiChat.Application.Contracts;
+using QianShiChat.Domain.Models;
+
+namespace QianShiChat.WebApi.Controllers;
 
 /// <summary>
 /// auth controller
@@ -48,21 +51,29 @@ public class AuthController : BaseController
             return BadRequest("The password is incorrect.");
         }
 
+        var userDto = _mapper.Map<UserDto>(userInfo);
+
+        var token = await CreateTokenAndSaveAsync(userInfo.NickName, userInfo.Id);
+
+        return Ok(userDto);
+    }
+
+    private async Task<string> CreateTokenAndSaveAsync(string name, int id)
+    {
         var token = _jwtService.CreateToken(new List<Claim>
         {
-            new Claim(ClaimTypes.Name , userInfo.NickName),
-            new Claim(ClaimTypes.NameIdentifier, userInfo.Id.ToString()),
+            new Claim(ClaimTypes.Name , name),
+            new Claim(ClaimTypes.NameIdentifier, id.ToString()),
             new Claim(CustomClaim.ClientType, CurrentClientType!)
         });
 
-        var userDto = _mapper.Map<UserDto>(userInfo);
-
         // 存入redis
-        await _redisCachingProvider.StringSetAsync(AppConsts.GetAuthorizeCacheKey(CurrentClientType!, userDto.Id.ToString()), token, TimeSpan.FromSeconds(_jwtOptions.Expires + 60));
+        await _redisCachingProvider.StringSetAsync(AppConsts.GetAuthorizeCacheKey(CurrentClientType!, id.ToString()), token, TimeSpan.FromSeconds(_jwtOptions.Expires + 60));
 
         Response.Headers.Add(CustomResponseHeader.AccessToken, token);
         Response.Headers.Add("Access-Control-Expose-Headers", CustomResponseHeader.AccessToken);
-        return Ok(userDto);
+
+        return token;
     }
 
     /// <summary>
@@ -78,17 +89,8 @@ public class AuthController : BaseController
         if (user == null)
             return Unauthorized();
 
-        var token = _jwtService.CreateToken(new List<Claim>
-        {
-            new Claim(ClaimTypes.Name , user.NickName),
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(CustomClaim.ClientType, CurrentClientType!)
-        });
-        // 存入redis
-        await _redisCachingProvider.StringSetAsync(AppConsts.GetAuthorizeCacheKey(CurrentClientType!, user.Id.ToString()), token, TimeSpan.FromSeconds(_jwtOptions.Expires + 60));
+        await CreateTokenAndSaveAsync(user.NickName, user.Id);
 
-        Response.Headers.Add(CustomResponseHeader.AccessToken, token);
-        Response.Headers.Add("Access-Control-Expose-Headers", CustomResponseHeader.AccessToken);
         return Ok(user);
     }
 
@@ -165,6 +167,12 @@ public class AuthController : BaseController
             Code = 800,
             Message = "二维码不存在或已过期"
         };
+
+        if(response.Code == 803)
+        {
+            Response.Headers.Add(CustomResponseHeader.AccessToken, response.AccessToken);
+            Response.Headers.Add("Access-Control-Expose-Headers", CustomResponseHeader.AccessToken);
+        }
 
         return Ok(response);
     }
@@ -264,11 +272,7 @@ public class AuthController : BaseController
             });
         }
 
-        var token = _jwtService.CreateToken(new List<Claim>
-        {
-            new Claim(ClaimTypes.Name , qrCheck.User.NickName),
-            new Claim(ClaimTypes.NameIdentifier, qrCheck.User.Id.ToString()),
-        });
+        var token = await CreateTokenAndSaveAsync(qrCheck.User.NickName, qrCheck.User.Id);
 
         qrCheck.Code = 803;
         qrCheck.Message = "授权成功";
