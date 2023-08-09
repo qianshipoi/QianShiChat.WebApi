@@ -115,7 +115,7 @@ public class ChatMessageService : IChatMessageService, ITransient
 
         if (chatMessageDto.MessageType != ChatMessageType.Text)
         {
-            chatMessageDto.Content = _fileService.FormatWwwRootFile(_fileService.FormatWwwRootFile(chatMessageDto.Content));
+            chatMessageDto.Content = _fileService.FormatWwwRootFile(chatMessageDto.Content);
         }
 
         // send message.

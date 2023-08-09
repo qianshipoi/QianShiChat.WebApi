@@ -18,6 +18,6 @@ public class FileService : IFileService, IScoped
 
     public string FormatWwwRootFile(string filePath)
     {
-        return _httpContextAccessor.HttpContext!.Request.GetBaseUrl() + '/' + filePath.TrimStart('/');
+        return _httpContextAccessor.HttpContext!.Request.GetBaseUrl() + '/' + filePath.TrimStart('/').Replace("\\", "/");
     }
 }

@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /src/QianShiChat.WebApi/appsettings.Local.json
+/src/QianShiChat.WebApi/wwwroot/Raw/Chat/*
