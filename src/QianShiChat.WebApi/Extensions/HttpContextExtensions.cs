@@ -93,7 +93,6 @@ public static class HttpContextExtensions
 
                     return Task.CompletedTask;
                 },
-
                 OnBeforeCreateAsync = ctx => {
                     // Partial files are not complete so we do not need to validate
                     // the metadata in our example.
@@ -126,12 +125,19 @@ public static class HttpContextExtensions
                     logger.LogInformation($"Deleted file {ctx.FileId} using {ctx.Store.GetType().FullName}");
                     return Task.CompletedTask;
                 },
-                OnFileCompleteAsync = ctx => {
+                OnFileCompleteAsync = async ctx => {
                     logger.LogInformation($"Upload of {ctx.FileId} completed using {ctx.Store.GetType().FullName}");
                     // If the store implements ITusReadableStore one could access the completed file here.
                     // The default TusDiskStore implements this interface:
                     //var file = await ctx.GetFileAsync();
-                    return Task.CompletedTask;
+
+                    // move to wwwroot dir.
+                    var file = await ctx.GetFileAsync();
+                    var fileStream = await file.GetContentAsync(ctx.CancellationToken);
+                    var metadata = await file.GetMetadataAsync(ctx.CancellationToken);
+                    metadata.TryGetValue("name", out var name);
+                    var fileService = ctx.HttpContext.RequestServices.GetRequiredService<IFileService>();
+                    await fileService.SaveFileAsync(fileStream, name!.GetString(Encoding.UTF8), ctx.CancellationToken);
                 }
             },
             Expiration = new AbsoluteExpiration(TimeSpan.FromMinutes(5))

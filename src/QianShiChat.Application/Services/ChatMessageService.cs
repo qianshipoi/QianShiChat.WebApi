@@ -10,7 +10,6 @@ public class ChatMessageService : IChatMessageService, ITransient
     private readonly IRedisCachingProvider _redisCachingProvider;
     private readonly IMapper _mapper;
     private readonly IHubContext<ChatHub, IChatClient> _hubContext;
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IFileService _fileService;
 
     /// <summary>
@@ -81,7 +80,7 @@ public class ChatMessageService : IChatMessageService, ITransient
         {
             if (message.MessageType != ChatMessageType.Text)
             {
-                message.Content = _fileService.FormatWwwRootFile(message.Content);
+                message.Content = _fileService.FormatPublicFile(message.Content);
             }
         }
 
@@ -115,7 +114,7 @@ public class ChatMessageService : IChatMessageService, ITransient
 
         if (chatMessageDto.MessageType != ChatMessageType.Text)
         {
-            chatMessageDto.Content = _fileService.FormatWwwRootFile(chatMessageDto.Content);
+            chatMessageDto.Content = _fileService.FormatPublicFile(chatMessageDto.Content);
         }
 
         // send message.

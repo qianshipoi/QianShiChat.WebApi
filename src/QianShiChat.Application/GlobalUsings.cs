@@ -1,11 +1,14 @@
 ﻿global using AutoMapper;
 global using AutoMapper.QueryableExtensions;
 
+global using CommunityToolkit.Diagnostics;
+
 global using EasyCaching.Core;
 
 global using Microsoft.AspNetCore.Hosting;
 global using Microsoft.AspNetCore.Http;
 global using Microsoft.AspNetCore.SignalR;
+global using Microsoft.AspNetCore.StaticFiles;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Options;
@@ -20,6 +23,9 @@ global using QianShiChat.Domain.Core.AutoDI;
 global using QianShiChat.Domain.Models;
 global using QianShiChat.Domain.Options;
 global using QianShiChat.Domain.Shared;
+
+global using SixLabors.ImageSharp;
+global using SixLabors.ImageSharp.Processing;
 
 global using System.IdentityModel.Tokens.Jwt;
 global using System.Security.Claims;

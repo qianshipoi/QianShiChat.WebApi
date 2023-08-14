@@ -43,7 +43,7 @@ public class FriendService : IFriendService, ITransient
 
         friends.ForEach(item =>
         {
-            item.Avatar = _fileService.FormatWwwRootFile(item.Avatar);
+            item.Avatar = _fileService.FormatPublicFile(item.Avatar);
         });
 
         return friends;
@@ -102,12 +102,12 @@ public class FriendService : IFriendService, ITransient
         uwm.ForEach(item =>
         {
             item.Messages = msg.Where(x => x.FromId == item.Id).ToList();
-            item.Avatar = _fileService.FormatWwwRootFile(item.Avatar);
+            item.Avatar = _fileService.FormatPublicFile(item.Avatar);
             item.Messages.ForEach(message =>
             {
                 if(message.MessageType != ChatMessageType.Text)
                 {
-                    message.Content = _fileService.FormatWwwRootFile(message.Content);
+                    message.Content = _fileService.FormatPublicFile(message.Content);
                 }
             });
         });

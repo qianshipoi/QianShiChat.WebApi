@@ -50,7 +50,7 @@ public class AvatarService : IAvatarService, ITransient
 
         data.ForEach(item =>
         {
-            item.Path = _fileService.FormatWwwRootFile(item.Path);
+            item.Path = _fileService.FormatPublicFile(item.Path);
         });
 
         return PagedList.Create(data, query.Count);
@@ -69,7 +69,7 @@ public class AvatarService : IAvatarService, ITransient
 
         data.ForEach(item =>
         {
-            item.Path = _fileService.FormatWwwRootFile(item.Path);
+            item.Path = _fileService.FormatPublicFile(item.Path);
         });
 
         return PagedList.Create(data, query.Count);

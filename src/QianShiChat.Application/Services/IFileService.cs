@@ -1,12 +1,20 @@
-﻿namespace QianShiChat.Application.Services
+﻿namespace QianShiChat.Application.Services;
+
+public interface IFileService
 {
-    public interface IFileService
-    {
-        /// <summary>
-        /// 格式化链接
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <returns></returns>
-        string FormatWwwRootFile(string filePath);
-    }
+    /// <summary>
+    /// format public file url.
+    /// </summary>
+    /// <param name="filePath"></param>
+    /// <returns></returns>
+    string FormatPublicFile(string filePath);
+
+    /// <summary>
+    /// save file.
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <param name="filename"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<SaveFileResult> SaveFileAsync(Stream stream, string filename, CancellationToken cancellationToken = default);
 }

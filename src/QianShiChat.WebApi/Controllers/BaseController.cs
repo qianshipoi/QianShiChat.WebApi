@@ -1,5 +1,6 @@
 ﻿namespace QianShiChat.WebApi.Controllers;
 
+[Route("api/[controller]")]
 public abstract class BaseController : ControllerBase
 {
     /// <summary>

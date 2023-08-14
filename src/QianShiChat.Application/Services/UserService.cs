@@ -41,7 +41,7 @@ public class UserService : IUserService, ITransient
 
         if (user == null) return user;
 
-        user.Avatar = _fileService.FormatWwwRootFile(user.Avatar);
+        user.Avatar = _fileService.FormatPublicFile(user.Avatar);
 
         return user;
     }
@@ -54,7 +54,7 @@ public class UserService : IUserService, ITransient
 
         if (user == null) return user;
 
-        user.Avatar = _fileService.FormatWwwRootFile(user.Avatar!);
+        user.Avatar = _fileService.FormatPublicFile(user.Avatar!);
 
         return user;
     }
@@ -86,7 +86,7 @@ public class UserService : IUserService, ITransient
             await _context.AddAsync(user, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
 
-            user.Avatar = _fileService.FormatWwwRootFile(user.Avatar);
+            user.Avatar = _fileService.FormatPublicFile(user.Avatar);
             return _mapper.Map<UserDto>(user);
         }
         catch (Exception ex)
@@ -106,7 +106,7 @@ public class UserService : IUserService, ITransient
 
         users.ForEach(item =>
         {
-            item.Avatar = _fileService.FormatWwwRootFile(item.Avatar);
+            item.Avatar = _fileService.FormatPublicFile(item.Avatar);
         });
         return users;
     }
@@ -123,7 +123,7 @@ public class UserService : IUserService, ITransient
 
         users.ForEach(item =>
         {
-            item.Avatar = _fileService.FormatWwwRootFile(item.Avatar);
+            item.Avatar = _fileService.FormatPublicFile(item.Avatar);
         });
         return users;
     }

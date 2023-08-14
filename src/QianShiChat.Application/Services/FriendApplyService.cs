@@ -50,7 +50,7 @@ public class FriendApplyService : IFriendApplyService, ITransient
             .Where(x => x.UserId == userId && x.FriendId == dto.UserId && x.Status == ApplyStatus.Applied)
             .SingleAsync(cancellationToken);
 
-        apply.Remark = dto.Remark;
+        apply.Remark = dto.Remark ?? "";
         apply.UpdateTime = Timestamp.Now;
         await _context.SaveChangesAsync(cancellationToken);
 
@@ -70,12 +70,11 @@ public class FriendApplyService : IFriendApplyService, ITransient
               .Take(size)
               .ProjectTo<FriendApplyDto>(_mapper.ConfigurationProvider)
               .ToListAsync(cancellationToken);
-        data.ForEach(item =>
-        {
+        data.ForEach(item => {
             if (item.User != null)
-                item.User.Avatar = _fileService.FormatWwwRootFile(item.User.Avatar);
+                item.User.Avatar = _fileService.FormatPublicFile(item.User.Avatar);
             if (item.Friend != null)
-                item.Friend.Avatar = _fileService.FormatWwwRootFile(item.Friend.Avatar);
+                item.Friend.Avatar = _fileService.FormatPublicFile(item.Friend.Avatar);
         });
 
         return data;

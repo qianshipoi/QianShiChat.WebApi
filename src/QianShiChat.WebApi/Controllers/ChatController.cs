@@ -4,7 +4,6 @@
 /// chat api
 /// </summary>
 [ApiController]
-[Route("api/[controller]")]
 public class ChatController : BaseController
 {
     private readonly IRedisCachingProvider _redisCachingProvider;
