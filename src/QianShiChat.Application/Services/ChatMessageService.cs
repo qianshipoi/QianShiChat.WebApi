@@ -112,11 +112,6 @@ public class ChatMessageService : IChatMessageService, ITransient
     {
         var chatMessageDto = _mapper.Map<ChatMessageDto>(chatMessage);
 
-        if (chatMessageDto.MessageType != ChatMessageType.Text)
-        {
-            chatMessageDto.Content = _fileService.FormatPublicFile(chatMessageDto.Content);
-        }
-
         // send message.
         if (chatMessageDto.SendType == ChatMessageSendType.Personal)
         {

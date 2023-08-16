@@ -77,7 +77,7 @@ public static class IServiceCollectionExtensions
             var safeDeleteInterceptor = sp.GetRequiredService<SoftDeleteInterceptor>();
             var auditableInterceptor = sp.GetRequiredService<IAuditableInterceptor>();
 
-            options.UseMySql(configuration.GetConnectionString("Default"), ServerVersion.Parse("8.0.31")).AddInterceptors(safeDeleteInterceptor, auditableInterceptor);
+            options.UseMySql(configuration.GetConnectionString("Default"), ServerVersion.Parse("8.0.31"),builder => builder.MigrationsAssembly(typeof(Program).Assembly.FullName)).AddInterceptors(safeDeleteInterceptor, auditableInterceptor);
         });
         return services;
     }

@@ -16,5 +16,5 @@ public interface IFileService
     /// <param name="filename"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<SaveFileResult> SaveFileAsync(Stream stream, string filename, CancellationToken cancellationToken = default);
+    Task<AttachmentDto> SaveFileAsync(Stream stream, string filename, CancellationToken cancellationToken = default);
 }

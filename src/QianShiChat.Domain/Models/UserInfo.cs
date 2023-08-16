@@ -51,6 +51,8 @@ public class UserInfo : IAuditable, ISoftDelete
     public virtual ICollection<Group> Groups { get; set; } = null!;
 
     public virtual ICollection<UserGroupRealtion> UserGroups { get; set; } = null!;
+
+    public virtual ICollection<Attachment> Attachments { get; set; } = null!;
 }
 
 public class UserInfoEntityTypeConfiguration : IEntityTypeConfiguration<UserInfo>

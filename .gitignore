@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 /src/QianShiChat.WebApi/appsettings.Local.json
 /src/QianShiChat.WebApi/wwwroot/Raw/Chat/*
+/src/QianShiChat.WebApi/wwwroot/files/*
+/src/QianShiChat.WebApi/wwwroot/previews/*

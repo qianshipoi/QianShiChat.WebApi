@@ -22,7 +22,7 @@ public class UserAvatar : ISoftDelete, IAuditable
     [Required]
     [MaxLength(255)]
     [Comment("file path.")]
-    public string Path { get; set; }
+    public string Path { get; set; } = default!;
 
     [Required]
     [Comment("file size.")]
@@ -36,5 +36,5 @@ public class UserAvatar : ISoftDelete, IAuditable
     [Comment("delete time.")]
     public long DeleteTime { get; set; }
 
-    public UserInfo User { get; set; }
+    public UserInfo User { get; set; } = default!;
 }

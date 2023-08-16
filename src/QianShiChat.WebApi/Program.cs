@@ -40,7 +40,7 @@ builder.Services
     })
     .AddMediatR(configure => configure.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()))
     .AddValidatorsFromAssemblyContaining<Program>()
-    .AddAutoMapper(Assembly.GetExecutingAssembly())
+    .AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies())
     .AddOpenApi()
     .AddJwtAuthentication(builder.Configuration)
     .AddCache(builder.Configuration)

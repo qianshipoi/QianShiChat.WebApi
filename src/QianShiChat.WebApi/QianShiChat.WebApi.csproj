@@ -27,6 +27,8 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
+    <Folder Include="wwwroot\files\" />
+    <Folder Include="wwwroot\previews\" />
     <Folder Include="wwwroot\Raw\Chat\" />
   </ItemGroup>
 

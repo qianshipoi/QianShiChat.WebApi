@@ -36,8 +36,8 @@ public class UserRealtion
     public long CreateTime { get; set; }
 
     [ForeignKey(nameof(UserId))]
-    public UserInfo User { get; set; }
+    public virtual UserInfo User { get; set; } = default!;
 
     [ForeignKey(nameof(FriendId))]
-    public UserInfo Friend { get; set; }
+    public virtual UserInfo Friend { get; set; } = default!;
 }

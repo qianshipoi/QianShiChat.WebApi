@@ -4,6 +4,7 @@
 /// chat api
 /// </summary>
 [ApiController]
+[Authorize]
 public class ChatController : BaseController
 {
     private readonly IRedisCachingProvider _redisCachingProvider;
@@ -11,6 +12,7 @@ public class ChatController : BaseController
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly IMapper _mapper;
     private readonly IChatMessageService _chatMessageService;
+    private readonly IAttachmentRepository _attachmentRepository;
 
     /// <summary>
     /// chat api
@@ -20,13 +22,15 @@ public class ChatController : BaseController
         IHubContext<ChatHub, IChatClient> hubContext,
         IWebHostEnvironment webHostEnvironment,
         IMapper mapper,
-        IChatMessageService chatMessageService)
+        IChatMessageService chatMessageService,
+        IAttachmentRepository attachmentRepository)
     {
         _redisCachingProvider = redisCachingProvider;
         _hubContext = hubContext;
         _webHostEnvironment = webHostEnvironment;
         _mapper = mapper;
         _chatMessageService = chatMessageService;
+        _attachmentRepository = attachmentRepository;
     }
 
     /// <summary>
@@ -52,69 +56,68 @@ public class ChatController : BaseController
         return PhysicalFile(filePath, contenttype ?? "application/octet-stream");
     }
 
-    /// <summary>
-    /// send file message.
-    /// </summary>
-    /// <param name="request"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    [HttpPost("file")]
-    [Authorize]
-    public async Task<IActionResult> SendFile(
-        [FromForm] SendFileRequest request,
-        CancellationToken cancellationToken = default)
-    {
-        // save to wwwroot
-        var wwwroot = _webHostEnvironment.WebRootPath;
+    ///// <summary>
+    ///// send file message.
+    ///// </summary>
+    ///// <param name="request"></param>
+    ///// <param name="cancellationToken"></param>
+    ///// <returns></returns>
+    //[HttpPost("file")]
+    //public async Task<IActionResult> SendFile(
+    //    [FromForm] SendFileRequest request,
+    //    CancellationToken cancellationToken = default)
+    //{
+    //    // save to wwwroot
+    //    var wwwroot = _webHostEnvironment.WebRootPath;
 
-        var fileExt = Path.GetExtension(request.File.FileName);
-        using var stream = request.File.OpenReadStream();
-        var md5 = stream.ToMd5();
-        var newFilePath = Path.Combine("Raw", "Chat", md5 + fileExt);
+    //    var fileExt = Path.GetExtension(request.File.FileName);
+    //    using var stream = request.File.OpenReadStream();
+    //    var md5 = stream.ToMd5();
+    //    var newFilePath = Path.Combine("Raw", "Chat", md5 + fileExt);
 
-        var saveFilePath = Path.Combine(wwwroot, newFilePath);
-        var dirPath = Path.GetDirectoryName(saveFilePath);
+    //    var saveFilePath = Path.Combine(wwwroot, newFilePath);
+    //    var dirPath = Path.GetDirectoryName(saveFilePath);
 
-        if (!Directory.Exists(dirPath))
-        {
-            Directory.CreateDirectory(dirPath!);
-        }
+    //    if (!Directory.Exists(dirPath))
+    //    {
+    //        Directory.CreateDirectory(dirPath!);
+    //    }
 
-        using var fileStream = new FileStream(saveFilePath, FileMode.OpenOrCreate, FileAccess.Write);
-        stream.CopyTo(fileStream);
-        await fileStream.FlushAsync();
+    //    using var fileStream = new FileStream(saveFilePath, FileMode.OpenOrCreate, FileAccess.Write);
+    //    stream.CopyTo(fileStream);
+    //    await fileStream.FlushAsync();
 
-        // send message
-        var now = Timestamp.Now;
+    //    // send message
+    //    var now = Timestamp.Now;
 
-        var messageType = ChatMessageType.OtherFile;
-        var isImage = FileHelper.IsAllowImages(request.File.FileName);
-        if (isImage)
-        {
-            messageType = ChatMessageType.Image;
-        }
-        else
-        {
-            var isVideo = FileHelper.IsAllowVideos(request.File.FileName);
-            if (isVideo) messageType = ChatMessageType.Video;
-        }
+    //    var messageType = ChatMessageType.OtherFile;
+    //    var isImage = FileHelper.IsAllowImages(request.File.FileName);
+    //    if (isImage)
+    //    {
+    //        messageType = ChatMessageType.Image;
+    //    }
+    //    else
+    //    {
+    //        var isVideo = FileHelper.IsAllowVideos(request.File.FileName);
+    //        if (isVideo) messageType = ChatMessageType.Video;
+    //    }
 
-        var chatMessage = new ChatMessage()
-        {
-            Id = YitIdHelper.NextId(),
-            Content = newFilePath,
-            CreateTime = now,
-            FromId = CurrentUserId,
-            ToId = request.ToId,
-            UpdateTime = now,
-            MessageType = messageType,
-            SendType = request.SendType
-        };
+    //    var chatMessage = new ChatMessage()
+    //    {
+    //        Id = YitIdHelper.NextId(),
+    //        Content = newFilePath,
+    //        CreateTime = now,
+    //        FromId = CurrentUserId,
+    //        ToId = request.ToId,
+    //        UpdateTime = now,
+    //        MessageType = messageType,
+    //        SendType = request.SendType
+    //    };
 
-        var chatMessageDto = await _chatMessageService.SendMessageAsync(chatMessage);
+    //    var chatMessageDto = await _chatMessageService.SendMessageAsync(chatMessage);
 
-        return CreatedAtAction(nameof(GetFile), new { filename = newFilePath }, chatMessageDto);
-    }
+    //    return CreatedAtAction(nameof(GetFile), new { filename = newFilePath }, chatMessageDto);
+    //}
 
     /// <summary>
     /// send text message.
@@ -123,8 +126,7 @@ public class ChatController : BaseController
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost("text")]
-    [Authorize]
-    public async Task<IActionResult> Send(PrivateChatMessageRequest request, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Send([FromBody] PrivateChatMessageRequest request, CancellationToken cancellationToken = default)
     {
         var now = Timestamp.Now;
 
@@ -144,4 +146,59 @@ public class ChatController : BaseController
 
         return Ok(chatMessageDto);
     }
+
+    /// <summary>
+    /// send file message.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="fileService"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    [HttpPost("file")]
+    public async Task<IActionResult> SendFile(
+        [FromBody] SendFileMessageRequest request,
+        [FromServices] IFileService fileService,
+        CancellationToken cancellationToken = default)
+    {
+        var now = Timestamp.Now;
+        var attachment = await _attachmentRepository.FindByIdAsync(request.AttachmentId, cancellationToken);
+
+        if(attachment is null)
+        {
+            return BadRequest("attachment not exists.");
+        }
+
+        var dto = _mapper.Map<AttachmentDto>(attachment);
+
+        dto.RawPath = fileService.FormatPublicFile(dto.RawPath);
+        if (!string.IsNullOrWhiteSpace(dto.PreviewPath))
+        {
+            dto.PreviewPath = fileService.FormatPublicFile(dto.PreviewPath);
+        }
+
+        var chatMessage = new ChatMessage()
+        {
+            Id = YitIdHelper.NextId(),
+            Content = JsonSerializer.Serialize(dto),
+            CreateTime = now,
+            FromId = CurrentUserId,
+            ToId = request.ToId,
+            UpdateTime = now,
+            MessageType = dto.ContentType.ToLower() switch
+            {
+                "image/png" => ChatMessageType.Image,
+                "image/jpeg" => ChatMessageType.Image,
+                "image/gif" => ChatMessageType.Image,
+                "image/x-icon" => ChatMessageType.Image,
+                "video/mpeg4" => ChatMessageType.Video,
+                _ => ChatMessageType.OtherFile
+            },
+            SendType = request.SendType
+        };
+
+        var chatMessageDto = await _chatMessageService.SendMessageAsync(chatMessage);
+
+        return Ok(chatMessageDto);
+    }
+
 }

@@ -1,5 +1,14 @@
 ﻿namespace QianShiChat.Application.Contracts;
 
-public record UploadAttachmentRequest(IFormFile File);
+public record UploadAttachmentRequest([Required] IFormFile File);
 
-public record SaveFileResult(string RawPath, string ContentType, string? PreviewPath = null);
+public class AttachmentDto
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = default!;
+    public string RawPath { get; set; } = default!;
+    public string? PreviewPath { get; set; }
+    public string Hash { get; set; } = default!;
+    public string ContentType { get; set; } = default!;
+    public long Size { get; set; }
+}

@@ -22,7 +22,7 @@ public class AttachmentController : BaseController
     /// <returns></returns>
     [HttpPost]
     [RequestFormLimits(MultipartBodyLengthLimit = 1024 * 1024 * 30)]
-    public async Task<SaveFileResult> UploadAsync([FromForm] UploadAttachmentRequest request, CancellationToken cancellationToken = default)
+    public async Task<AttachmentDto> UploadAsync([FromForm] UploadAttachmentRequest request, CancellationToken cancellationToken = default)
     {
         using var stream = request.File.OpenReadStream();
         return await _fileService.SaveFileAsync(stream, request.File.FileName, cancellationToken);
