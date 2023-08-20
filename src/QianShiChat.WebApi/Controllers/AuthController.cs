@@ -1,13 +1,11 @@
-﻿using QianShiChat.Application.Contracts;
-using QianShiChat.Domain.Models;
-
-namespace QianShiChat.WebApi.Controllers;
+﻿namespace QianShiChat.WebApi.Controllers;
 
 /// <summary>
 /// auth controller
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
+[AllowAnonymous]
 public class AuthController : BaseController
 {
     private readonly IMapper _mapper;
@@ -53,7 +51,7 @@ public class AuthController : BaseController
 
         var userDto = _mapper.Map<UserDto>(userInfo);
 
-        var token = await CreateTokenAndSaveAsync(userInfo.NickName, userInfo.Id);
+        await CreateTokenAndSaveAsync(userInfo.NickName, userInfo.Id);
 
         return Ok(userDto);
     }
@@ -71,7 +69,6 @@ public class AuthController : BaseController
         await _redisCachingProvider.StringSetAsync(AppConsts.GetAuthorizeCacheKey(CurrentClientType!, id.ToString()), token, TimeSpan.FromSeconds(_jwtOptions.Expires + 60));
 
         Response.Headers.Add(CustomResponseHeader.AccessToken, token);
-        Response.Headers.Add("Access-Control-Expose-Headers", CustomResponseHeader.AccessToken);
 
         return token;
     }

@@ -20,6 +20,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F913559D-A44C-41C3-9FF8-15AB80A7308B}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		打包ChatService.md = 打包ChatService.md
 	EndProjectSection
 EndProject
 Global

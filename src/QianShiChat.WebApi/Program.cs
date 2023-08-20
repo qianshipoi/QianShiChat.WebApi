@@ -32,9 +32,10 @@ builder.Services
     .AddCors(options => {
         options.AddPolicy(AppConsts.MyAllowSpecificOrigins, builder => {
             builder
-            .WithOrigins("https://www.kuriyama.top", "http://127.0.0.1:5173")
+            .WithOrigins("https://www.kuriyama.top", "http://127.0.0.1:5173", "http://127.0.0.1:3000")
             .WithHeaders("*")
             .WithMethods("*")
+            .WithExposedHeaders(CustomResponseHeader.AccessToken)
             .WithExposedHeaders(tusdotnet.Helpers.CorsHelper.GetExposedHeaders());
         });
     })

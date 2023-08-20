@@ -200,5 +200,4 @@ public class ChatController : BaseController
 
         return Ok(chatMessageDto);
     }
-
 }
