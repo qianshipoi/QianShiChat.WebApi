@@ -52,3 +52,17 @@ public class SendFileRequest
 public record CreateGroupRequest([property: Required] List<int> FriendIds, [property: MaxLength(32)] string? Name);
 
 public record JoinGroupRequest([property: Required, MaxLength(32)] string Remark);
+
+public class BasePagedRequest
+{
+    [Required]
+    [Range(1, int.MaxValue)]
+    public int Page { get; set; }
+
+    [Range(1, 100)]
+    public int Size { get; set; } = 30;
+}
+
+public class QueryMessagesRequest : BasePagedRequest
+{
+}

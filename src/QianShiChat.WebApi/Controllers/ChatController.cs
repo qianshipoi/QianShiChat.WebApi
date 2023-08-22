@@ -56,68 +56,6 @@ public class ChatController : BaseController
         return PhysicalFile(filePath, contenttype ?? "application/octet-stream");
     }
 
-    ///// <summary>
-    ///// send file message.
-    ///// </summary>
-    ///// <param name="request"></param>
-    ///// <param name="cancellationToken"></param>
-    ///// <returns></returns>
-    //[HttpPost("file")]
-    //public async Task<IActionResult> SendFile(
-    //    [FromForm] SendFileRequest request,
-    //    CancellationToken cancellationToken = default)
-    //{
-    //    // save to wwwroot
-    //    var wwwroot = _webHostEnvironment.WebRootPath;
-
-    //    var fileExt = Path.GetExtension(request.File.FileName);
-    //    using var stream = request.File.OpenReadStream();
-    //    var md5 = stream.ToMd5();
-    //    var newFilePath = Path.Combine("Raw", "Chat", md5 + fileExt);
-
-    //    var saveFilePath = Path.Combine(wwwroot, newFilePath);
-    //    var dirPath = Path.GetDirectoryName(saveFilePath);
-
-    //    if (!Directory.Exists(dirPath))
-    //    {
-    //        Directory.CreateDirectory(dirPath!);
-    //    }
-
-    //    using var fileStream = new FileStream(saveFilePath, FileMode.OpenOrCreate, FileAccess.Write);
-    //    stream.CopyTo(fileStream);
-    //    await fileStream.FlushAsync();
-
-    //    // send message
-    //    var now = Timestamp.Now;
-
-    //    var messageType = ChatMessageType.OtherFile;
-    //    var isImage = FileHelper.IsAllowImages(request.File.FileName);
-    //    if (isImage)
-    //    {
-    //        messageType = ChatMessageType.Image;
-    //    }
-    //    else
-    //    {
-    //        var isVideo = FileHelper.IsAllowVideos(request.File.FileName);
-    //        if (isVideo) messageType = ChatMessageType.Video;
-    //    }
-
-    //    var chatMessage = new ChatMessage()
-    //    {
-    //        Id = YitIdHelper.NextId(),
-    //        Content = newFilePath,
-    //        CreateTime = now,
-    //        FromId = CurrentUserId,
-    //        ToId = request.ToId,
-    //        UpdateTime = now,
-    //        MessageType = messageType,
-    //        SendType = request.SendType
-    //    };
-
-    //    var chatMessageDto = await _chatMessageService.SendMessageAsync(chatMessage);
-
-    //    return CreatedAtAction(nameof(GetFile), new { filename = newFilePath }, chatMessageDto);
-    //}
 
     /// <summary>
     /// send text message.
@@ -199,5 +137,12 @@ public class ChatController : BaseController
         var chatMessageDto = await _chatMessageService.SendMessageAsync(chatMessage);
 
         return Ok(chatMessageDto);
+    }
+
+
+    [HttpGet("{id:int}/history")]
+    public Task<PagedList<ChatMessageDto>> GetUserHistory([FromRoute] int id, [FromQuery] QueryMessagesRequest request, CancellationToken cancellationToken = default)
+    {
+        return _chatMessageService.GetHistoryAsync(id, request, cancellationToken);
     }
 }

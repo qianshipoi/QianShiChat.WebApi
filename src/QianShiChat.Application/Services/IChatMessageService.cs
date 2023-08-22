@@ -5,6 +5,8 @@
 /// </summary>
 public interface IChatMessageService
 {
+    Task<PagedList<ChatMessageDto>> GetHistoryAsync(int userId, QueryMessagesRequest request, CancellationToken cancellationToken = default);
+
     /// <summary>
     /// get new messages.
     /// </summary>

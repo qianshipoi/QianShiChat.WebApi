@@ -11,6 +11,7 @@ public class ChatMessageService : IChatMessageService, ITransient
     private readonly IMapper _mapper;
     private readonly IHubContext<ChatHub, IChatClient> _hubContext;
     private readonly IFileService _fileService;
+    private readonly IUserManager _userManager;
 
     /// <summary>
     /// chat message service
@@ -21,7 +22,8 @@ public class ChatMessageService : IChatMessageService, ITransient
         ILogger<ChatMessageService> logger,
         IMapper mapper,
         IHubContext<ChatHub, IChatClient> hubContext,
-        IFileService fileService)
+        IFileService fileService,
+        IUserManager userManager)
     {
         _redisCachingProvider = redisCachingProvider;
         _context = context;
@@ -29,12 +31,10 @@ public class ChatMessageService : IChatMessageService, ITransient
         _mapper = mapper;
         _hubContext = hubContext;
         _fileService = fileService;
+        _userManager = userManager;
     }
 
-    public async Task<List<ChatMessageDto>> GetNewMessageAndCacheAsync(
-        int userId1,
-        int userId2,
-        CancellationToken cancellationToken = default)
+    private async Task<List<ChatMessage>> GetCacheMessageAsync(int userId1, int userId2)
     {
         var cacheKey = AppConsts.GetPrivateChatCacheKey(userId1, userId2);
 
@@ -53,13 +53,25 @@ public class ChatMessageService : IChatMessageService, ITransient
             messages.Add(message);
         }
 
+        return messages;
+    }
+
+    public async Task<List<ChatMessageDto>> GetNewMessageAndCacheAsync(
+        int userId1,
+        int userId2,
+        CancellationToken cancellationToken = default)
+    {
+        var cacheKey = AppConsts.GetPrivateChatCacheKey(userId1, userId2);
+
+        var messages = await GetCacheMessageAsync(userId1, userId2);
+
         if (messages.Count < 10)
         {
             var minId = messages.Count > 0 ? messages.Min(x => x.Id) : long.MaxValue;
 
             var data = await _context.ChatMessages.AsNoTracking()
                  .Where(x => x.SendType == ChatMessageSendType.Personal)
-                 .Where(x => x.ToId == userId1 && x.FromId == userId2 || x.ToId == userId2 && x.FromId == userId1)
+                 .Where(x => (x.ToId == userId1 && x.FromId == userId2) || (x.ToId == userId2 && x.FromId == userId1))
                  .Where(x => x.Id < minId)
                  .OrderByDescending(x => x.Id)
                  .Take(10 - messages.Count)
@@ -85,6 +97,60 @@ public class ChatMessageService : IChatMessageService, ITransient
         }
 
         return _mapper.Map<List<ChatMessageDto>>(messages);
+    }
+
+    public async Task<PagedList<ChatMessageDto>> GetHistoryAsync(int userId, QueryMessagesRequest request, CancellationToken cancellationToken = default)
+    {
+        var cacheMessages = await GetCacheMessageAsync(_userManager.CurrentUserId, userId);
+        var minId = cacheMessages.Count > 0 ? cacheMessages.Min(x => x.Id) : long.MaxValue;
+        var skipCount = (request.Page - 1) * request.Size;
+        var takeCount = 0;
+
+        var message = new List<ChatMessage>();
+
+        if (cacheMessages.Count >= skipCount + request.Size)
+        {
+            // all in cache.
+            message.AddRange(cacheMessages.Skip(skipCount).Take(request.Size));
+        }
+        else if (cacheMessages.Count > skipCount)
+        {
+            // some record in cache.
+            message.AddRange(cacheMessages.Skip(skipCount));
+            takeCount = request.Size - (cacheMessages.Count - skipCount);
+            skipCount = cacheMessages.Count;
+        }
+        else
+        {
+            // all out cache.
+            takeCount = request.Size;
+        }
+
+        if (takeCount > 0)
+        {
+            var databaseMessages = await _context.ChatMessages.AsNoTracking()
+                .OrderByDescending(x => x.Id)
+                .Where(x => x.Id < minId)
+                .Where(x => x.SendType == ChatMessageSendType.Personal)
+                .Where(x => (x.ToId == _userManager.CurrentUserId && x.FromId == userId) || (x.ToId == userId && x.FromId == _userManager.CurrentUserId))
+                .Skip(skipCount)
+                .Take(takeCount)
+                .ToListAsync(cancellationToken);
+            if (databaseMessages is not null && databaseMessages.Any())
+            {
+                message.AddRange(databaseMessages);
+            }
+        }
+
+        var databaseCount = await _context.ChatMessages
+            .Where(x => x.Id < minId)
+            .Where(x => x.SendType == ChatMessageSendType.Personal)
+            .Where(x => (x.ToId == _userManager.CurrentUserId && x.FromId == userId) || (x.ToId == userId && x.FromId == _userManager.CurrentUserId))
+            .CountAsync(cancellationToken);
+
+        var total = cacheMessages.Count + databaseCount;
+
+        return PagedList.Create(_mapper.Map<List<ChatMessageDto>>(message), total, request.Size);
     }
 
     public async Task UpdateMessageCursor(
