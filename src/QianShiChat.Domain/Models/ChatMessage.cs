@@ -3,6 +3,11 @@
 [Table(nameof(ChatMessage))]
 public class ChatMessage : IAuditable
 {
+    public ChatMessage()
+    {
+
+    }
+
     [Key]
     [Required]
     public long Id { get; set; }
@@ -12,6 +17,10 @@ public class ChatMessage : IAuditable
 
     [Required]
     public int ToId { get; set; }
+
+    [Required]
+    [MaxLength(32)]
+    public string SessionId { get; set; } = default!;
 
     [Required]
     public ChatMessageSendType SendType { get; set; }

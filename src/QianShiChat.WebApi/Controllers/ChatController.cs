@@ -68,11 +68,14 @@ public class ChatController : BaseController
     {
         var now = Timestamp.Now;
 
+        var sessionId = request.SendType == ChatMessageSendType.Personal ? AppConsts.GetPrivateChatCacheKey(CurrentUserId, request.ToId) : request.ToId.ToString();
+
         var chatMessage = new ChatMessage()
         {
             Id = YitIdHelper.NextId(),
             Content = request.Message,
             CreateTime = now,
+            SessionId = sessionId,
             FromId = CurrentUserId,
             ToId = request.ToId,
             UpdateTime = now,
@@ -101,10 +104,11 @@ public class ChatController : BaseController
         var now = Timestamp.Now;
         var attachment = await _attachmentRepository.FindByIdAsync(request.AttachmentId, cancellationToken);
 
-        if(attachment is null)
+        if (attachment is null)
         {
             return BadRequest("attachment not exists.");
         }
+        var sessionId = request.SendType == ChatMessageSendType.Personal ? AppConsts.GetPrivateChatCacheKey(CurrentUserId, request.ToId) : request.ToId.ToString();
 
         var dto = _mapper.Map<AttachmentDto>(attachment);
 
@@ -121,6 +125,7 @@ public class ChatController : BaseController
             CreateTime = now,
             FromId = CurrentUserId,
             ToId = request.ToId,
+            SessionId = sessionId,
             UpdateTime = now,
             MessageType = dto.ContentType.ToLower() switch
             {

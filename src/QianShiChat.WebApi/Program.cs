@@ -35,6 +35,7 @@ builder.Services
             .WithOrigins("https://www.kuriyama.top", "http://127.0.0.1:5173", "http://127.0.0.1:3000")
             .WithHeaders("*")
             .WithMethods("*")
+            .AllowCredentials()
             .WithExposedHeaders(CustomResponseHeader.AccessToken)
             .WithExposedHeaders(tusdotnet.Helpers.CorsHelper.GetExposedHeaders());
         });

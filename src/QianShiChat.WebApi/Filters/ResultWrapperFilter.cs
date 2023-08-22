@@ -13,7 +13,11 @@ public class ResultWrapperFilter : ActionFilterAttribute
             return;
         }
 
-        if (context.Result is ObjectResult objectResult)
+        if (context.Result is BadRequestObjectResult badRequestObjectResult)
+        {
+            return;
+        }
+        else if (context.Result is ObjectResult objectResult)
         {
             if (objectResult.Value == null)
             {

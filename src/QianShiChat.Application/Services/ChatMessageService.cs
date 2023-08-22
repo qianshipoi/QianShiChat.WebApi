@@ -101,6 +101,8 @@ public class ChatMessageService : IChatMessageService, ITransient
 
     public async Task<PagedList<ChatMessageDto>> GetHistoryAsync(int userId, QueryMessagesRequest request, CancellationToken cancellationToken = default)
     {
+        var sessionId = AppConsts.GetPrivateChatCacheKey(_userManager.CurrentUserId, userId);
+
         var cacheMessages = await GetCacheMessageAsync(_userManager.CurrentUserId, userId);
         var minId = cacheMessages.Count > 0 ? cacheMessages.Min(x => x.Id) : long.MaxValue;
         var skipCount = (request.Page - 1) * request.Size;
@@ -131,8 +133,8 @@ public class ChatMessageService : IChatMessageService, ITransient
             var databaseMessages = await _context.ChatMessages.AsNoTracking()
                 .OrderByDescending(x => x.Id)
                 .Where(x => x.Id < minId)
+                .Where(x=>x.SessionId == sessionId)
                 .Where(x => x.SendType == ChatMessageSendType.Personal)
-                .Where(x => (x.ToId == _userManager.CurrentUserId && x.FromId == userId) || (x.ToId == userId && x.FromId == _userManager.CurrentUserId))
                 .Skip(skipCount)
                 .Take(takeCount)
                 .ToListAsync(cancellationToken);

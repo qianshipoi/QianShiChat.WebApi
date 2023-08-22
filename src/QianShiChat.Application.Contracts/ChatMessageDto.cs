@@ -8,6 +8,8 @@ public class ChatMessageDto
 
     public int ToId { get; set; }
 
+    public string SessionId { get; set; } = default!;
+
     public ChatMessageSendType SendType { get; set; }
 
     public ChatMessageType MessageType { get; set; }

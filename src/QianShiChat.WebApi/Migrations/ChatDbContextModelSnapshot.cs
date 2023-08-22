@@ -102,6 +102,11 @@ namespace QianShiChat.WebApi.Migrations
                     b.Property<sbyte>("SendType")
                         .HasColumnType("tinyint");
 
+                    b.Property<string>("SessionId")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar(32)");
+
                     b.Property<int>("ToId")
                         .HasColumnType("int");
 
@@ -502,7 +507,7 @@ namespace QianShiChat.WebApi.Migrations
                             Path = "/Raw/DefaultAvatar/2.jpg",
                             Size = 30720ul,
                             UpdateTime = 0L,
-                            UserId = 0
+                            UserId = 2
                         },
                         new
                         {
@@ -513,7 +518,7 @@ namespace QianShiChat.WebApi.Migrations
                             Path = "/Raw/DefaultAvatar/3.jpg",
                             Size = 87757ul,
                             UpdateTime = 0L,
-                            UserId = 0
+                            UserId = 3
                         },
                         new
                         {
@@ -524,7 +529,7 @@ namespace QianShiChat.WebApi.Migrations
                             Path = "/Raw/DefaultAvatar/4.jpg",
                             Size = 159744ul,
                             UpdateTime = 0L,
-                            UserId = 0
+                            UserId = 4
                         },
                         new
                         {
@@ -535,7 +540,7 @@ namespace QianShiChat.WebApi.Migrations
                             Path = "/Raw/DefaultAvatar/5.jpg",
                             Size = 73216ul,
                             UpdateTime = 0L,
-                            UserId = 0
+                            UserId = 5
                         },
                         new
                         {
@@ -546,7 +551,7 @@ namespace QianShiChat.WebApi.Migrations
                             Path = "/Raw/DefaultAvatar/6.jpg",
                             Size = 108544ul,
                             UpdateTime = 0L,
-                            UserId = 0
+                            UserId = 6
                         },
                         new
                         {
@@ -557,7 +562,7 @@ namespace QianShiChat.WebApi.Migrations
                             Path = "/Raw/DefaultAvatar/7.jpg",
                             Size = 93799ul,
                             UpdateTime = 0L,
-                            UserId = 0
+                            UserId = 7
                         },
                         new
                         {
@@ -568,7 +573,7 @@ namespace QianShiChat.WebApi.Migrations
                             Path = "/Raw/DefaultAvatar/8.jpg",
                             Size = 112640ul,
                             UpdateTime = 0L,
-                            UserId = 0
+                            UserId = 8
                         },
                         new
                         {
@@ -579,7 +584,7 @@ namespace QianShiChat.WebApi.Migrations
                             Path = "/Raw/DefaultAvatar/9.jpg",
                             Size = 108544ul,
                             UpdateTime = 0L,
-                            UserId = 0
+                            UserId = 9
                         });
                 });
 

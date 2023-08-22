@@ -109,34 +109,34 @@ public class ChatDbContext : DbContext
 
         var userAvatars = new List<UserAvatar>()
         {
-            new UserAvatar(){ Id = 1, UserId = 1, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/1.jpg", Size = 204*1024 },
-            new UserAvatar(){ Id = 2, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/2.jpg", Size = 30*1024 },
-            new UserAvatar(){ Id = 3, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/3.jpg", Size = (ulong)Math.Ceiling(85.7*1024) },
-            new UserAvatar(){ Id = 4, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/4.jpg", Size = 156*1024 },
-            new UserAvatar(){ Id = 5, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/5.jpg", Size = (ulong)Math.Ceiling(71.5*1024) },
-            new UserAvatar(){ Id = 6, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/6.jpg", Size = 106*1024 },
-            new UserAvatar(){ Id = 7, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/7.jpg", Size = (ulong)Math.Ceiling(91.6*1024) },
-            new UserAvatar(){ Id = 8, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/8.jpg", Size = 110*1024 },
-            new UserAvatar(){ Id = 9, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/9.jpg", Size = 106*1024 },
+            new UserAvatar { Id = 1, UserId = 1, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/1.jpg", Size = 204*1024 },
+            new UserAvatar { Id = 2, UserId = 2, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/2.jpg", Size = 30*1024 },
+            new UserAvatar { Id = 3, UserId = 3, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/3.jpg", Size = (ulong)Math.Ceiling(85.7*1024) },
+            new UserAvatar { Id = 4, UserId = 4, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/4.jpg", Size = 156*1024 },
+            new UserAvatar { Id = 5, UserId = 5, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/5.jpg", Size = (ulong)Math.Ceiling(71.5*1024) },
+            new UserAvatar { Id = 6, UserId = 6, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/6.jpg", Size = 106*1024 },
+            new UserAvatar { Id = 7, UserId = 7, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/7.jpg", Size = (ulong)Math.Ceiling(91.6*1024) },
+            new UserAvatar { Id = 8, UserId = 8, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/8.jpg", Size = 110*1024 },
+            new UserAvatar { Id = 9, UserId = 9, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/9.jpg", Size = 106*1024 },
         };
 
         modelBuilder.Entity<UserAvatar>().HasData(userAvatars);
 
         var defaultAvatars = new List<DefaultAvatar>()
         {
-            new DefaultAvatar(){ Id = 1, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/1.jpg", Size = 204*1024, },
-            new DefaultAvatar(){ Id = 2, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/2.jpg", Size = 30*1024, },
-            new DefaultAvatar(){ Id = 3, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/3.jpg", Size = (ulong)Math.Ceiling(85.7*1024), },
-            new DefaultAvatar(){ Id = 4, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/4.jpg", Size = 156*1024,  },
-            new DefaultAvatar(){ Id = 5, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/5.jpg", Size = (ulong)Math.Ceiling(71.5*1024), },
-            new DefaultAvatar(){ Id = 6, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/6.jpg", Size = 106*1024, },
-            new DefaultAvatar(){ Id = 7, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/7.jpg", Size = (ulong)Math.Ceiling(91.6*1024), },
-            new DefaultAvatar(){ Id = 8, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/8.jpg", Size = 110*1024, },
-            new DefaultAvatar(){ Id = 9, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/9.jpg", Size = 106*1024,  },
-            new DefaultAvatar(){ Id = 10, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/10.jpg", Size = 111*1024,  },
-            new DefaultAvatar(){ Id = 11, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/11.png", Size = 664*1024,  },
-            new DefaultAvatar(){ Id = 12, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/12.gif", Size = 879*1024,  },
-            new DefaultAvatar(){ Id = 13, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/13.gif", Size = 731*1024,  },
+            new DefaultAvatar { Id = 1, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/1.jpg", Size = 204*1024, },
+            new DefaultAvatar { Id = 2, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/2.jpg", Size = 30*1024, },
+            new DefaultAvatar { Id = 3, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/3.jpg", Size = (ulong)Math.Ceiling(85.7*1024), },
+            new DefaultAvatar { Id = 4, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/4.jpg", Size = 156*1024,  },
+            new DefaultAvatar { Id = 5, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/5.jpg", Size = (ulong)Math.Ceiling(71.5*1024), },
+            new DefaultAvatar { Id = 6, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/6.jpg", Size = 106*1024, },
+            new DefaultAvatar { Id = 7, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/7.jpg", Size = (ulong)Math.Ceiling(91.6*1024), },
+            new DefaultAvatar { Id = 8, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/8.jpg", Size = 110*1024, },
+            new DefaultAvatar { Id = 9, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/9.jpg", Size = 106*1024,  },
+            new DefaultAvatar { Id = 10, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/10.jpg", Size = 111*1024,  },
+            new DefaultAvatar { Id = 11, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/11.png", Size = 664*1024,  },
+            new DefaultAvatar { Id = 12, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/12.gif", Size = 879*1024,  },
+            new DefaultAvatar { Id = 13, CreateTime = nowTime, Path = "/Raw/DefaultAvatar/13.gif", Size = 731*1024,  },
         };
 
         modelBuilder.Entity<DefaultAvatar>().HasData(defaultAvatars);
