@@ -152,7 +152,7 @@ public class ChatMessageService : IChatMessageService, ITransient
 
         var total = cacheMessages.Count + databaseCount;
 
-        return PagedList.Create(_mapper.Map<List<ChatMessageDto>>(message), total, request.Size);
+        return PagedList.Create(_mapper.Map<List<ChatMessageDto>>(message.OrderByDescending(x => x.CreateTime)), total, request.Size);
     }
 
     public async Task UpdateMessageCursor(
