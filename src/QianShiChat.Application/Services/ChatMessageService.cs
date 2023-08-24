@@ -133,7 +133,7 @@ public class ChatMessageService : IChatMessageService, ITransient
             var databaseMessages = await _context.ChatMessages.AsNoTracking()
                 .OrderByDescending(x => x.Id)
                 .Where(x => x.Id < minId)
-                .Where(x=>x.SessionId == sessionId)
+                .Where(x => x.SessionId == sessionId)
                 .Where(x => x.SendType == ChatMessageSendType.Personal)
                 .Skip(skipCount)
                 .Take(takeCount)
@@ -152,7 +152,23 @@ public class ChatMessageService : IChatMessageService, ITransient
 
         var total = cacheMessages.Count + databaseCount;
 
-        return PagedList.Create(_mapper.Map<List<ChatMessageDto>>(message.OrderByDescending(x => x.CreateTime)), total, request.Size);
+        var messages = _mapper.Map<List<ChatMessageDto>>(message.OrderByDescending(x => x.CreateTime));
+
+        Parallel.ForEach(messages, message => {
+            if (message.MessageType != ChatMessageType.Text
+                && message.Content is not null
+                && message.Content is string content
+                && !string.IsNullOrWhiteSpace(content))
+            {
+                var attachment = JsonSerializer.Deserialize<AttachmentDto>(content);
+                if(attachment is not null)
+                {
+                    message.Content = attachment;
+                }
+            }
+        });
+
+        return PagedList.Create(messages, total, request.Size);
     }
 
     public async Task UpdateMessageCursor(
@@ -180,30 +196,28 @@ public class ChatMessageService : IChatMessageService, ITransient
     {
         var chatMessageDto = _mapper.Map<ChatMessageDto>(chatMessage);
 
+        // cache message max 30 times;
+        string? cacheKey;
         // send message.
         if (chatMessageDto.SendType == ChatMessageSendType.Personal)
         {
             await _hubContext.Clients
                 .User(chatMessageDto.ToId.ToString())
                 .PrivateChat(chatMessageDto);
+            cacheKey = AppConsts.GetPrivateChatCacheKey(chatMessageDto.ToId, chatMessageDto.FromId);
         }
         else if (chatMessageDto.SendType == ChatMessageSendType.Group)
         {
             await _hubContext.Clients
                 .Group(chatMessageDto.ToId.ToString())
                 .PrivateChat(chatMessageDto);
-        }
-
-        // cache message max 30 times;
-        string? cacheKey;
-        if (chatMessageDto.SendType == ChatMessageSendType.Personal)
-        {
-            cacheKey = AppConsts.GetPrivateChatCacheKey(chatMessageDto.ToId, chatMessageDto.FromId);
+            cacheKey = AppConsts.GetGroupChatCacheKey(chatMessageDto.ToId);
         }
         else
         {
-            cacheKey = AppConsts.GetGroupChatCacheKey(chatMessageDto.ToId);
+            throw new NotSupportedException();
         }
+
         var cacheValue = await _redisCachingProvider.HGetAllAsync(cacheKey);
         if (cacheValue == null) cacheValue = new Dictionary<string, string>();
 
@@ -227,6 +241,14 @@ public class ChatMessageService : IChatMessageService, ITransient
             AppConsts.MessageCursorCacheKey,
             chatMessageDto.FromId.ToString(),
             chatMessageDto.Id.ToString());
+
+        if (chatMessageDto.MessageType is not ChatMessageType.Text
+            && chatMessageDto.Content is not null
+            && chatMessageDto.Content is string content
+            && !string.IsNullOrWhiteSpace(content))
+        {
+            chatMessageDto.Content = JsonSerializer.Deserialize<AttachmentDto>(content)!;
+        }
 
         return chatMessageDto;
     }

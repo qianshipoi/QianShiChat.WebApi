@@ -41,8 +41,7 @@ public class FriendService : IFriendService, ITransient
             .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
             .ToListAsync(cancellationToken);
 
-        friends.ForEach(item =>
-        {
+        friends.ForEach(item => {
             item.Avatar = _fileService.FormatPublicFile(item.Avatar);
         });
 
@@ -99,15 +98,22 @@ public class FriendService : IFriendService, ITransient
         var uwm = _mapper.Map<List<UserWithMessage>>(friends);
         var msg = _mapper.Map<List<ChatMessageDto>>(allMsg);
 
-        uwm.ForEach(item =>
-        {
+        uwm.ForEach(item => {
             item.Messages = msg.Where(x => x.FromId == item.Id).ToList();
             item.Avatar = _fileService.FormatPublicFile(item.Avatar);
-            item.Messages.ForEach(message =>
-            {
-                if(message.MessageType != ChatMessageType.Text)
+            item.Messages.ForEach(message => {
+                if (message.MessageType is not ChatMessageType.Text
+                    && message.Content is string content
+                    && !string.IsNullOrWhiteSpace(content))
                 {
-                    message.Content = _fileService.FormatPublicFile(message.Content);
+                    var attachemnt = JsonSerializer.Deserialize<AttachmentDto>(content);
+                    if (attachemnt is not null)
+                    {
+                        attachemnt.RawPath = _fileService.FormatPublicFile(attachemnt.RawPath);
+                        if (!string.IsNullOrWhiteSpace(attachemnt.PreviewPath))
+                            attachemnt.PreviewPath = _fileService.FormatPublicFile(attachemnt.PreviewPath);
+                        message.Content = attachemnt;
+                    }
                 }
             });
         });

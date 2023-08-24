@@ -14,7 +14,7 @@ public class ChatMessageDto
 
     public ChatMessageType MessageType { get; set; }
 
-    public string Content { get; set; } = null!;
+    public object Content { get; set; } = null!;
 
     public long CreateTime { get; set; }
 
