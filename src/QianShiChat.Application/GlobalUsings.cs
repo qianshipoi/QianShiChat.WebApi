@@ -16,6 +16,7 @@ global using Microsoft.IdentityModel.Tokens;
 
 global using QianShiChat.Application.Contracts;
 global using QianShiChat.Application.Hubs;
+global using QianShiChat.Application.Repositories;
 global using QianShiChat.Common.Extensions;
 global using QianShiChat.Domain;
 global using QianShiChat.Domain.Core.AppOops;

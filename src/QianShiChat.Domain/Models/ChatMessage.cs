@@ -3,11 +3,6 @@
 [Table(nameof(ChatMessage))]
 public class ChatMessage : IAuditable
 {
-    public ChatMessage()
-    {
-
-    }
-
     [Key]
     [Required]
     public long Id { get; set; }

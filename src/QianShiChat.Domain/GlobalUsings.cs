@@ -6,6 +6,7 @@ global using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 global using QianShiChat.Common.Extensions;
 global using QianShiChat.Domain.Core.AutoDI;
+global using QianShiChat.Domain.Core.Interceptors;
 global using QianShiChat.Domain.Models;
 global using QianShiChat.Domain.Shared;
 

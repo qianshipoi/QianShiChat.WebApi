@@ -12,6 +12,7 @@ public class ChatMessageService : IChatMessageService, ITransient
     private readonly IHubContext<ChatHub, IChatClient> _hubContext;
     private readonly IFileService _fileService;
     private readonly IUserManager _userManager;
+    private readonly ISessionService _sessionService;
 
     /// <summary>
     /// chat message service
@@ -23,7 +24,8 @@ public class ChatMessageService : IChatMessageService, ITransient
         IMapper mapper,
         IHubContext<ChatHub, IChatClient> hubContext,
         IFileService fileService,
-        IUserManager userManager)
+        IUserManager userManager,
+        ISessionService sessionService)
     {
         _redisCachingProvider = redisCachingProvider;
         _context = context;
@@ -32,6 +34,7 @@ public class ChatMessageService : IChatMessageService, ITransient
         _hubContext = hubContext;
         _fileService = fileService;
         _userManager = userManager;
+        _sessionService = sessionService;
     }
 
     private async Task<List<ChatMessage>> GetCacheMessageAsync(int userId1, int userId2)
@@ -161,7 +164,7 @@ public class ChatMessageService : IChatMessageService, ITransient
                 && !string.IsNullOrWhiteSpace(content))
             {
                 var attachment = JsonSerializer.Deserialize<AttachmentDto>(content);
-                if(attachment is not null)
+                if (attachment is not null)
                 {
                     message.Content = attachment;
                 }
@@ -249,6 +252,12 @@ public class ChatMessageService : IChatMessageService, ITransient
         {
             chatMessageDto.Content = JsonSerializer.Deserialize<AttachmentDto>(content)!;
         }
+
+        await _sessionService.AddOrUpdatePositionAsync(
+            chatMessage.FromId,
+            chatMessage.ToId,
+            chatMessage.SendType,
+            chatMessage.Id);
 
         return chatMessageDto;
     }

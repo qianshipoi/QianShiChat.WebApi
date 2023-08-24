@@ -3,7 +3,7 @@
 public abstract class EntityTypeConfiguration<TEntity> : IEntityTypeConfiguration<TEntity>
     where TEntity : class
 {
-    public void Configure(EntityTypeBuilder<TEntity> builder)
+    public virtual void Configure(EntityTypeBuilder<TEntity> builder)
     {
         var entityType = typeof(TEntity);
 

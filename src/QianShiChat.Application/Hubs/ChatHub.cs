@@ -18,6 +18,7 @@ public class ChatHub : Hub<IChatClient>
 
     private readonly IFriendService _friendService;
     private readonly IRedisCachingProvider _redisCachingProvider;
+    private readonly ISessionService _sessionService;
 
     /// <summary>
     /// chat hub.
@@ -26,10 +27,12 @@ public class ChatHub : Hub<IChatClient>
     /// <param name="redisCachingProvider"></param>
     public ChatHub(
         IFriendService friendService,
-        IRedisCachingProvider redisCachingProvider)
+        IRedisCachingProvider redisCachingProvider,
+        ISessionService sessionService)
     {
         _friendService = friendService;
         _redisCachingProvider = redisCachingProvider;
+        _sessionService = sessionService;
     }
 
     /// <summary>
@@ -78,4 +81,9 @@ public class ChatHub : Hub<IChatClient>
         }
     }
     string FormatOnlineUserKey(string userId, string clientType) => $"{userId}_{clientType}";
+
+    public async Task<List<SessionDto>> GetSessionsAsync()
+    {
+        return await _sessionService.GetUserSessionAsync(CurrentUserId);
+    }
 }

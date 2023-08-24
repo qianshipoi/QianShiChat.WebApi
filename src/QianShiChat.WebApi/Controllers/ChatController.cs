@@ -7,8 +7,6 @@
 [Authorize]
 public class ChatController : BaseController
 {
-    private readonly IRedisCachingProvider _redisCachingProvider;
-    private readonly IHubContext<ChatHub, IChatClient> _hubContext;
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly IMapper _mapper;
     private readonly IChatMessageService _chatMessageService;
@@ -18,15 +16,11 @@ public class ChatController : BaseController
     /// chat api
     /// </summary>
     public ChatController(
-        IRedisCachingProvider redisCachingProvider,
-        IHubContext<ChatHub, IChatClient> hubContext,
         IWebHostEnvironment webHostEnvironment,
         IMapper mapper,
         IChatMessageService chatMessageService,
         IAttachmentRepository attachmentRepository)
     {
-        _redisCachingProvider = redisCachingProvider;
-        _hubContext = hubContext;
         _webHostEnvironment = webHostEnvironment;
         _mapper = mapper;
         _chatMessageService = chatMessageService;
@@ -55,7 +49,6 @@ public class ChatController : BaseController
 
         return PhysicalFile(filePath, contenttype ?? "application/octet-stream");
     }
-
 
     /// <summary>
     /// send text message.
@@ -143,7 +136,6 @@ public class ChatController : BaseController
 
         return Ok(chatMessageDto);
     }
-
 
     [HttpGet("{id:int}/history")]
     public Task<PagedList<ChatMessageDto>> GetUserHistory([FromRoute] int id, [FromQuery] QueryMessagesRequest request, CancellationToken cancellationToken = default)
