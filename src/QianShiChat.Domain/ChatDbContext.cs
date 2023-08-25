@@ -160,6 +160,15 @@ public class ChatDbContext : DbContext
         };
         modelBuilder.Entity<UserRealtion>().HasData(urs);
 
+        var sessions = new List<Session>()
+        {
+            new Session { Id = AppConsts.GetPrivateChatSessionId(1,2), CreateTime = nowTime, FromId = 1, ToId = 2, MessagePosition = nowTime, UpdateTime = nowTime, Type = ChatMessageSendType.Personal  },
+            new Session { Id = AppConsts.GetPrivateChatSessionId(2,1), CreateTime = nowTime, FromId = 2, ToId = 1, MessagePosition = nowTime, UpdateTime = nowTime, Type = ChatMessageSendType.Personal  },
+            new Session { Id = AppConsts.GetPrivateChatSessionId(2,3), CreateTime = nowTime, FromId = 2, ToId = 3, MessagePosition = nowTime, UpdateTime = nowTime, Type = ChatMessageSendType.Personal  },
+            new Session { Id = AppConsts.GetPrivateChatSessionId(3,2), CreateTime = nowTime, FromId = 3, ToId = 2, MessagePosition = nowTime, UpdateTime = nowTime, Type = ChatMessageSendType.Personal  },
+        };
+        modelBuilder.Entity<Session>().HasData(sessions);
+
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
             if (typeof(ISoftDelete).IsAssignableFrom(entityType.ClrType))

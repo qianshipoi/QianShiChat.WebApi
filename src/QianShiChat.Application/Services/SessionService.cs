@@ -16,25 +16,54 @@ public class SessionService : ISessionService, ITransient
         _unitOfWork = unitOfWork;
     }
 
+    private object? FormatMessageContnt(string content, ChatMessageType type)
+    {
+        if (type == ChatMessageType.Text)
+        {
+            return content;
+        }
+
+        var classType = type switch
+        {
+            ChatMessageType.Image => typeof(Attachment),
+            ChatMessageType.Video => typeof(Attachment),
+            ChatMessageType.OtherFile => typeof(Attachment),
+            _ => throw new NotSupportedException()
+        };
+
+        return JsonSerializer.Deserialize(content, classType);
+    }
+
     public async Task<List<SessionDto>> GetUserSessionAsync(int userId, CancellationToken cancellationToken = default)
     {
         var sessions = await _sessionRepository.GetByUser(userId).ToListAsync(cancellationToken);
         var sessionDtos = new List<SessionDto>();
-        await Parallel.ForEachAsync(sessions, async (session, ctx) => {
-            var unreadCount = await _chatMessageRepository.GetUnreadCountAsync(session.Id, session.MessagePosition, ctx);
+
+        foreach (var session in sessions)
+        {
+            var unreadCount = await _chatMessageRepository.GetUnreadCountAsync(session.Id, session.MessagePosition, cancellationToken);
             if (unreadCount > 0)
             {
-                sessionDtos.Add(new SessionDto
+                var messageDto = new SessionDto
                 {
                     Id = session.Id,
-                    CreateTime = session.CreateTime,
                     FromId = session.FromId,
                     ToId = session.ToId,
                     Type = session.Type,
                     UnreadCount = unreadCount
-                });
+                };
+
+                // get last message content and time;
+                var lastMessage = await _chatMessageRepository.GetLastMessageAsync(session.Id, cancellationToken);
+                if (lastMessage is not null)
+                {
+                    messageDto.LastMessageTime = lastMessage.UpdateTime;
+                    messageDto.LastMessageContent = FormatMessageContnt(lastMessage.Content, lastMessage.MessageType);
+                }
+
+                sessionDtos.Add(messageDto);
             }
-        });
+        }
 
         return sessionDtos;
     }

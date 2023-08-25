@@ -16,4 +16,12 @@ public class ChatMessageRepository : IChatMessageRepository, IScoped
             .Where(x => x.Id > position)
             .CountAsync(cancellationToken);
     }
+
+    public async Task<ChatMessage?> GetLastMessageAsync(string sessionId,CancellationToken cancellationToken= default)
+    {
+        return await _context.ChatMessages.AsNoTracking()
+            .Where(x => x.SessionId == sessionId)
+            .OrderByDescending(x => x.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
 }

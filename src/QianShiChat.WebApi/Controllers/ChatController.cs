@@ -50,6 +50,21 @@ public class ChatController : BaseController
         return PhysicalFile(filePath, contenttype ?? "application/octet-stream");
     }
 
+    public static Dictionary<ChatMessageSendType, Func<int, int, string>> SendTypeMapper = new()
+        {
+            { ChatMessageSendType.Personal, AppConsts.GetPrivateChatSessionId },
+            { ChatMessageSendType.Group, AppConsts.GetGroupChatSessionId },
+        };
+
+    private string GetSesionId(int fromId, int toId, ChatMessageSendType type)
+    {
+        if (SendTypeMapper.ContainsKey(type))
+        {
+            throw new NotSupportedException();
+        }
+        return SendTypeMapper[type].Invoke(fromId, toId);
+    }
+
     /// <summary>
     /// send text message.
     /// </summary>
@@ -61,14 +76,12 @@ public class ChatController : BaseController
     {
         var now = Timestamp.Now;
 
-        var sessionId = request.SendType == ChatMessageSendType.Personal ? AppConsts.GetPrivateChatCacheKey(CurrentUserId, request.ToId) : request.ToId.ToString();
-
         var chatMessage = new ChatMessage()
         {
             Id = YitIdHelper.NextId(),
             Content = request.Message,
             CreateTime = now,
-            SessionId = sessionId,
+            SessionId = GetSesionId(CurrentUserId, request.ToId, request.SendType),
             FromId = CurrentUserId,
             ToId = request.ToId,
             UpdateTime = now,
@@ -101,7 +114,6 @@ public class ChatController : BaseController
         {
             return BadRequest("attachment not exists.");
         }
-        var sessionId = request.SendType == ChatMessageSendType.Personal ? AppConsts.GetPrivateChatCacheKey(CurrentUserId, request.ToId) : request.ToId.ToString();
 
         var dto = _mapper.Map<AttachmentDto>(attachment);
 
@@ -118,7 +130,7 @@ public class ChatController : BaseController
             CreateTime = now,
             FromId = CurrentUserId,
             ToId = request.ToId,
-            SessionId = sessionId,
+            SessionId = GetSesionId(CurrentUserId, request.ToId, request.SendType),
             UpdateTime = now,
             MessageType = dto.ContentType.ToLower() switch
             {
