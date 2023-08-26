@@ -104,7 +104,7 @@ public class ChatMessageService : IChatMessageService, ITransient
 
     public async Task<PagedList<ChatMessageDto>> GetHistoryAsync(int userId, QueryMessagesRequest request, CancellationToken cancellationToken = default)
     {
-        var sessionId = AppConsts.GetPrivateChatCacheKey(_userManager.CurrentUserId, userId);
+        var sessionId = AppConsts.GetPrivateChatSessionId(_userManager.CurrentUserId, userId);
 
         var cacheMessages = await GetCacheMessageAsync(_userManager.CurrentUserId, userId);
         var minId = cacheMessages.Count > 0 ? cacheMessages.Min(x => x.Id) : long.MaxValue;

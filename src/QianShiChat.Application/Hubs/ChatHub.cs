@@ -86,4 +86,9 @@ public class ChatHub : Hub<IChatClient>
     {
         return await _sessionService.GetUserSessionAsync(CurrentUserId);
     }
+
+    public async Task ReadPositionAsync(string sessionId, long position)
+    {
+        await _sessionService.UpdateSessionPositionAsync(CurrentUserId, sessionId, position);   
+    }
 }

@@ -58,7 +58,7 @@ public class ChatController : BaseController
 
     private string GetSesionId(int fromId, int toId, ChatMessageSendType type)
     {
-        if (SendTypeMapper.ContainsKey(type))
+        if (!SendTypeMapper.ContainsKey(type))
         {
             throw new NotSupportedException();
         }

@@ -68,6 +68,17 @@ public class SessionService : ISessionService, ITransient
         return sessionDtos;
     }
 
+    public async Task UpdateSessionPositionAsync(int userId, string sessionId, long position, CancellationToken cancellationToken = default)
+    {
+        var session = await _sessionRepository.FindAsync(userId, sessionId, cancellationToken);
+
+        if (session is null) return;
+
+        session.MessagePosition = position;
+
+        await _unitOfWork.SaveChangeAsync(cancellationToken);
+    }
+
     public async Task AddOrUpdatePositionAsync(
         int fromId,
         int toId,
