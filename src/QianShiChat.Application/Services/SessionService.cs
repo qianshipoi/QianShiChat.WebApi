@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.Application.Services;
+﻿using System.Runtime.CompilerServices;
+
+namespace QianShiChat.Application.Services;
 
 public class SessionService : ISessionService, ITransient
 {
@@ -66,6 +68,36 @@ public class SessionService : ISessionService, ITransient
         }
 
         return sessionDtos;
+    }
+
+    public async IAsyncEnumerable<SessionDto> GetRoomsAsync(int userId, [EnumeratorCancellation]CancellationToken cancellationToken = default)
+    {
+        var sessions = await _sessionRepository.GetByUser(userId).ToListAsync(cancellationToken);
+
+        foreach (var session in sessions)
+        {
+            var unreadCount = await _chatMessageRepository.GetUnreadCountAsync(session.Id, session.MessagePosition, cancellationToken);
+            if (unreadCount > 0)
+            {
+                var messageDto = new SessionDto
+                {
+                    Id = session.Id,
+                    FromId = session.FromId,
+                    ToId = session.ToId,
+                    Type = session.Type,
+                    UnreadCount = unreadCount
+                };
+
+                // get last message content and time;
+                var lastMessage = await _chatMessageRepository.GetLastMessageAsync(session.Id, cancellationToken);
+                if (lastMessage is not null)
+                {
+                    messageDto.LastMessageTime = lastMessage.UpdateTime;
+                    messageDto.LastMessageContent = FormatMessageContnt(lastMessage.Content, lastMessage.MessageType);
+                }
+                yield return messageDto;
+            }
+        }
     }
 
     public async Task UpdateSessionPositionAsync(int userId, string sessionId, long position, CancellationToken cancellationToken = default)

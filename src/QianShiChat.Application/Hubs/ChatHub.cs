@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using QianShiChat.Application.Filters;
 using QianShiChat.Application.Services;
 
+using System.Runtime.CompilerServices;
+
 namespace QianShiChat.Application.Hubs;
 
 /// <summary>
@@ -82,13 +84,25 @@ public class ChatHub : Hub<IChatClient>
     }
     string FormatOnlineUserKey(string userId, string clientType) => $"{userId}_{clientType}";
 
-    public async Task<List<SessionDto>> GetSessionsAsync()
+    public IAsyncEnumerable<SessionDto> GetSessionsAsync(CancellationToken cancellationToken)
     {
-        return await _sessionService.GetUserSessionAsync(CurrentUserId);
+        return _sessionService.GetRoomsAsync(CurrentUserId, cancellationToken);
     }
 
     public async Task ReadPositionAsync(string sessionId, long position)
     {
-        await _sessionService.UpdateSessionPositionAsync(CurrentUserId, sessionId, position);   
+        await _sessionService.UpdateSessionPositionAsync(CurrentUserId, sessionId, position);
+    }
+
+    public async IAsyncEnumerable<int> Counter(int count, int delay, [EnumeratorCancellation]CancellationToken cancellationToken)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            yield return i;
+
+            await Task.Delay(delay);
+        }
     }
 }
