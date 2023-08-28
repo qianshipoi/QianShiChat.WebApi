@@ -94,7 +94,7 @@ public class ChatHub : Hub<IChatClient>
         await _sessionService.UpdateSessionPositionAsync(CurrentUserId, sessionId, position);
     }
 
-    public async IAsyncEnumerable<int> Counter(int count, int delay, [EnumeratorCancellation]CancellationToken cancellationToken)
+    public async IAsyncEnumerable<int> Counter(int count, int delay, [EnumeratorCancellation] CancellationToken cancellationToken)
     {
         for (int i = 0; i < count; i++)
         {
@@ -105,4 +105,15 @@ public class ChatHub : Hub<IChatClient>
             await Task.Delay(delay);
         }
     }
+
+    public Task<SessionDto?> GetRoomAsync(int toId, ChatMessageSendType type)
+    {
+        return _sessionService.GetRoomAsync(CurrentUserId, type switch
+        {
+            ChatMessageSendType.Personal => AppConsts.GetPrivateChatSessionId(CurrentUserId, toId),
+            ChatMessageSendType.Group => AppConsts.GetGroupChatSessionId(CurrentUserId, toId),
+            _ => throw new NotSupportedException()
+        });
+    }
+
 }

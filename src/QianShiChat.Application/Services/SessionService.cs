@@ -1,4 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿using QianShiChat.Domain.Models;
+
+using System.Runtime.CompilerServices;
 
 namespace QianShiChat.Application.Services;
 
@@ -70,7 +72,7 @@ public class SessionService : ISessionService, ITransient
         return sessionDtos;
     }
 
-    public async IAsyncEnumerable<SessionDto> GetRoomsAsync(int userId, [EnumeratorCancellation]CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<SessionDto> GetRoomsAsync(int userId, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var sessions = await _sessionRepository.GetByUser(userId).ToListAsync(cancellationToken);
 
@@ -98,6 +100,34 @@ public class SessionService : ISessionService, ITransient
                 yield return messageDto;
             }
         }
+    }
+
+    public async Task<SessionDto?> GetRoomAsync(int userId, string roomId, CancellationToken cancellationToken = default)
+    {
+        var room = await _sessionRepository.FindAsync(userId, roomId, cancellationToken);
+        if (room is null)
+        {
+            return null;
+        }
+
+        var message = await _chatMessageRepository.GetLastMessageAsync(roomId, cancellationToken);
+
+        var roomDto = new SessionDto
+        {
+            Id = room.Id,
+            FromId = room.FromId,
+            ToId = room.ToId,
+            Type = room.Type,
+            UnreadCount = 0
+        };
+
+        if (message is not null)
+        {
+            roomDto.LastMessageTime = message.UpdateTime;
+            roomDto.LastMessageContent = FormatMessageContnt(message.Content, message.MessageType);
+        }
+
+        return roomDto;
     }
 
     public async Task UpdateSessionPositionAsync(int userId, string sessionId, long position, CancellationToken cancellationToken = default)

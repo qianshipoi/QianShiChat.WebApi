@@ -127,7 +127,7 @@ public class PhysicalFileService : IFileService, IScoped
             Hash = hash,
             ContentType = contentType,
             Name = filename,
-            PreviewPath = string.IsNullOrWhiteSpace(absPrevFilepath) ? null : absFilepath.Replace('\\', '/'),
+            PreviewPath = string.IsNullOrWhiteSpace(absPrevFilepath) ? null : absPrevFilepath.Replace('\\', '/'),
             RawPath = absFilepath.Replace('\\', '/'),
             Size = stream.Length,
             UserId = _userManager.CurrentUserId,
