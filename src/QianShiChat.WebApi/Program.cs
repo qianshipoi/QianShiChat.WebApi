@@ -1,4 +1,6 @@
 // config distributed id.
+using System.Security.AccessControl;
+
 var options = new IdGeneratorOptions(1);
 YitIdHelper.SetIdGenerator(options);
 
@@ -30,9 +32,13 @@ builder.Services.AddSignalR()
 // config infrastructure.
 builder.Services
     .AddCors(options => {
+        var corsSection = builder.Configuration.GetSection("Cors");
+        var corsOptions = new CorsOptions();
+        corsSection.Bind(corsOptions);
+
         options.AddPolicy(AppConsts.MyAllowSpecificOrigins, builder => {
             builder
-            .WithOrigins("https://www.kuriyama.top", "http://127.0.0.1:5173", "http://127.0.0.1:3000")
+            .WithOrigins(corsOptions.WithOrigins)
             .WithHeaders("*")
             .WithMethods("*")
             .AllowCredentials()
