@@ -8,13 +8,15 @@ public class GroupService : IGroupService, ITransient
     private readonly ILogger<GroupService> _logger;
     private readonly IMapper _mapper;
     private readonly IUserService _userService;
+    private readonly IFileService _fileService;
 
-    public GroupService(ChatDbContext context, ILogger<GroupService> logger, IMapper mapper, IUserService userService)
+    public GroupService(ChatDbContext context, ILogger<GroupService> logger, IMapper mapper, IUserService userService, IFileService fileService)
     {
         _context = context;
         _logger = logger;
         _mapper = mapper;
         _userService = userService;
+        _fileService = fileService;
     }
 
     /// <summary>
@@ -43,7 +45,9 @@ public class GroupService : IGroupService, ITransient
         await _context.AddAsync(group, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
-        return _mapper.Map<GroupDto>(group);
+        var dto = _mapper.Map<GroupDto>(group);
+        FormatGroupAvatar(dto);
+        return dto;
     }
 
     public async Task<GroupDto> CreateByFriendAsync(int userId, CreateGroupRequest request, CancellationToken cancellationToken = default)
@@ -72,7 +76,7 @@ public class GroupService : IGroupService, ITransient
             Name = $"{currentUserName}、{friendName}",
             UserId = userId,
             TotalUser = 1,
-            CreateTime = now
+            CreateTime = now,
         };
         group.UserGroupRealtions.Add(new UserGroupRealtion()
         {
@@ -91,8 +95,9 @@ public class GroupService : IGroupService, ITransient
 
         await _context.AddAsync(group, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
-
-        return _mapper.Map<GroupDto>(group);
+        var dto = _mapper.Map<GroupDto>(group);
+        FormatGroupAvatar(dto);
+        return dto;
     }
 
     /// <summary>
@@ -100,7 +105,7 @@ public class GroupService : IGroupService, ITransient
     /// </summary>
     /// <param name="userId"></param>
     /// <param name="id"></param>
-    /// <param name="remark"></param>
+    /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     public async Task ApplyJoin(int userId, int id, JoinGroupRequest request, CancellationToken cancellationToken = default)
@@ -183,22 +188,28 @@ public class GroupService : IGroupService, ITransient
 
     public async Task<List<GroupDto>> GetAllByUserIdAsync(int userId, CancellationToken cancellationToken = default)
     {
-        return await _context.UserGroupRealtions
+        var groups = await _context.UserGroupRealtions
              .AsNoTracking()
              .Include(x => x.Group)
              .Where(x => x.UserId == userId && !x.Group.IsDeleted)
              .Select(x => x.Group)
-             .ProjectTo<GroupDto>(_mapper.ConfigurationProvider)
              .ToListAsync(cancellationToken);
-    }
-}
 
-public interface IGroupService
-{
-    Task ApplyJoin(int userId, int id, JoinGroupRequest request, CancellationToken cancellationToken = default);
-    Task<GroupDto> Create(int userId, string name, CancellationToken cancellationToken = default);
-    Task<GroupDto> CreateByFriendAsync(int userId, CreateGroupRequest request, CancellationToken cancellationToken = default);
-    Task Delete(int userId, int id, CancellationToken cancellationToken = default);
-    Task<List<GroupDto>> GetAllByUserIdAsync(int userId, CancellationToken cancellationToken = default);
-    Task Leave(int userId, int id, CancellationToken cancellationToken = default);
+        var dtos = _mapper.Map<List<GroupDto>>(groups);
+
+        dtos.ForEach(FormatGroupAvatar);
+        return dtos;
+    }
+
+    private void FormatGroupAvatar(GroupDto item)
+    {
+        if (string.IsNullOrWhiteSpace(item.Avatar))
+        {
+            item.Avatar = _fileService.GetDefaultGroupAvatar();
+        }
+        else
+        {
+            item.Avatar = _fileService.FormatPublicFile(item.Avatar);
+        }
+    }
 }

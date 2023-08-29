@@ -9,20 +9,14 @@
 public class FriendController : BaseController
 {
     private readonly IFriendService _friendService;
-    private readonly IChatMessageService _chatMessageService;
-    private readonly IMapper _mapper;
 
     /// <summary>
     /// friend api.
     /// </summary>
     public FriendController(
-        IFriendService friendService,
-        IChatMessageService chatMessageService,
-        IMapper mapper)
+        IFriendService friendService)
     {
         _friendService = friendService;
-        _chatMessageService = chatMessageService;
-        _mapper = mapper;
     }
 
     /// <summary>

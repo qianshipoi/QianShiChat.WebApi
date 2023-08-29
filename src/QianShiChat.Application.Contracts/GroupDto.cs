@@ -7,4 +7,5 @@ public class GroupDto
     public string Name { get; set; } = null!;
     public int TotalUser { get; set; }
     public long CreateTime { get; set; }
+    public string Avatar { get; set; } = null!;
 }

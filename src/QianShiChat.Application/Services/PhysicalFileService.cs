@@ -53,6 +53,8 @@ public class PhysicalFileService : IFileService, IScoped
         return _httpContextAccessor.HttpContext!.Request.GetBaseUrl() + '/' + filePath.TrimStart('/').Replace("\\", "/");
     }
 
+    public string GetDefaultGroupAvatar() => FormatPublicFile("Raw/DefaultAvatar/1.jpg");
+
     public async Task<AttachmentDto> SaveFileAsync(Stream stream, string filename, CancellationToken cancellationToken = default)
     {
         Guard.IsNotNull(stream);

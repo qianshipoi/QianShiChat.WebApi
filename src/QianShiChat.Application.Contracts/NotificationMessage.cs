@@ -1,6 +1,6 @@
 ﻿namespace QianShiChat.Application.Contracts;
 
-public class PrivateChatMessageRequest
+public class SendTextMessageRequest
 {
     [Required]
     [Range(1,int.MaxValue)]
@@ -30,7 +30,7 @@ public class SendFileMessageRequest
 
 public record PrivateChatMessage(long Id, int UserId, string Message);
 
-public record NotificationMessage(NotificationType Type, string Message);
+public record NotificationMessage(NotificationType Type, object Message);
 
 public enum NotificationType
 {

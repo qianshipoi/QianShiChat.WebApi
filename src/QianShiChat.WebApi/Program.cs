@@ -1,6 +1,4 @@
 // config distributed id.
-using System.Security.AccessControl;
-
 var options = new IdGeneratorOptions(1);
 YitIdHelper.SetIdGenerator(options);
 

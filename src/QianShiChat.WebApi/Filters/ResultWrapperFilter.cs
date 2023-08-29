@@ -19,6 +19,11 @@ public class ResultWrapperFilter : ActionFilterAttribute
         }
         else if (context.Result is ObjectResult objectResult)
         {
+            if(objectResult.StatusCode == 401)
+            {
+                return;
+            }
+
             if (objectResult.Value == null)
             {
                 context.Result = new ObjectResult(GlobalResult<object>.SuccessResult(null));

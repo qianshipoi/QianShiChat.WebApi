@@ -1,11 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-
-using QianShiChat.Application.Filters;
-using QianShiChat.Application.Services;
-
-using System.Runtime.CompilerServices;
-
 namespace QianShiChat.Application.Hubs;
 
 /// <summary>
@@ -70,7 +62,7 @@ public class ChatHub : Hub<IChatClient>
             .Notification(
             new NotificationMessage(
                 isOnline ? NotificationType.FriendOnline : NotificationType.FriendOffline,
-                CurrentUserId.ToString()));
+                CurrentUserId));
 
         var cacheKey = FormatOnlineUserKey(CurrentUserId.ToString(), CurrentClientType!);
         if (isOnline)

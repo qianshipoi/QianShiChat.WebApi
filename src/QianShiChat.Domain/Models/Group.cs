@@ -17,6 +17,9 @@ public class Group : ISoftDelete
     [Required, MaxLength(128)]
     public string Name { get; set; } = null!;
 
+    [MaxLength(512)]
+    public string? Avatar { get; set; }
+
     [Required]
     public int TotalUser { get; set; }
 
@@ -27,9 +30,9 @@ public class Group : ISoftDelete
     public long DeleteTime { get; set; }
 
     [ForeignKey(nameof(UserId))]
-    public virtual UserInfo User { get; set; } = null!;
+    public virtual UserInfo? User { get; set; }
 
-    public virtual ICollection<UserGroupRealtion> UserGroupRealtions { get; set; } = null!;
+    public virtual ICollection<UserGroupRealtion> UserGroupRealtions { get; set; }
 }
 
 [PrimaryKey(nameof(UserId), nameof(GroupId))]

@@ -73,7 +73,7 @@ public class FriendApplyController : BaseController
 
         await _hubContext.Clients
             .User(applyDto.FriendId.ToString())
-            .Notification(new NotificationMessage(NotificationType.FriendApply, JsonSerializer.Serialize(applyDto)));
+            .Notification(new NotificationMessage(NotificationType.FriendApply, applyDto));
 
         return Ok(applyDto);
     }
@@ -101,7 +101,7 @@ public class FriendApplyController : BaseController
     /// <param name="status"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    [HttpGet("{id}/Approval/{status}")]
+    [HttpPut("{id}/Approval/{status}")]
     public async Task<IActionResult> Approval([FromRoute] int id, [FromRoute] ApplyStatus status, CancellationToken cancellationToken = default)
     {
         var user = await _context.UserInfos
@@ -121,7 +121,7 @@ public class FriendApplyController : BaseController
 
         await _hubContext.Clients
             .Users(dto.UserId.ToString(), dto.FriendId.ToString())
-            .Notification(new NotificationMessage(NotificationType.NewFriend, JsonSerializer.Serialize(dto)));
+            .Notification(new NotificationMessage(NotificationType.NewFriend, dto));
 
         return Ok("处理成功");
     }
