@@ -77,4 +77,7 @@ public interface IFriendApplyService
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<FriendApplyDto> ApprovalAsync(int userId, int id, ApplyStatus status, CancellationToken cancellationToken = default);
+    Task ClearApplyAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default);
+    Task RemoveByIdAsync(int id, CancellationToken cancellationToken = default);
+    Task ClearAllApplyAsync(CancellationToken cancellationToken = default);
 }

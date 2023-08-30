@@ -16,7 +16,7 @@ public class FriendApply : ApplyBase
     /// 目标
     /// </summary>
     [ForeignKey(nameof(FriendId))]
-    public UserInfo Friend { get; set; }
+    public UserInfo Friend { get; set; } = default!;
 }
 
 /// <summary>
@@ -34,5 +34,5 @@ public class GroupApply : ApplyBase
     /// 群组
     /// </summary>
     [ForeignKey(nameof(GroupId))]
-    public Group Group { get; set; }
+    public Group Group { get; set; } = default!;
 }

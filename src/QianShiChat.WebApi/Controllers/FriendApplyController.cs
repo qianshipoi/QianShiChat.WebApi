@@ -94,6 +94,19 @@ public class FriendApplyController : BaseController
         return PagedList.Create(items, total, dto.Size);
     }
 
+
+    [HttpDelete("{id:int}")]
+    public async Task DeleteById([FromRoute,Range(1, int.MaxValue)]int id, CancellationToken cancellationToken = default)
+    {
+        await _friendApplyService.RemoveByIdAsync(id, cancellationToken);
+    }
+
+    [HttpDelete("clear")]
+    public async Task ClearAll(CancellationToken cancellationToken = default)
+    {
+        await _friendApplyService.ClearAllApplyAsync(cancellationToken);
+    }
+
     /// <summary>
     /// 审批
     /// </summary>

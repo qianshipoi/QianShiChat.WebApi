@@ -1,6 +1,6 @@
 ﻿namespace QianShiChat.Domain.Models;
 
-public class ApplyBase : IAuditable
+public class ApplyBase : IAuditable, ISoftDelete
 {
     /// <summary>
     /// 申请编号
@@ -31,16 +31,18 @@ public class ApplyBase : IAuditable
     /// 备注
     /// </summary>
     [MaxLength(255)]
-    public string Remark { get; set; }
+    public string? Remark { get; set; }
 
     /// <summary>
     /// 修改时间
     /// </summary>
     public long UpdateTime { get; set; }
+    public bool IsDeleted { get; set; }
+    public long DeleteTime { get; set; }
 
     /// <summary>
     /// 目标
     /// </summary>
     [ForeignKey(nameof(UserId))]
-    public UserInfo User { get; set; }
+    public UserInfo User { get; set; } = default!;
 }

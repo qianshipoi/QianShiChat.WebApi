@@ -9,16 +9,18 @@ public class FriendApplyService : IFriendApplyService, ITransient
     private readonly ChatDbContext _context;
     private readonly IMapper _mapper;
     private readonly IFileService _fileService;
+    private readonly IUserManager _userManager;
 
     /// <summary>
     /// firend apply service.
     /// </summary>
-    public FriendApplyService(ILogger<FriendApplyService> logger, ChatDbContext context, IMapper mapper, IFileService fileService)
+    public FriendApplyService(ILogger<FriendApplyService> logger, ChatDbContext context, IMapper mapper, IFileService fileService, IUserManager userManager)
     {
         _logger = logger;
         _context = context;
         _mapper = mapper;
         _fileService = fileService;
+        _userManager = userManager;
     }
 
     public async Task<bool> IsApplyAsync(int userId, int friendId, CancellationToken cancellationToken = default)
@@ -78,6 +80,40 @@ public class FriendApplyService : IFriendApplyService, ITransient
         });
 
         return data;
+    }
+
+    public async Task ClearApplyAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default)
+    {
+        var applies = await _context.FriendApplies
+            .Where(x => x.UserId == _userManager.CurrentUserId)
+            .Where(x => ids.Contains(x.Id))
+            .ToListAsync(cancellationToken);
+
+        _context.RemoveRange(applies);
+
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task ClearAllApplyAsync(CancellationToken cancellationToken = default)
+    {
+        var applies = await _context.FriendApplies
+            .Where(x => x.UserId == _userManager.CurrentUserId)
+            .ToListAsync(cancellationToken);
+        _context.RemoveRange(applies);
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task RemoveByIdAsync(int id, CancellationToken cancellationToken = default)
+    {
+        var apply = await _context.FriendApplies
+            .Where(x => x.Id == id)
+            .Where(x => x.UserId == _userManager.CurrentUserId)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (apply is null) return;
+
+        _context.RemoveRange(apply);
+        await _context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<long> GetPendingListCountByUserAsync(int userId, CancellationToken cancellationToken = default)
