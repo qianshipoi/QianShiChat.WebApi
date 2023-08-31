@@ -97,4 +97,13 @@ app.MapControllers();
 
 app.MapHub<ChatHub>("/Hubs/Chat");
 
+using (var scope = app.Services.CreateScope())
+{
+    using var dbContext  = scope.ServiceProvider.GetRequiredService<ChatDbContext>();
+    if (dbContext.Database.GetPendingMigrations().Any())
+    {
+        dbContext.Database.Migrate();
+    }
+}
+
 app.Run();
