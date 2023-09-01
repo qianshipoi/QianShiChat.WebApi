@@ -101,12 +101,12 @@ public static class HttpContextExtensions
                         return Task.CompletedTask;
                     }
 
-                    if (!ctx.Metadata.ContainsKey("name") || ctx.Metadata["name"].HasEmptyValue)
+                    if (!ctx.Metadata.ContainsKey("filename") || ctx.Metadata["filename"].HasEmptyValue)
                     {
                         ctx.FailRequest("name metadata must be specified. ");
                     }
 
-                    if (!ctx.Metadata.ContainsKey("contentType") || ctx.Metadata["contentType"].HasEmptyValue)
+                    if (!ctx.Metadata.ContainsKey("filetype") || ctx.Metadata["filetype"].HasEmptyValue)
                     {
                         ctx.FailRequest("contentType metadata must be specified. ");
                     }
@@ -137,7 +137,8 @@ public static class HttpContextExtensions
                     var metadata = await file.GetMetadataAsync(ctx.CancellationToken);
                     metadata.TryGetValue("name", out var name);
                     var fileService = ctx.HttpContext.RequestServices.GetRequiredService<IFileService>();
-                    await fileService.SaveFileAsync(fileStream, name!.GetString(Encoding.UTF8), ctx.CancellationToken);
+                    var dto = await fileService.SaveFileAsync(fileStream, name!.GetString(Encoding.UTF8), ctx.CancellationToken);
+                    ctx.HttpContext.Response.Headers.Add("AttachmentLocaltion", JsonSerializer.Serialize(dto));
                 }
             },
             Expiration = new AbsoluteExpiration(TimeSpan.FromMinutes(5))
