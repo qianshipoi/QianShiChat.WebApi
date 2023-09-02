@@ -125,20 +125,22 @@ public static class HttpContextExtensions
                     logger.LogInformation($"Deleted file {ctx.FileId} using {ctx.Store.GetType().FullName}");
                     return Task.CompletedTask;
                 },
-                OnFileCompleteAsync = async ctx => {
+                OnFileCompleteAsync = ctx => {
                     logger.LogInformation($"Upload of {ctx.FileId} completed using {ctx.Store.GetType().FullName}");
                     // If the store implements ITusReadableStore one could access the completed file here.
                     // The default TusDiskStore implements this interface:
                     //var file = await ctx.GetFileAsync();
 
                     // move to wwwroot dir.
-                    var file = await ctx.GetFileAsync();
-                    var fileStream = await file.GetContentAsync(ctx.CancellationToken);
-                    var metadata = await file.GetMetadataAsync(ctx.CancellationToken);
-                    metadata.TryGetValue("name", out var name);
-                    var fileService = ctx.HttpContext.RequestServices.GetRequiredService<IFileService>();
-                    var dto = await fileService.SaveFileAsync(fileStream, name!.GetString(Encoding.UTF8), ctx.CancellationToken);
-                    ctx.HttpContext.Response.Headers.Add("AttachmentLocaltion", JsonSerializer.Serialize(dto));
+                    //var file = await ctx.GetFileAsync();
+                    //var fileStream = await file.GetContentAsync(ctx.CancellationToken);
+                    //var metadata = await file.GetMetadataAsync(ctx.CancellationToken);
+                    //metadata.TryGetValue("filename", out var name);
+                    //var fileService = ctx.HttpContext.RequestServices.GetRequiredService<IFileService>();
+                    //var dto = await fileService.SaveFileAsync(fileStream, name!.GetString(Encoding.UTF8), ctx.CancellationToken);
+                    //ctx.HttpContext.Response.Headers.Add("AttachmentLocaltion", JsonSerializer.Serialize(dto));
+
+                    return Task.CompletedTask;
                 }
             },
             Expiration = new AbsoluteExpiration(TimeSpan.FromMinutes(5))

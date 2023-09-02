@@ -2,6 +2,8 @@
 
 public record UploadAttachmentRequest([Required] IFormFile File);
 
+public record UploadAttachmentByTusRequest([Required, MaxLength(128)] string Id);
+
 public class AttachmentDto
 {
     public int Id { get; set; }

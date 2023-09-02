@@ -1,4 +1,8 @@
-﻿namespace QianShiChat.WebApi.Controllers;
+﻿using Microsoft.AspNetCore.Http;
+
+using System.IO;
+
+namespace QianShiChat.WebApi.Controllers;
 
 /// <summary>
 /// attachment api
@@ -26,5 +30,22 @@ public class AttachmentController : BaseController
     {
         using var stream = request.File.OpenReadStream();
         return await _fileService.SaveFileAsync(stream, request.File.FileName, cancellationToken);
+    }
+
+    [HttpPut("bind-tus-file/{fileId}")]
+    public async Task<AttachmentDto> UploadByTusFileAsync([FromRoute, Required, MaxLength(128)] string fileId, CancellationToken cancellationToken = default)
+    {
+        var diskStorePath = HttpContext.RequestServices.GetRequiredService<TusDiskStorageOptionHelper>().StorageDiskPath;
+        var store = new TusDiskStore(diskStorePath);
+        var file = await store.GetFileAsync(fileId, cancellationToken);
+        if(file is null)
+        {
+            throw Oops.Bah("file not exists.");
+        }
+
+        var fileStream = await file.GetContentAsync(cancellationToken);
+        var metadata = await file.GetMetadataAsync(cancellationToken);
+        metadata.TryGetValue("filename", out var name);
+        return await _fileService.SaveFileAsync(fileStream, name!.GetString(Encoding.UTF8), cancellationToken);
     }
 }
