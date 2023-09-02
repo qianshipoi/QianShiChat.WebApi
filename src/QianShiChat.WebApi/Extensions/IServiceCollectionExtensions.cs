@@ -26,8 +26,7 @@ public static class IServiceCollectionExtensions
         services.AddOptions();
         services.Configure<JwtOptions>(section);
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-            {
+            .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options => {
                 var secretByte = Encoding.UTF8.GetBytes(jwtOptions.SecretKey);
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -41,8 +40,7 @@ public static class IServiceCollectionExtensions
                 };
                 options.Events = new JwtBearerEvents
                 {
-                    OnMessageReceived = context =>
-                    {
+                    OnMessageReceived = context => {
                         var accessToken = context.Request.Query["access_token"];
                         var path = context.HttpContext.Request.Path;
                         if (!string.IsNullOrEmpty(accessToken) &&
@@ -72,12 +70,11 @@ public static class IServiceCollectionExtensions
         services.AddScoped<SoftDeleteInterceptor>();
         services.AddScoped<IAuditableInterceptor>();
 
-        services.AddDbContext<ChatDbContext>((sp, options) =>
-        {
+        services.AddDbContext<ChatDbContext>((sp, options) => {
             var safeDeleteInterceptor = sp.GetRequiredService<SoftDeleteInterceptor>();
             var auditableInterceptor = sp.GetRequiredService<IAuditableInterceptor>();
 
-            options.UseMySql(configuration.GetConnectionString("Default"), ServerVersion.Parse("8.0.31"),builder => builder.MigrationsAssembly(typeof(Program).Assembly.FullName)).AddInterceptors(safeDeleteInterceptor, auditableInterceptor);
+            options.UseMySql(configuration.GetConnectionString("Default"), ServerVersion.Parse("8.0.31"), builder => builder.MigrationsAssembly(typeof(Program).Assembly.FullName)).AddInterceptors(safeDeleteInterceptor, auditableInterceptor);
         });
         return services;
     }
@@ -90,8 +87,7 @@ public static class IServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddCache(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddEasyCaching(setup =>
-        {
+        services.AddEasyCaching(setup => {
             setup.UseRedis(configuration);
             setup.WithSystemTextJson("mymsgpack");
         });
@@ -106,8 +102,7 @@ public static class IServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddSaveChatMessageJob(this IServiceCollection services)
     {
-        services.AddQuartz(q =>
-        {
+        services.AddQuartz(q => {
             // base Quartz scheduler, job and trigger configuration
             q.UseMicrosoftDependencyInjectionJobFactory();
             var jobKey = nameof(SaveChatMessageJob);
@@ -127,8 +122,7 @@ public static class IServiceCollectionExtensions
         });
 
         // ASP.NET Core hosting
-        services.AddQuartzHostedService(options =>
-        {
+        services.AddQuartzHostedService(options => {
             // when shutting down we want jobs to complete gracefully
             options.WaitForJobsToComplete = true;
         });
@@ -144,8 +138,7 @@ public static class IServiceCollectionExtensions
     public static IServiceCollection AddOpenApi(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(options =>
-        {
+        services.AddSwaggerGen(options => {
             options.SwaggerDoc("v1", new OpenApiInfo
             {
                 Version = "v1",
@@ -211,20 +204,18 @@ public static class IServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddImageConversion(this IServiceCollection services)
     {
-        services.AddImageSharp(options =>
-               {
-                   options.Configuration = SixLabors.ImageSharp.Configuration.Default;
-                   options.BrowserMaxAge = TimeSpan.FromDays(7);
-                   options.CacheMaxAge = TimeSpan.FromDays(365);
-                   options.CacheHashLength = 8;
-                   options.OnParseCommandsAsync = _ => Task.CompletedTask;
-                   options.OnBeforeSaveAsync = _ => Task.CompletedTask;
-                   options.OnProcessedAsync = _ => Task.CompletedTask;
-                   options.OnPrepareResponseAsync = _ => Task.CompletedTask;
-               })
+        services.AddImageSharp(options => {
+            options.Configuration = SixLabors.ImageSharp.Configuration.Default;
+            options.BrowserMaxAge = TimeSpan.FromDays(7);
+            options.CacheMaxAge = TimeSpan.FromDays(365);
+            options.CacheHashLength = 8;
+            options.OnParseCommandsAsync = _ => Task.CompletedTask;
+            options.OnBeforeSaveAsync = _ => Task.CompletedTask;
+            options.OnProcessedAsync = _ => Task.CompletedTask;
+            options.OnPrepareResponseAsync = _ => Task.CompletedTask;
+        })
                .SetRequestParser<QueryCollectionRequestParser>()
-               .Configure<PhysicalFileSystemCacheOptions>(options =>
-               {
+               .Configure<PhysicalFileSystemCacheOptions>(options => {
                    options.CacheRootPath = null;
                    options.CacheFolder = "is-cache";
                    options.CacheFolderDepth = 8;
@@ -232,8 +223,7 @@ public static class IServiceCollectionExtensions
                .SetCache<PhysicalFileSystemCache>()
                .SetCacheKey<UriRelativeLowerInvariantCacheKey>()
                .SetCacheHash<SHA256CacheHash>()
-               .Configure<PhysicalFileSystemProviderOptions>(options =>
-               {
+               .Configure<PhysicalFileSystemProviderOptions>(options => {
                    options.ProviderRootPath = null;
                })
                .AddProvider<PhysicalFileSystemProvider>()

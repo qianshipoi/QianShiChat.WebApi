@@ -58,6 +58,8 @@ builder.Services
     .AddDirectoryBrowser();
 
 builder.Services.AddSingleton<TusDiskStorageOptionHelper>();
+builder.Services.AddSingleton(serviceProvider => serviceProvider.CreateTusConfigurationForCleanupService());
+builder.Services.AddHostedService<ExpiredFilesCleanupService>();
 
 var app = builder.Build();
 

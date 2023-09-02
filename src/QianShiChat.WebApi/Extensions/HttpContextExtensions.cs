@@ -148,4 +148,15 @@ public static class HttpContextExtensions
 
         return Task.FromResult(config);
     }
+
+
+    public static DefaultTusConfiguration CreateTusConfigurationForCleanupService(this IServiceProvider services)
+    {
+        var path = services.GetRequiredService<TusDiskStorageOptionHelper>().StorageDiskPath;
+        return new DefaultTusConfiguration
+        {
+            Store = new TusDiskStore(path),
+            Expiration = new AbsoluteExpiration(TimeSpan.FromMinutes(5))
+        };
+    }
 }
