@@ -1,8 +1,4 @@
-﻿using QianShiChat.Domain.Models;
-
-using System.Runtime.CompilerServices;
-
-namespace QianShiChat.Application.Services;
+﻿namespace QianShiChat.Application.Services;
 
 public class SessionService : ISessionService, ITransient
 {

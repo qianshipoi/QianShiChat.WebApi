@@ -63,6 +63,7 @@ public interface IUserService
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<long> GetUserCountByNickNameAsync(string nickName, CancellationToken cancellationToken = default);
+
     /// <summary>
     /// get user nicknanme by id.
     /// </summary>
@@ -70,5 +71,6 @@ public interface IUserService
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<string?> GetNickNameByIdAsync(int userId, CancellationToken cancellationToken = default);
+
     Task<bool> IsFriendAsync(int userId, int friendId, CancellationToken cancellationToken = default);
 }

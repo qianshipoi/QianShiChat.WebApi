@@ -8,6 +8,11 @@ public interface IFileService
     /// <param name="filePath"></param>
     /// <returns></returns>
     string FormatPublicFile(string filePath);
+
+    /// <summary>
+    /// get default group avatar.
+    /// </summary>
+    /// <returns></returns>
     string GetDefaultGroupAvatar();
 
     /// <summary>

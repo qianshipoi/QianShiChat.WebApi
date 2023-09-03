@@ -7,14 +7,16 @@ public class FriendService : IFriendService, ITransient
     private readonly IMapper _mapper;
     private readonly IRedisCachingProvider _redisCachingProvider;
     private readonly IFileService _fileService;
+    private readonly IOnlineManager _onlineManager;
 
-    public FriendService(ChatDbContext context, ILogger<FriendService> logger, IMapper mapper, IRedisCachingProvider redisCachingProvider, IFileService fileService)
+    public FriendService(ChatDbContext context, ILogger<FriendService> logger, IMapper mapper, IRedisCachingProvider redisCachingProvider, IFileService fileService, IOnlineManager onlineManager)
     {
         _context = context;
         _logger = logger;
         _mapper = mapper;
         _redisCachingProvider = redisCachingProvider;
         _fileService = fileService;
+        _onlineManager = onlineManager;
     }
 
     public async Task<bool> IsFriendAsync(int userId, int friendId, CancellationToken cancellationToken = default)
@@ -43,6 +45,7 @@ public class FriendService : IFriendService, ITransient
 
         friends.ForEach(item => {
             item.Avatar = _fileService.FormatPublicFile(item.Avatar);
+            item.IsOnline = _onlineManager.CheckOnline(item.Id);
         });
 
         return friends;

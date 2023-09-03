@@ -11,6 +11,8 @@ public class UserDto
     public string NickName { get; set; } = default!;
 
     public long CreateTime { get; set; }
+
+    public bool IsOnline { get; set; }
 }
 
 public class UserWithMessage : UserDto

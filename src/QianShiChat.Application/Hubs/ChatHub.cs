@@ -13,6 +13,7 @@ public class ChatHub : Hub<IChatClient>
     private readonly IFriendService _friendService;
     private readonly IRedisCachingProvider _redisCachingProvider;
     private readonly ISessionService _sessionService;
+    private readonly IOnlineManager _onlineManager;
 
     /// <summary>
     /// chat hub.
@@ -22,11 +23,13 @@ public class ChatHub : Hub<IChatClient>
     public ChatHub(
         IFriendService friendService,
         IRedisCachingProvider redisCachingProvider,
-        ISessionService sessionService)
+        ISessionService sessionService,
+        IOnlineManager onlineManager)
     {
         _friendService = friendService;
         _redisCachingProvider = redisCachingProvider;
         _sessionService = sessionService;
+        _onlineManager = onlineManager;
     }
 
     /// <summary>
@@ -67,14 +70,17 @@ public class ChatHub : Hub<IChatClient>
         var cacheKey = FormatOnlineUserKey(CurrentUserId.ToString(), CurrentClientType!);
         if (isOnline)
         {
+            _onlineManager.Add(CurrentUserId, Context.ConnectionId);
             await _redisCachingProvider.HSetAsync(AppConsts.OnlineCacheKey, cacheKey, Context.ConnectionId);
         }
         else
         {
+            _onlineManager.Remove(CurrentUserId, Context.ConnectionId);
             await _redisCachingProvider.HDelAsync(AppConsts.OnlineCacheKey, new string[] { cacheKey });
         }
     }
-    string FormatOnlineUserKey(string userId, string clientType) => $"{userId}_{clientType}";
+
+    private static string FormatOnlineUserKey(string userId, string clientType) => $"{userId}_{clientType}";
 
     public IAsyncEnumerable<SessionDto> GetSessionsAsync(CancellationToken cancellationToken)
     {
@@ -108,4 +114,5 @@ public class ChatHub : Hub<IChatClient>
         });
     }
 
+    public bool UserIsOnline(int id) => _onlineManager.CheckOnline(id);
 }
