@@ -13,6 +13,8 @@ public class AuthController : BaseController
     private readonly IUserService _userService;
     private readonly IRedisCachingProvider _redisCachingProvider;
     private readonly JwtOptions _jwtOptions;
+    private readonly IOnlineManager _onlineManager;
+    private readonly IHubContext<ChatHub, IChatClient> _hubContext;
 
     /// <summary>
     /// auth controller
@@ -22,13 +24,17 @@ public class AuthController : BaseController
         IJwtService jwtService,
         IUserService userService,
         IRedisCachingProvider redisCachingProvider,
-        IOptionsMonitor<JwtOptions> jwtOptions)
+        IOptionsMonitor<JwtOptions> jwtOptions,
+        IOnlineManager onlineManager,
+        IHubContext<ChatHub, IChatClient> hubContext)
     {
         _mapper = mapper;
         _jwtService = jwtService;
         _userService = userService;
         _redisCachingProvider = redisCachingProvider;
         _jwtOptions = jwtOptions.CurrentValue;
+        _onlineManager = onlineManager;
+        _hubContext = hubContext;
     }
 
     /// <summary>
@@ -47,6 +53,13 @@ public class AuthController : BaseController
         if (string.Compare(userInfo.Password, dto.Password, true) != 0)
         {
             return BadRequest("The password is incorrect.");
+        }
+
+        var connectionId = await _onlineManager.GetUserClientConnectionIdAsync(userInfo.Id, CurrentClientType!);
+
+        if (!string.IsNullOrWhiteSpace(connectionId))
+        {
+            await _hubContext.Clients.Client(connectionId).Notification(new NotificationMessage(NotificationType.Signed, "You have been signed out because you are signed in at another location."));
         }
 
         var userDto = _mapper.Map<UserDto>(userInfo);
@@ -165,7 +178,7 @@ public class AuthController : BaseController
             Message = "二维码不存在或已过期"
         };
 
-        if(response.Code == 803)
+        if (response.Code == 803)
         {
             Response.Headers.Add(CustomResponseHeader.AccessToken, response.AccessToken);
             Response.Headers.Add("Access-Control-Expose-Headers", CustomResponseHeader.AccessToken);

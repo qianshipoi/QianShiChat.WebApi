@@ -11,7 +11,6 @@ public class ChatHub : Hub<IChatClient>
     private string CurrentClientType => Context.User!.FindFirstValue(CustomClaim.ClientType)!;
 
     private readonly IFriendService _friendService;
-    private readonly IRedisCachingProvider _redisCachingProvider;
     private readonly ISessionService _sessionService;
     private readonly IOnlineManager _onlineManager;
 
@@ -22,12 +21,10 @@ public class ChatHub : Hub<IChatClient>
     /// <param name="redisCachingProvider"></param>
     public ChatHub(
         IFriendService friendService,
-        IRedisCachingProvider redisCachingProvider,
         ISessionService sessionService,
         IOnlineManager onlineManager)
     {
         _friendService = friendService;
-        _redisCachingProvider = redisCachingProvider;
         _sessionService = sessionService;
         _onlineManager = onlineManager;
     }
@@ -70,13 +67,11 @@ public class ChatHub : Hub<IChatClient>
         var cacheKey = FormatOnlineUserKey(CurrentUserId.ToString(), CurrentClientType!);
         if (isOnline)
         {
-            _onlineManager.Add(CurrentUserId, Context.ConnectionId);
-            await _redisCachingProvider.HSetAsync(AppConsts.OnlineCacheKey, cacheKey, Context.ConnectionId);
+            await _onlineManager.ConnectedAsync(CurrentUserId, Context.ConnectionId, CurrentClientType);
         }
         else
         {
-            _onlineManager.Remove(CurrentUserId, Context.ConnectionId);
-            await _redisCachingProvider.HDelAsync(AppConsts.OnlineCacheKey, new string[] { cacheKey });
+            await _onlineManager.DisconnectedAsync(CurrentUserId, Context.ConnectionId, CurrentClientType);
         }
     }
 

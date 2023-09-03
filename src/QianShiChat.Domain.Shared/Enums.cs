@@ -71,4 +71,9 @@ public enum NotificationType
     /// 新好友
     /// </summary>
     NewFriend,
+
+    /// <summary>
+    /// 强制注销（其他地方登录）
+    /// </summary>
+    Signed,
 }
