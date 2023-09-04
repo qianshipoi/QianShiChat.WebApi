@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.SignalR;
+
 using System.Threading.Channels;
 
 namespace QianShiChat.Application.Hubs;
@@ -129,9 +131,31 @@ public class ChatHub : Hub<IChatClient>
         Console.WriteLine(id);
     }
 
-    public Task<string> OnlineFileStreamConfirm(int toid, FileBaseInfo fileInfo)
+    public async Task<string?> OnlineFileStreamConfirm(int toid, FileBaseInfo fileInfo)
     {
-        return _onlineDataTransmission.CreateChannel(CurrentUserId, toid, fileInfo);
+        var connections = _onlineManager.GetConnections(toid);
+        if (!connections.Any())
+        {
+            return null;
+        }
+
+        var channel = await _onlineDataTransmission.CreateChannel(CurrentUserId, toid, fileInfo);
+        var confirm = await Clients.Client(connections.First())
+            .ConfirmOnlineFile(channel);
+        if (!confirm)
+        {
+            await _onlineDataTransmission.Cancel(channel.Id, CurrentUserId);
+            return null;
+        }
+        channel.PassedClient(CurrentClientType);
+        await Clients.Client(connections.First())
+            .OnlineFileReceive(channel);
+        return channel.Id;
+    }
+
+    public async Task<bool> RejectOnlineFile(string id)
+    {
+        return await _onlineDataTransmission.Cancel(id, CurrentUserId);
     }
 
     public async Task OnlineUploadFileStream(ChannelReader<string> stream, string id)
@@ -145,11 +169,14 @@ public class ChatHub : Hub<IChatClient>
                 await writer.WriteAsync(item);
             }
         }
+
+        await stream.Completion.ContinueWith((_) => {
+            writer.Complete();
+        });
     }
 
-    public ChannelReader<string>? OnlineReceiveFileStream(string id)
+    public ChannelReader<string> OnlineReceiveFileStream(string id)
     {
-        var reader = _onlineDataTransmission.GetChannelReader(id, CurrentUserId);
-        return reader;
+        return _onlineDataTransmission.GetChannelReader(id, CurrentUserId)!;
     }
 }

@@ -26,4 +26,8 @@ public interface IChatClient
     /// <param name="message"></param>
     /// <returns></returns>
     Task PrivateChat(ChatMessageDto message);
+
+    Task<bool> ConfirmOnlineFile(FileOnlineTransmission file);
+
+    Task OnlineFileReceive(FileOnlineTransmission file);
 }

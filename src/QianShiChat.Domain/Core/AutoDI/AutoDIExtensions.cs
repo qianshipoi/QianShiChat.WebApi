@@ -29,13 +29,23 @@ public static class AutoDIExtensions
 
         foreach (var type in types)
         {
-            var interfaces = type.GetInterfaces();
-            interfaces.ToList().ForEach(x =>
+            var interfaces = type.GetInterfaces().Where(x=>x != lifetimeType).ToList();
+
+            if (interfaces.Any())
             {
-                if (lifetimeType == typeof(ISingleton)) services.AddSingleton(x, type);
-                if (lifetimeType == typeof(IScoped)) services.AddScoped(x, type);
-                if (lifetimeType == typeof(ITransient)) services.AddTransient(x, type);
-            });
+                foreach (var x in interfaces)
+                {
+                    if (lifetimeType == typeof(ISingleton)) services.AddSingleton(x, type);
+                    if (lifetimeType == typeof(IScoped)) services.AddScoped(x, type);
+                    if (lifetimeType == typeof(ITransient)) services.AddTransient(x, type);
+                }
+            }
+            else
+            {
+                if (lifetimeType == typeof(ISingleton)) services.AddSingleton(type);
+                if (lifetimeType == typeof(IScoped)) services.AddScoped(type);
+                if (lifetimeType == typeof(ITransient)) services.AddTransient(type);
+            }
         }
     }
 }

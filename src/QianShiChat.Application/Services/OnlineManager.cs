@@ -80,11 +80,6 @@ public class FileOnlineTransmission
         FileInfo = fileInfo;
     }
 
-    public FileOnlineTransmission CreateChannel()
-    {
-        return this;
-    }
-
     public void PassedClient(string clientType)
     {
         ClientType = clientType;
@@ -114,15 +109,15 @@ public class OnlineDataTransmission : ISingleton
         _hubContext = hubContext;
     }
 
-    public async Task<string> CreateChannel(int fromId, int toId, FileBaseInfo fileInfo)
+    public async Task<FileOnlineTransmission> CreateChannel(int fromId, int toId, FileBaseInfo fileInfo)
     {
         var id = Guid.NewGuid().ToString();
-        var channel = new FileOnlineTransmission(id, fromId, toId, fileInfo).CreateChannel();
+        var channel = new FileOnlineTransmission(id, fromId, toId, fileInfo);
         _channels[id] = channel;
         // send confirm.
         await _hubContext.Clients.User(toId.ToString())
               .Notification(new NotificationMessage(NotificationType.OnlineTransmissionConfirm, channel));
-        return id;
+        return channel;
     }
 
     public async Task<bool> Passed(string id, int userId, string clientType)
