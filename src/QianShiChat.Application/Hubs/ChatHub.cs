@@ -1,3 +1,5 @@
+using System.Threading.Channels;
+
 namespace QianShiChat.Application.Hubs;
 
 /// <summary>
@@ -13,6 +15,7 @@ public class ChatHub : Hub<IChatClient>
     private readonly IFriendService _friendService;
     private readonly ISessionService _sessionService;
     private readonly IOnlineManager _onlineManager;
+    private readonly OnlineDataTransmission _onlineDataTransmission;
 
     /// <summary>
     /// chat hub.
@@ -22,11 +25,13 @@ public class ChatHub : Hub<IChatClient>
     public ChatHub(
         IFriendService friendService,
         ISessionService sessionService,
-        IOnlineManager onlineManager)
+        IOnlineManager onlineManager,
+        OnlineDataTransmission onlineDataTransmission)
     {
         _friendService = friendService;
         _sessionService = sessionService;
         _onlineManager = onlineManager;
+        _onlineDataTransmission = onlineDataTransmission;
     }
 
     /// <summary>
@@ -110,4 +115,41 @@ public class ChatHub : Hub<IChatClient>
     }
 
     public bool UserIsOnline(int id) => _onlineManager.CheckOnline(id);
+
+    public async Task UploadStream(ChannelReader<string> stream, string id)
+    {
+        Console.WriteLine(id);
+        while (await stream.WaitToReadAsync())
+        {
+            while (stream.TryRead(out var item))
+            {
+                Console.WriteLine(item);
+            }
+        }
+        Console.WriteLine(id);
+    }
+
+    public Task<string> OnlineFileStreamConfirm(int toid, FileBaseInfo fileInfo)
+    {
+        return _onlineDataTransmission.CreateChannel(CurrentUserId, toid, fileInfo);
+    }
+
+    public async Task OnlineUploadFileStream(ChannelReader<string> stream, string id)
+    {
+        var writer = _onlineDataTransmission.GetChannelWriter(id, CurrentUserId);
+        if (writer is null) return;
+        while (await stream.WaitToReadAsync())
+        {
+            while (stream.TryRead(out var item))
+            {
+                await writer.WriteAsync(item);
+            }
+        }
+    }
+
+    public ChannelReader<string>? OnlineReceiveFileStream(string id)
+    {
+        var reader = _onlineDataTransmission.GetChannelReader(id, CurrentUserId);
+        return reader;
+    }
 }

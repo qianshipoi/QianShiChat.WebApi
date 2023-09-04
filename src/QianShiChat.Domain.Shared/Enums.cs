@@ -76,4 +76,19 @@ public enum NotificationType
     /// 强制注销（其他地方登录）
     /// </summary>
     Signed,
+
+    /// <summary>
+    /// 询问在线文件传输
+    /// </summary>
+    OnlineTransmissionConfirm,
+
+    /// <summary>
+    /// 确认在线传呼文件
+    /// </summary>
+    OnlineTransmissionPassed,
+
+    /// <summary>
+    /// 取消在线传呼文件
+    /// </summary>
+    OnlineTransmissionCancel,
 }
