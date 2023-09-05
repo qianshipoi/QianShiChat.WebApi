@@ -1,10 +1,10 @@
-﻿namespace QianShiChat.Application.Services;
+﻿namespace QianShiChat.Application.Repositories;
 
-public class AttachmentReposition : IAttachmentRepository, IScoped
+public class AttachmentRepositiory : IAttachmentRepository, IScoped
 {
     private readonly ChatDbContext _chatDbContext;
 
-    public AttachmentReposition(ChatDbContext chatDbContext)
+    public AttachmentRepositiory(ChatDbContext chatDbContext)
     {
         _chatDbContext = chatDbContext;
     }

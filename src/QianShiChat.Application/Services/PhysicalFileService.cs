@@ -73,9 +73,9 @@ public class PhysicalFileService : IFileService, IScoped
             contentType = STREAM_CONRENT_TYPE;
         }
 
-        filename = $"{YitIdHelper.NextId()}{ext.ToLower()}";
+        var newFilename = $"{YitIdHelper.NextId()}{ext.ToLower()}";
 
-        var absFilepath = Path.Combine(FILES_DIRNAME, filename);
+        var absFilepath = Path.Combine(FILES_DIRNAME, newFilename);
 
         var filepath = Path.Combine(_webHostEnvironment.WebRootPath, absFilepath);
 
@@ -92,7 +92,7 @@ public class PhysicalFileService : IFileService, IScoped
 
         if (_compressibleExts.Contains(ext))
         {
-            absPrevFilepath = Path.Combine(PREVIEW_DIRNAME, filename);
+            absPrevFilepath = Path.Combine(PREVIEW_DIRNAME, newFilename);
             prevPath = Path.Combine(_webHostEnvironment.WebRootPath, absPrevFilepath);
             using var image = Image.Load(stream);
 

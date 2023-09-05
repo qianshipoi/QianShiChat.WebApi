@@ -1,7 +1,3 @@
-using Microsoft.AspNetCore.SignalR;
-
-using System.Threading.Channels;
-
 namespace QianShiChat.Application.Hubs;
 
 /// <summary>
@@ -23,7 +19,9 @@ public class ChatHub : Hub<IChatClient>
     /// chat hub.
     /// </summary>
     /// <param name="friendService"></param>
-    /// <param name="redisCachingProvider"></param>
+    /// <param name="sessionService"></param>
+    /// <param name="onlineManager"></param>
+    /// <param name="onlineDataTransmission"></param>
     public ChatHub(
         IFriendService friendService,
         ISessionService sessionService,
@@ -117,19 +115,6 @@ public class ChatHub : Hub<IChatClient>
     }
 
     public bool UserIsOnline(int id) => _onlineManager.CheckOnline(id);
-
-    public async Task UploadStream(ChannelReader<string> stream, string id)
-    {
-        Console.WriteLine(id);
-        while (await stream.WaitToReadAsync())
-        {
-            while (stream.TryRead(out var item))
-            {
-                Console.WriteLine(item);
-            }
-        }
-        Console.WriteLine(id);
-    }
 
     public async Task<string?> OnlineFileStreamConfirm(int toid, FileBaseInfo fileInfo)
     {

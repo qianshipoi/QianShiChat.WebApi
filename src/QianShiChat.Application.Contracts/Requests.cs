@@ -6,6 +6,8 @@ public class UpdateCursorRequest
     public long Position { get; set; }
 }
 
+public record FileBaseInfo(string Name, string ContentType, int Size);
+
 public class QueryUserAvatar
 {
     public int? BeforeId { get; set; }
