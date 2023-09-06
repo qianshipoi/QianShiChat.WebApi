@@ -50,7 +50,7 @@ builder.Services
     .AddOpenApi()
     .AddJwtAuthentication(builder.Configuration)
     .AddCache(builder.Configuration)
-    .AddChatDbContext(builder.Configuration)
+    .AddInfrastructureServices(builder.Configuration)
     .AddAutoDI()
     .AddSaveChatMessageJob()
     .AddImageConversion()

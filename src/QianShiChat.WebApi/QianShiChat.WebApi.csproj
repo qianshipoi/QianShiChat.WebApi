@@ -8,10 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.6.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.7.1" />
     <PackageReference Include="MediatR" Version="12.1.1" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="7.0.9" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.9">
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="7.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.10">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <TreatAsUsed>true</TreatAsUsed>
@@ -35,6 +35,7 @@
   <ItemGroup>
     <ProjectReference Include="..\QianShiChat.Application\QianShiChat.Application.csproj" />
     <ProjectReference Include="..\QianShiChat.Common\QianShiChat.Common.csproj" />
+    <ProjectReference Include="..\QianShiChat.Infrastructure\QianShiChat.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

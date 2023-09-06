@@ -1,4 +1,4 @@
-﻿namespace QianShiChat.Domain.Core.Interceptors;
+﻿namespace QianShiChat.Infrastructure.Data.Interceptors;
 
 public abstract class EntityTypeConfiguration<TEntity> : IEntityTypeConfiguration<TEntity>
     where TEntity : class

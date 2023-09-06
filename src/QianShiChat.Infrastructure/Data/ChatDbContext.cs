@@ -1,8 +1,6 @@
-﻿using System.Reflection;
+﻿namespace QianShiChat.Infrastructure.Data;
 
-namespace QianShiChat.Domain;
-
-public class ChatDbContext : DbContext
+public class ChatDbContext : DbContext, IApplicationDbContext
 {
     public DbSet<UserInfo> UserInfos { get; set; }
     public DbSet<UserAvatar> UserAvatars { get; set; }
@@ -23,8 +21,8 @@ public class ChatDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
 
         var nowTime = 1668583992424L;
         var password = "E10ADC3949BA59ABBE56E057F20F883E";
