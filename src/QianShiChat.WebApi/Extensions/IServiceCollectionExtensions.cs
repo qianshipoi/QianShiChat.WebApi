@@ -1,10 +1,6 @@
 ﻿using Microsoft.OpenApi.Any;
 
 using QianShiChat.Application.Filters;
-using QianShiChat.Infrastructure.Data.Interceptors;
-
-using Swashbuckle.AspNetCore.SwaggerGen;
-
 namespace Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
@@ -57,27 +53,6 @@ public static class IServiceCollectionExtensions
 
         services.AddSingleton<ClientTypeAuthorize>();
 
-        return services;
-    }
-
-    /// <summary>
-    /// 添加ChatDbContext
-    /// </summary>
-    /// <param name="services"></param>
-    /// <param name="configuration"></param>
-    /// <returns></returns>
-    [Obsolete]
-    public static IServiceCollection AddChatDbContext(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddScoped<SoftDeleteInterceptor>();
-        services.AddScoped<AuditableInterceptor>();
-
-        services.AddDbContext<ChatDbContext>((sp, options) => {
-            var safeDeleteInterceptor = sp.GetRequiredService<SoftDeleteInterceptor>();
-            var auditableInterceptor = sp.GetRequiredService<AuditableInterceptor>();
-
-            options.UseMySql(configuration.GetConnectionString("Default"), ServerVersion.Parse("8.0.31"), builder => builder.MigrationsAssembly(typeof(Program).Assembly.FullName)).AddInterceptors(safeDeleteInterceptor, auditableInterceptor);
-        });
         return services;
     }
 

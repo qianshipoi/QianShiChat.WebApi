@@ -3,11 +3,11 @@
 public class UserManager : IUserManager, IScoped
 {
     private readonly IHttpContextAccessor _contextAccessor;
-    private readonly ChatDbContext _chatDbContext;
+    private readonly IApplicationDbContext _chatDbContext;
     private int _userId;
     private UserInfo? _currentUserInfo;
 
-    public UserManager(IHttpContextAccessor contextAccessor, ChatDbContext chatDbContext)
+    public UserManager(IHttpContextAccessor contextAccessor, IApplicationDbContext chatDbContext)
     {
         _contextAccessor = contextAccessor;
         _chatDbContext = chatDbContext;

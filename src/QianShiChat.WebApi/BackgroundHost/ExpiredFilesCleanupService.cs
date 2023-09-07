@@ -1,6 +1,4 @@
-﻿using tusdotnet.Interfaces;
-
-namespace QianShiChat.WebApi.BackgroundHost
+﻿namespace QianShiChat.WebApi.BackgroundHost
 {
     public sealed class ExpiredFilesCleanupService : IHostedService, IDisposable
     {
@@ -16,7 +14,6 @@ namespace QianShiChat.WebApi.BackgroundHost
             _expiration = config.Expiration;
         }
 
-
         public void Dispose()
         {
             _timer?.Dispose();
@@ -31,7 +28,7 @@ namespace QianShiChat.WebApi.BackgroundHost
             }
 
             await RunCleanup(cancellationToken);
-            _timer = new Timer(async (e) => await RunCleanup((CancellationToken)e), cancellationToken, TimeSpan.Zero, _expiration.Timeout);
+            _timer = new Timer(async (e) => await RunCleanup((CancellationToken)e!), cancellationToken, TimeSpan.Zero, _expiration.Timeout);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

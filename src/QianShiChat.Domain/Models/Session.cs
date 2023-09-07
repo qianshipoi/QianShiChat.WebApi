@@ -11,6 +11,5 @@ public class Session : IAuditable, ISoftDelete
     public long UpdateTime { get; set; }
     public bool IsDeleted { get; set; }
     public long DeleteTime { get; set; }
-
     public virtual UserInfo? FromUser { get; set; }
 }

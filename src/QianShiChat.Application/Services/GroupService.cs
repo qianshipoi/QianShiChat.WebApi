@@ -4,13 +4,13 @@ namespace QianShiChat.Application.Services;
 
 public class GroupService : IGroupService, ITransient
 {
-    private readonly ChatDbContext _context;
+    private readonly IApplicationDbContext _context;
     private readonly ILogger<GroupService> _logger;
     private readonly IMapper _mapper;
     private readonly IUserService _userService;
     private readonly IFileService _fileService;
 
-    public GroupService(ChatDbContext context, ILogger<GroupService> logger, IMapper mapper, IUserService userService, IFileService fileService)
+    public GroupService(IApplicationDbContext context, ILogger<GroupService> logger, IMapper mapper, IUserService userService, IFileService fileService)
     {
         _context = context;
         _logger = logger;
@@ -42,7 +42,7 @@ public class GroupService : IGroupService, ITransient
             UserId = userId
         });
 
-        await _context.AddAsync(group, cancellationToken);
+        await _context.Groups.AddAsync(group, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
         var dto = _mapper.Map<GroupDto>(group);
@@ -93,7 +93,7 @@ public class GroupService : IGroupService, ITransient
             });
         }
 
-        await _context.AddAsync(group, cancellationToken);
+        await _context.Groups.AddAsync(group, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
         var dto = _mapper.Map<GroupDto>(group);
         FormatGroupAvatar(dto);
@@ -123,7 +123,7 @@ public class GroupService : IGroupService, ITransient
                 Status = ApplyStatus.Applied,
             };
 
-            await _context.AddAsync(apply, cancellationToken);
+            await _context.GroupApplies.AddAsync(apply, cancellationToken);
         }
         else
         {
@@ -176,7 +176,7 @@ public class GroupService : IGroupService, ITransient
 
         try
         {
-            _context.Remove(group);
+            _context.Groups.Remove(group);
             await _context.SaveChangesAsync(cancellationToken);
         }
         catch (Exception ex)
@@ -191,7 +191,7 @@ public class GroupService : IGroupService, ITransient
         var groups = await _context.UserGroupRealtions
              .AsNoTracking()
              .Include(x => x.Group)
-             .Where(x => x.UserId == userId && !x.Group.IsDeleted)
+             .Where(x => x.UserId == userId && !x.Group!.IsDeleted)
              .Select(x => x.Group)
              .ToListAsync(cancellationToken);
 

@@ -1,4 +1,6 @@
 // config distributed id.
+using QianShiChat.Infrastructure.Data;
+
 var options = new IdGeneratorOptions(1);
 YitIdHelper.SetIdGenerator(options);
 
@@ -63,6 +65,8 @@ builder.Services.AddHostedService<ExpiredFilesCleanupService>();
 
 var app = builder.Build();
 
+await app.InitialiseDatabaseAsync();
+
 app.UseForwardedHeaders();
 app.UseOpenApi();
 
@@ -94,18 +98,7 @@ app.MapTus("/api/tusfiles", HttpContextExtensions.TusConfigurationFactory)
         }
         return await next(context);
     });
-
 app.MapControllers();
-
 app.MapHub<ChatHub>("/Hubs/Chat");
-
-using (var scope = app.Services.CreateScope())
-{
-    using var dbContext  = scope.ServiceProvider.GetRequiredService<ChatDbContext>();
-    if (dbContext.Database.GetPendingMigrations().Any())
-    {
-        dbContext.Database.Migrate();
-    }
-}
 
 app.Run();

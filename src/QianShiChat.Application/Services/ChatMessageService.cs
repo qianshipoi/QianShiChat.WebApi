@@ -11,7 +11,7 @@ public class ChatMessageService : IChatMessageService, ITransient
         { ChatMessageSendType.Group, AppConsts.GetGroupChatSessionId },
     };
 
-    private readonly ChatDbContext _context;
+    private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
     private readonly IHubContext<ChatHub, IChatClient> _hubContext;
     private readonly IFileService _fileService;
@@ -23,7 +23,7 @@ public class ChatMessageService : IChatMessageService, ITransient
     /// chat message service
     /// </summary>
     public ChatMessageService(
-        ChatDbContext context,
+        IApplicationDbContext context,
         IMapper mapper,
         IHubContext<ChatHub, IChatClient> hubContext,
         IFileService fileService,
@@ -125,7 +125,7 @@ public class ChatMessageService : IChatMessageService, ITransient
             chatMessage.SendType,
             chatMessage.Id);
 
-        await _context.AddAsync(chatMessage, cancellationToken);
+        await _context.ChatMessages.AddAsync(chatMessage, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 
         return chatMessageDto;

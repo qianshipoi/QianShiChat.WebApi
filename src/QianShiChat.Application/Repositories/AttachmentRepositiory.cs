@@ -2,9 +2,9 @@
 
 public class AttachmentRepositiory : IAttachmentRepository, IScoped
 {
-    private readonly ChatDbContext _chatDbContext;
+    private readonly IApplicationDbContext _chatDbContext;
 
-    public AttachmentRepositiory(ChatDbContext chatDbContext)
+    public AttachmentRepositiory(IApplicationDbContext chatDbContext)
     {
         _chatDbContext = chatDbContext;
     }

@@ -2,9 +2,9 @@
 
 public class ChatMessageRepository : IChatMessageRepository, IScoped
 {
-    private readonly ChatDbContext _context;
+    private readonly IApplicationDbContext _context;
 
-    public ChatMessageRepository(ChatDbContext context)
+    public ChatMessageRepository(IApplicationDbContext context)
     {
         _context = context;
     }

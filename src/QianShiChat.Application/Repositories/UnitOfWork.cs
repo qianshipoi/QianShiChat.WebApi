@@ -2,9 +2,9 @@
 
 public class UnitOfWork : IUnitOfWork, IScoped
 {
-    private readonly ChatDbContext _context;
+    private readonly IApplicationDbContext _context;
 
-    public UnitOfWork(ChatDbContext context)
+    public UnitOfWork(IApplicationDbContext context)
     {
         _context = context;
     }

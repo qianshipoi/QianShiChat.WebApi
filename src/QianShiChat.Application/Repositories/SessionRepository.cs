@@ -2,8 +2,8 @@
 
 public class SessionRepository : ISessionRepository, IScoped
 {
-    private readonly ChatDbContext _context;
-    public SessionRepository(ChatDbContext context)
+    private readonly IApplicationDbContext _context;
+    public SessionRepository(IApplicationDbContext context)
     {
         _context = context;
     }

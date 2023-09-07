@@ -2,14 +2,14 @@
 
 public class FriendService : IFriendService, ITransient
 {
-    private readonly ChatDbContext _context;
+    private readonly IApplicationDbContext _context;
     private readonly ILogger<FriendService> _logger;
     private readonly IMapper _mapper;
     private readonly IRedisCachingProvider _redisCachingProvider;
     private readonly IFileService _fileService;
     private readonly IOnlineManager _onlineManager;
 
-    public FriendService(ChatDbContext context, ILogger<FriendService> logger, IMapper mapper, IRedisCachingProvider redisCachingProvider, IFileService fileService, IOnlineManager onlineManager)
+    public FriendService(IApplicationDbContext context, ILogger<FriendService> logger, IMapper mapper, IRedisCachingProvider redisCachingProvider, IFileService fileService, IOnlineManager onlineManager)
     {
         _context = context;
         _logger = logger;

@@ -21,6 +21,7 @@ public class UserInfoEntityTypeConfiguration : IEntityTypeConfiguration<UserInfo
             .IsRequired()
             .HasMaxLength(32)
             .HasComment("昵称");
+
         builder.Property(x => x.Password)
             .IsRequired()
             .HasMaxLength(32)
@@ -33,13 +34,16 @@ public class UserInfoEntityTypeConfiguration : IEntityTypeConfiguration<UserInfo
         builder.Property(x => x.CreateTime)
             .IsRequired()
             .HasComment("创建时间");
+
         builder.Property(x => x.UpdateTime)
             .IsRequired()
             .HasComment("修改时间");
+
         builder.Property(x => x.IsDeleted)
             .IsRequired()
             .HasDefaultValue(false)
             .HasComment("是否已删除");
+
         builder.Property(x => x.DeleteTime)
             .IsRequired()
             .HasComment("删除时间");

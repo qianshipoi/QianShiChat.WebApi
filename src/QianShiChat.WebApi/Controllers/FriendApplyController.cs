@@ -8,7 +8,7 @@
 [Authorize]
 public class FriendApplyController : BaseController
 {
-    private readonly ChatDbContext _context;
+    private readonly IApplicationDbContext _context;
     private readonly IHubContext<ChatHub, IChatClient> _hubContext;
     private readonly IUserService _userService;
     private readonly IFriendApplyService _friendApplyService;
@@ -18,7 +18,7 @@ public class FriendApplyController : BaseController
     /// friend apply api.
     /// </summary>
     public FriendApplyController(
-        ChatDbContext context,
+        IApplicationDbContext context,
         IHubContext<ChatHub, IChatClient> hubContext,
         IUserService userService,
         IFriendApplyService friendApplyService,

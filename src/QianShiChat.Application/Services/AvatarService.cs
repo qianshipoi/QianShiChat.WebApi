@@ -7,7 +7,7 @@ public class AvatarService : IAvatarService, ITransient
 {
     private readonly ILogger<AvatarService> _logger;
     private readonly IMapper _mapper;
-    private readonly ChatDbContext _context;
+    private readonly IApplicationDbContext _context;
     private readonly string _avatarPath;
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly IFileService _fileService;
@@ -18,7 +18,7 @@ public class AvatarService : IAvatarService, ITransient
     private static string[] AllowAvatarExts = new string[] { ".png", ".jpg", ".jpeg", ".gif" };
 
     public AvatarService(
-        ChatDbContext context,
+        IApplicationDbContext context,
         ILogger<AvatarService> logger,
         IMapper mapper,
         IWebHostEnvironment webHostEnvironment,

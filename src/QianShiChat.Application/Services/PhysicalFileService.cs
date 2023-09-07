@@ -6,7 +6,7 @@ public class PhysicalFileService : IFileService, IScoped
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IUserManager _userManager;
-    private readonly ChatDbContext _chatDbContext;
+    private readonly IApplicationDbContext _chatDbContext;
     private readonly IMapper _mapper;
 
     private static HashSet<string> _compressibleExts = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -22,7 +22,7 @@ public class PhysicalFileService : IFileService, IScoped
         ILogger<PhysicalFileService> logger,
         IHttpContextAccessor httpContextAccessor,
         IUserManager userManager,
-        ChatDbContext chatDbContext,
+        IApplicationDbContext chatDbContext,
         IMapper mapper)
     {
         _logger = logger;
@@ -137,7 +137,7 @@ public class PhysicalFileService : IFileService, IScoped
 
         try
         {
-            await _chatDbContext.AddAsync(attachment, cancellationToken);
+            await _chatDbContext.Attachments.AddAsync(attachment, cancellationToken);
             await _chatDbContext.SaveChangesAsync(cancellationToken);
         }
         catch (Exception ex)

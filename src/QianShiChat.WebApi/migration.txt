@@ -1,1 +1,1 @@
-﻿Add-Migration vx.x.x 
+﻿Add-Migration v0.0.1 -OutputDir Data\Migrations

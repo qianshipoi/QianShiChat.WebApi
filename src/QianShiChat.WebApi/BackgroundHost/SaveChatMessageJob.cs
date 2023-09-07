@@ -24,7 +24,7 @@ public class SaveChatMessageJob : IJob
 
         using var scoped = _serviceProvider.CreateScope();
         var redisCachingProvider = scoped.ServiceProvider.GetRequiredService<IRedisCachingProvider>();
-        var dbContext = scoped.ServiceProvider.GetRequiredService<ChatDbContext>();
+        var dbContext = scoped.ServiceProvider.GetRequiredService<IApplicationDbContext>();
 
         var cacheValues = await redisCachingProvider.HGetAllAsync(AppConsts.ChatMessageCacheKey);
         if (cacheValues is not null && cacheValues.Count() > 0)
@@ -36,8 +36,8 @@ public class SaveChatMessageJob : IJob
                 {
                     try
                     {
-                        await dbContext.AddAsync(message);
-                        await dbContext.SaveChangesAsync();
+                        await dbContext.ChatMessages.AddAsync(message);
+                        await dbContext.SaveChangesAsync(CancellationToken.None);
                     }
                     catch (Exception ex)
                     {

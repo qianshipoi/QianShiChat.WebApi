@@ -14,23 +14,29 @@ public class RoomEntityTypeConfiguration : EntityTypeConfiguration<Session>
         builder.HasOne(e => e.FromUser)
             .WithMany(e => e.Sessions)
             .HasForeignKey(e => e.FromId)
-            .IsRequired();
+            .IsRequired(false);
+
         builder.Property(p => p.Id)
             .IsRequired()
             .HasMaxLength(64);
+
         builder.Property(p => p.ToId)
             .IsRequired();
+
         builder.Property(p => p.Type)
             .IsRequired();
+
         builder.Property(p => p.MessagePosition)
             .IsRequired();
+
         builder.Property(p => p.CreateTime)
             .IsRequired();
+
         builder.Property(p => p.UpdateTime)
             .IsRequired();
+
         builder.Property(p => p.IsDeleted)
             .IsRequired();
-
         base.Configure(builder);
     }
 }

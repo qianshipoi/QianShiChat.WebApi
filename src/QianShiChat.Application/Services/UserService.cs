@@ -7,14 +7,14 @@ public class UserService : IUserService, ITransient
 {
     private readonly ILogger<UserService> _logger;
     private readonly IMapper _mapper;
-    private readonly ChatDbContext _context;
+    private readonly IApplicationDbContext _context;
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly IFileService _fileService;
 
     private const string AvatarPrefix = "/Raw/Avatar";
 
     public UserService(
-        ChatDbContext context,
+        IApplicationDbContext context,
         IMapper mapper,
         ILogger<UserService> logger,
         IWebHostEnvironment webHostEnvironment,
@@ -83,7 +83,7 @@ public class UserService : IUserService, ITransient
         {
             File.Copy(defaultAvatarPath, newAvatarPath);
             user.Avatar = newPath.Replace('\\', '/');
-            await _context.AddAsync(user, cancellationToken);
+            await _context.UserInfos.AddAsync(user, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
 
             user.Avatar = _fileService.FormatPublicFile(user.Avatar);

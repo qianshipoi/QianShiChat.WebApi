@@ -38,15 +38,18 @@ public class AttachmentEntityTypeConfiguration : IEntityTypeConfiguration<Attach
 
         builder.HasOne(e => e.User)
             .WithMany(e => e.Attachments)
-            .IsRequired();
+            .IsRequired(false);
 
         builder.Property(x => x.CreateTime)
             .IsRequired();
+
         builder.Property(x => x.UpdateTime)
             .IsRequired();
+
         builder.Property(x => x.IsDeleted)
             .IsRequired()
             .HasDefaultValue(false);
+
         builder.Property(x => x.DeleteTime)
             .IsRequired();
     }

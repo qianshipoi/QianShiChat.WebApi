@@ -15,7 +15,10 @@ public class ApplicationDbContextInitialiser
     {
         try
         {
-            await _context.Database.MigrateAsync();
+            if (_context.Database.GetPendingMigrations().Any())
+            {
+                await _context.Database.MigrateAsync();
+            }
         }
         catch (Exception ex)
         {
@@ -43,7 +46,6 @@ public class ApplicationDbContextInitialiser
     }
 }
 
-
 public static class InitialiserExtensions
 {
     public static async Task InitialiseDatabaseAsync(this WebApplication app)
@@ -57,4 +59,3 @@ public static class InitialiserExtensions
         await initialiser.SeedAsync();
     }
 }
-

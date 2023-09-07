@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace QianShiChat.WebApi.Migrations
+namespace QianShiChat.Infrastructure.Data.Migrations
 {
     /// <inheritdoc />
     public partial class v001 : Migration
@@ -17,22 +17,22 @@ namespace QianShiChat.WebApi.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "DefaultAvatars",
+                name: "DefaultAvatar",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false, comment: "avatar id.")
+                    Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    CreateTime = table.Column<long>(type: "bigint", nullable: false, comment: "create time."),
-                    Path = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "file path.")
+                    Path = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Size = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "file size."),
-                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false, comment: "is deleted."),
-                    DeleteTime = table.Column<long>(type: "bigint", nullable: false, comment: "delete time."),
-                    UpdateTime = table.Column<long>(type: "bigint", nullable: false, comment: "update time.")
+                    Size = table.Column<ulong>(type: "bigint unsigned", nullable: false),
+                    CreateTime = table.Column<long>(type: "bigint", nullable: false),
+                    UpdateTime = table.Column<long>(type: "bigint", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    DeleteTime = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DefaultAvatars", x => x.Id);
+                    table.PrimaryKey("PK_DefaultAvatar", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -93,8 +93,7 @@ namespace QianShiChat.WebApi.Migrations
                         name: "FK_Attachments_UserInfo_UserId",
                         column: x => x.UserId,
                         principalTable: "UserInfo",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -114,17 +113,17 @@ namespace QianShiChat.WebApi.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CreateTime = table.Column<long>(type: "bigint", nullable: false),
                     UpdateTime = table.Column<long>(type: "bigint", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    FromUserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ChatMessage", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ChatMessage_UserInfo_FromId",
-                        column: x => x.FromId,
+                        name: "FK_ChatMessage_UserInfo_FromUserId",
+                        column: x => x.FromUserId,
                         principalTable: "UserInfo",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -138,9 +137,11 @@ namespace QianShiChat.WebApi.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     CreateTime = table.Column<long>(type: "bigint", nullable: false),
                     Status = table.Column<sbyte>(type: "tinyint", nullable: false),
-                    Remark = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
+                    Remark = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    UpdateTime = table.Column<long>(type: "bigint", nullable: false)
+                    UpdateTime = table.Column<long>(type: "bigint", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    DeleteTime = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -161,13 +162,15 @@ namespace QianShiChat.WebApi.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Groups",
+                name: "Group",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "varchar(128)", maxLength: 128, nullable: false)
+                    Name = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Avatar = table.Column<string>(type: "varchar(512)", maxLength: 512, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     TotalUser = table.Column<int>(type: "int", nullable: false),
                     CreateTime = table.Column<long>(type: "bigint", nullable: false),
@@ -176,13 +179,12 @@ namespace QianShiChat.WebApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Groups", x => x.Id);
+                    table.PrimaryKey("PK_Group", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Groups_UserInfo_UserId",
+                        name: "FK_Group_UserInfo_UserId",
                         column: x => x.UserId,
                         principalTable: "UserInfo",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -190,8 +192,8 @@ namespace QianShiChat.WebApi.Migrations
                 name: "MessageCursor",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "int", nullable: false, comment: "user id"),
-                    Postiton = table.Column<long>(type: "bigint", nullable: false, comment: "message position"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Postiton = table.Column<long>(type: "bigint", nullable: false, defaultValue: 0L),
                     LastUpdateTime = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -201,35 +203,59 @@ namespace QianShiChat.WebApi.Migrations
                         name: "FK_MessageCursor_UserInfo_UserId",
                         column: x => x.UserId,
                         principalTable: "UserInfo",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "UserAvatars",
+                name: "Sessions",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false, comment: "avatar id.")
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    UserId = table.Column<int>(type: "int", nullable: false, comment: "user id."),
-                    CreateTime = table.Column<long>(type: "bigint", nullable: false, comment: "create time."),
-                    UpdateTime = table.Column<long>(type: "bigint", nullable: false, comment: "update time."),
-                    Path = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "file path.")
+                    Id = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Size = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "file size."),
-                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false, comment: "is deleted."),
-                    DeleteTime = table.Column<long>(type: "bigint", nullable: false, comment: "delete time.")
+                    FromId = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<sbyte>(type: "tinyint", nullable: false),
+                    ToId = table.Column<int>(type: "int", nullable: false),
+                    MessagePosition = table.Column<long>(type: "bigint", nullable: false),
+                    CreateTime = table.Column<long>(type: "bigint", nullable: false),
+                    UpdateTime = table.Column<long>(type: "bigint", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    DeleteTime = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserAvatars", x => x.Id);
+                    table.PrimaryKey("PK_Sessions", x => new { x.Id, x.FromId });
                     table.ForeignKey(
-                        name: "FK_UserAvatars_UserInfo_UserId",
+                        name: "FK_Sessions_UserInfo_FromId",
+                        column: x => x.FromId,
+                        principalTable: "UserInfo",
+                        principalColumn: "Id");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "UserAvatar",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    CreateTime = table.Column<long>(type: "bigint", nullable: false),
+                    UpdateTime = table.Column<long>(type: "bigint", nullable: false),
+                    Path = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Size = table.Column<ulong>(type: "bigint unsigned", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    DeleteTime = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserAvatar", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserAvatar_UserInfo_UserId",
                         column: x => x.UserId,
                         principalTable: "UserInfo",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -237,11 +263,11 @@ namespace QianShiChat.WebApi.Migrations
                 name: "UserRealtion",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false, comment: "用户关系表主键")
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    UserId = table.Column<int>(type: "int", nullable: false, comment: "用户编号"),
-                    FriendId = table.Column<int>(type: "int", nullable: false, comment: "朋友编号"),
-                    CreateTime = table.Column<long>(type: "bigint", nullable: false, comment: "创建时间")
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    FriendId = table.Column<int>(type: "int", nullable: false),
+                    CreateTime = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -250,19 +276,17 @@ namespace QianShiChat.WebApi.Migrations
                         name: "FK_UserRealtion_UserInfo_FriendId",
                         column: x => x.FriendId,
                         principalTable: "UserInfo",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_UserRealtion_UserInfo_UserId",
                         column: x => x.UserId,
                         principalTable: "UserInfo",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "GroupApplies",
+                name: "GroupApply",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -271,30 +295,30 @@ namespace QianShiChat.WebApi.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     CreateTime = table.Column<long>(type: "bigint", nullable: false),
                     Status = table.Column<sbyte>(type: "tinyint", nullable: false),
-                    Remark = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
+                    Remark = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    UpdateTime = table.Column<long>(type: "bigint", nullable: false)
+                    UpdateTime = table.Column<long>(type: "bigint", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    DeleteTime = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GroupApplies", x => x.Id);
+                    table.PrimaryKey("PK_GroupApply", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_GroupApplies_Groups_GroupId",
+                        name: "FK_GroupApply_Group_GroupId",
                         column: x => x.GroupId,
-                        principalTable: "Groups",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalTable: "Group",
+                        principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_GroupApplies_UserInfo_UserId",
+                        name: "FK_GroupApply_UserInfo_UserId",
                         column: x => x.UserId,
                         principalTable: "UserInfo",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "UserGroupRealtions",
+                name: "UserGroupRealtion",
                 columns: table => new
                 {
                     UserId = table.Column<int>(type: "int", nullable: false),
@@ -303,24 +327,22 @@ namespace QianShiChat.WebApi.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserGroupRealtions", x => new { x.UserId, x.GroupId });
+                    table.PrimaryKey("PK_UserGroupRealtion", x => new { x.UserId, x.GroupId });
                     table.ForeignKey(
-                        name: "FK_UserGroupRealtions_Groups_GroupId",
+                        name: "FK_UserGroupRealtion_Group_GroupId",
                         column: x => x.GroupId,
-                        principalTable: "Groups",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalTable: "Group",
+                        principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_UserGroupRealtions_UserInfo_UserId",
+                        name: "FK_UserGroupRealtion_UserInfo_UserId",
                         column: x => x.UserId,
                         principalTable: "UserInfo",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.InsertData(
-                table: "DefaultAvatars",
+                table: "DefaultAvatar",
                 columns: new[] { "Id", "CreateTime", "DeleteTime", "IsDeleted", "Path", "Size", "UpdateTime" },
                 values: new object[,]
                 {
@@ -357,16 +379,27 @@ namespace QianShiChat.WebApi.Migrations
 
             migrationBuilder.InsertData(
                 table: "FriendApply",
-                columns: new[] { "Id", "CreateTime", "FriendId", "Remark", "Status", "UpdateTime", "UserId" },
+                columns: new[] { "Id", "CreateTime", "DeleteTime", "FriendId", "IsDeleted", "Remark", "Status", "UpdateTime", "UserId" },
                 values: new object[,]
                 {
-                    { 1, 1668583992424L, 2, "很高兴认识你。", (sbyte)3, 1668583992424L, 1 },
-                    { 2, 1668583992424L, 2, "Nice to meet you.", (sbyte)2, 1668583992424L, 1 },
-                    { 3, 1668583992424L, 3, "hi!", (sbyte)1, 1668583992424L, 1 }
+                    { 1, 1668583992424L, 0L, 2, false, "很高兴认识你。", (sbyte)3, 1668583992424L, 1 },
+                    { 2, 1668583992424L, 0L, 2, false, "Nice to meet you.", (sbyte)2, 1668583992424L, 1 },
+                    { 3, 1668583992424L, 0L, 3, false, "hi!", (sbyte)1, 1668583992424L, 1 }
                 });
 
             migrationBuilder.InsertData(
-                table: "UserAvatars",
+                table: "Sessions",
+                columns: new[] { "FromId", "Id", "CreateTime", "DeleteTime", "IsDeleted", "MessagePosition", "ToId", "Type", "UpdateTime" },
+                values: new object[,]
+                {
+                    { 1, "personal-1-2", 1668583992424L, 0L, false, 1668583992424L, 2, (sbyte)1, 1668583992424L },
+                    { 2, "personal-1-2", 1668583992424L, 0L, false, 1668583992424L, 1, (sbyte)1, 1668583992424L },
+                    { 2, "personal-2-3", 1668583992424L, 0L, false, 1668583992424L, 3, (sbyte)1, 1668583992424L },
+                    { 3, "personal-2-3", 1668583992424L, 0L, false, 1668583992424L, 2, (sbyte)1, 1668583992424L }
+                });
+
+            migrationBuilder.InsertData(
+                table: "UserAvatar",
                 columns: new[] { "Id", "CreateTime", "DeleteTime", "IsDeleted", "Path", "Size", "UpdateTime", "UserId" },
                 values: new object[,]
                 {
@@ -403,9 +436,9 @@ namespace QianShiChat.WebApi.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ChatMessage_FromId",
+                name: "IX_ChatMessage_FromUserId",
                 table: "ChatMessage",
-                column: "FromId");
+                column: "FromUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FriendApply_FriendId",
@@ -418,28 +451,53 @@ namespace QianShiChat.WebApi.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GroupApplies_GroupId",
-                table: "GroupApplies",
+                name: "IX_Group_UserId",
+                table: "Group",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GroupApply_GroupId",
+                table: "GroupApply",
                 column: "GroupId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GroupApplies_UserId",
-                table: "GroupApplies",
+                name: "IX_GroupApply_UserId",
+                table: "GroupApply",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Groups_UserId",
-                table: "Groups",
+                name: "IX_Sessions_FromId",
+                table: "Sessions",
+                column: "FromId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_Id",
+                table: "Sessions",
+                column: "Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_IsDeleted",
+                table: "Sessions",
+                column: "IsDeleted");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_ToId",
+                table: "Sessions",
+                column: "ToId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Sessions_Type",
+                table: "Sessions",
+                column: "Type");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserAvatar_UserId",
+                table: "UserAvatar",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserAvatars_UserId",
-                table: "UserAvatars",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserGroupRealtions_GroupId",
-                table: "UserGroupRealtions",
+                name: "IX_UserGroupRealtion_GroupId",
+                table: "UserGroupRealtion",
                 column: "GroupId");
 
             migrationBuilder.CreateIndex(
@@ -463,28 +521,31 @@ namespace QianShiChat.WebApi.Migrations
                 name: "ChatMessage");
 
             migrationBuilder.DropTable(
-                name: "DefaultAvatars");
+                name: "DefaultAvatar");
 
             migrationBuilder.DropTable(
                 name: "FriendApply");
 
             migrationBuilder.DropTable(
-                name: "GroupApplies");
+                name: "GroupApply");
 
             migrationBuilder.DropTable(
                 name: "MessageCursor");
 
             migrationBuilder.DropTable(
-                name: "UserAvatars");
+                name: "Sessions");
 
             migrationBuilder.DropTable(
-                name: "UserGroupRealtions");
+                name: "UserAvatar");
+
+            migrationBuilder.DropTable(
+                name: "UserGroupRealtion");
 
             migrationBuilder.DropTable(
                 name: "UserRealtion");
 
             migrationBuilder.DropTable(
-                name: "Groups");
+                name: "Group");
 
             migrationBuilder.DropTable(
                 name: "UserInfo");

@@ -40,5 +40,5 @@ public static class ValidationFailureMapper
 
 public class ValidationFailureResponse
 {
-    public IEnumerable<string> Error { get; set; }
+    public IEnumerable<string>? Error { get; set; }
 }

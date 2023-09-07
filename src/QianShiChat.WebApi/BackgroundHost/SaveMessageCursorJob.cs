@@ -31,7 +31,7 @@ public class SaveMessageCursorJob : IJob
 
         using var scoped = _serviceProvider.CreateScope();
         var redisCachingProvider = scoped.ServiceProvider.GetRequiredService<IRedisCachingProvider>();
-        var dbContext = scoped.ServiceProvider.GetRequiredService<ChatDbContext>();
+        var dbContext = scoped.ServiceProvider.GetRequiredService<IApplicationDbContext>();
 
         var cacheValues = await redisCachingProvider.HGetAllAsync(AppConsts.MessageCursorCacheKey);
 
@@ -62,7 +62,7 @@ public class SaveMessageCursorJob : IJob
 
                     try
                     {
-                        await dbContext.SaveChangesAsync();
+                        await dbContext.SaveChangesAsync(CancellationToken.None);
                     }
                     catch (Exception ex)
                     {

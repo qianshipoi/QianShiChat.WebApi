@@ -6,7 +6,7 @@
 public class FriendApplyService : IFriendApplyService, ITransient
 {
     private readonly ILogger<FriendApplyService> _logger;
-    private readonly ChatDbContext _context;
+    private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
     private readonly IFileService _fileService;
     private readonly IUserManager _userManager;
@@ -14,7 +14,7 @@ public class FriendApplyService : IFriendApplyService, ITransient
     /// <summary>
     /// firend apply service.
     /// </summary>
-    public FriendApplyService(ILogger<FriendApplyService> logger, ChatDbContext context, IMapper mapper, IFileService fileService, IUserManager userManager)
+    public FriendApplyService(ILogger<FriendApplyService> logger, IApplicationDbContext context, IMapper mapper, IFileService fileService, IUserManager userManager)
     {
         _logger = logger;
         _context = context;
@@ -41,7 +41,7 @@ public class FriendApplyService : IFriendApplyService, ITransient
     {
         var apply = _mapper.Map<FriendApply>(dto);
         apply.UserId = userId;
-        await _context.AddAsync(apply, cancellationToken);
+        await _context.FriendApplies.AddAsync(apply, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
         return _mapper.Map<FriendApplyDto>(apply);
     }
@@ -89,7 +89,7 @@ public class FriendApplyService : IFriendApplyService, ITransient
             .Where(x => ids.Contains(x.Id))
             .ToListAsync(cancellationToken);
 
-        _context.RemoveRange(applies);
+        _context.FriendApplies.RemoveRange(applies);
 
         await _context.SaveChangesAsync(cancellationToken);
     }
@@ -99,7 +99,7 @@ public class FriendApplyService : IFriendApplyService, ITransient
         var applies = await _context.FriendApplies
             .Where(x => x.UserId == _userManager.CurrentUserId)
             .ToListAsync(cancellationToken);
-        _context.RemoveRange(applies);
+        _context.FriendApplies.RemoveRange(applies);
         await _context.SaveChangesAsync(cancellationToken);
     }
 
@@ -112,7 +112,7 @@ public class FriendApplyService : IFriendApplyService, ITransient
 
         if (apply is null) return;
 
-        _context.RemoveRange(apply);
+        _context.FriendApplies.RemoveRange(apply);
         await _context.SaveChangesAsync(cancellationToken);
     }
 
