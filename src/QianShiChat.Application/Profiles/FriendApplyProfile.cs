@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.Application.Profiles;
+﻿using QianShiChat.Domain.Extensions;
+
+namespace QianShiChat.Application.Profiles;
 
 public class FriendApplyProfile : Profile
 {

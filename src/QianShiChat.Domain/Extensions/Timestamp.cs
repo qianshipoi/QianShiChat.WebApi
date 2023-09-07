@@ -1,4 +1,4 @@
-﻿namespace QianShiChat.Common.Extensions;
+﻿namespace QianShiChat.Domain.Extensions;
 
 public static class Timestamp
 {

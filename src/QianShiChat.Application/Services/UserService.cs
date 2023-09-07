@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.Application.Services;
+﻿using QianShiChat.Domain.Extensions;
+
+namespace QianShiChat.Application.Services;
 
 /// <summary>
 /// user service.

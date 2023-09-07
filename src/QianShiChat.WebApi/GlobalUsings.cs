@@ -23,7 +23,7 @@ global using QianShiChat.Application.Common.Interfaces;
 global using QianShiChat.Application.Contracts;
 global using QianShiChat.Application.Hubs;
 global using QianShiChat.Application.Services;
-global using QianShiChat.Common.Extensions;
+global using QianShiChat.Domain.Extensions;
 global using QianShiChat.Domain;
 global using QianShiChat.Domain.Core.AppOops;
 global using QianShiChat.Domain.Models;

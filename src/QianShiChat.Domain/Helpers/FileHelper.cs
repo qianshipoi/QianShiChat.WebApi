@@ -1,4 +1,4 @@
-﻿namespace QianShiChat.Common.Helpers;
+﻿namespace QianShiChat.Domain.Helpers;
 
 public class FileHelper
 {

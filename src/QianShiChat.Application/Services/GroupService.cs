@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using QianShiChat.Domain.Extensions;
+
+using System.Net;
 
 namespace QianShiChat.Application.Services;
 

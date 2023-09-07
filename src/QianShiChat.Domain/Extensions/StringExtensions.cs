@@ -1,7 +1,4 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-
-namespace QianShiChat.Common.Extensions;
+﻿namespace QianShiChat.Domain.Extensions;
 
 public static class StringExtensions
 {

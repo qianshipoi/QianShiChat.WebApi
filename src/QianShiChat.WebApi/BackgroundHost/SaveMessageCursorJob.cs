@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.WebApi.BackgroundHost;
+﻿using QianShiChat.Domain.Extensions;
+
+namespace QianShiChat.WebApi.BackgroundHost;
 
 /// <summary>
 /// save message cursor job.

@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\QianShiChat.Common\QianShiChat.Common.csproj" />
     <ProjectReference Include="..\QianShiChat.Domain.Shared\QianShiChat.Domain.Shared.csproj" />
   </ItemGroup>
 

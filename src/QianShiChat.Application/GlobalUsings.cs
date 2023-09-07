@@ -22,7 +22,7 @@ global using QianShiChat.Application.Filters;
 global using QianShiChat.Application.Hubs;
 global using QianShiChat.Application.Repositories;
 global using QianShiChat.Application.Services;
-global using QianShiChat.Common.Extensions;
+global using QianShiChat.Domain.Extensions;
 global using QianShiChat.Domain;
 global using QianShiChat.Domain.Core.AppOops;
 global using QianShiChat.Domain.Core.AutoDI;
