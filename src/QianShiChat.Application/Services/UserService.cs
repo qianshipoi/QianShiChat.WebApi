@@ -69,7 +69,7 @@ public class UserService : IUserService, ITransient
     }
 
     public async Task<UserDto> AddAsync(
-        CreateUserDto dto,
+        CreateUserRequest dto,
         string avatarPath,
         CancellationToken cancellationToken = default)
     {

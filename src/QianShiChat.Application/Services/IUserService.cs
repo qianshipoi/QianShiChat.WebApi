@@ -36,7 +36,7 @@ public interface IUserService
     /// <param name="avatarPath"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<UserDto> AddAsync(CreateUserDto dto, string avatarPath, CancellationToken cancellationToken = default);
+    Task<UserDto> AddAsync(CreateUserRequest dto, string avatarPath, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// get user by account.

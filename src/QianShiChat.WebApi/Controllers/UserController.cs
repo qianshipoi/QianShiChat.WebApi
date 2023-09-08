@@ -88,7 +88,7 @@ public class UserController : BaseController
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateUserDto dto, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Create([FromBody] CreateUserRequest dto, CancellationToken cancellationToken = default)
     {
         var avatarPath = await _avatarService.GetDefaultAvatarByIdAsync(dto.DefaultAvatarId, cancellationToken);
         if (string.IsNullOrWhiteSpace(avatarPath))

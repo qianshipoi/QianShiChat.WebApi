@@ -1,7 +1,4 @@
-﻿using Microsoft.OpenApi.Any;
-
-using QianShiChat.Application.Filters;
-namespace Microsoft.Extensions.DependencyInjection;
+﻿namespace Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
 /// Service Extension
@@ -89,13 +86,6 @@ public static class IServiceCollectionExtensions
                 .WithIdentity(jobKey + "_trigger")
                 .WithDailyTimeIntervalSchedule(opt => opt.WithIntervalInMinutes(5))
             );
-
-            var messageCursorJobKey = nameof(SaveMessageCursorJob);
-            q.AddJob<SaveMessageCursorJob>(options => options.WithIdentity(messageCursorJobKey));
-            q.AddTrigger(options => options
-                .ForJob(messageCursorJobKey)
-                .WithIdentity(messageCursorJobKey + "_trigger")
-                .WithDailyTimeIntervalSchedule(opt => opt.WithIntervalInMinutes(2)));
         });
 
         // ASP.NET Core hosting

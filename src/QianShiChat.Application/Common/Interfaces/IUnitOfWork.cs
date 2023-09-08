@@ -1,4 +1,4 @@
-﻿namespace QianShiChat.Application.Repositories;
+﻿namespace QianShiChat.Application.Common.Interfaces;
 
 public interface IUnitOfWork
 {

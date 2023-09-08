@@ -149,7 +149,6 @@ public static class HttpContextExtensions
         return Task.FromResult(config);
     }
 
-
     public static DefaultTusConfiguration CreateTusConfigurationForCleanupService(this IServiceProvider services)
     {
         var path = services.GetRequiredService<TusDiskStorageOptionHelper>().StorageDiskPath;

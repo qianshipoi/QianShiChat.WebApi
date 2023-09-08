@@ -1,6 +1,4 @@
-﻿using QianShiChat.Domain.Extensions;
-
-namespace QianShiChat.Infrastructure.Data.Interceptors;
+﻿namespace QianShiChat.Infrastructure.Data.Interceptors;
 
 public class AuditableInterceptor : SaveChangesInterceptor
 {

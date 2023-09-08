@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.Application.Repositories;
+﻿using QianShiChat.Application.Common.IRepositories;
+
+namespace QianShiChat.Infrastructure.Data.Repositories;
 
 public class AttachmentRepositiory : IAttachmentRepository, IScoped
 {

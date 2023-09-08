@@ -1,4 +1,4 @@
-﻿namespace QianShiChat.Application.Repositories;
+﻿namespace QianShiChat.Infrastructure.Data.Repositories;
 
 public class UnitOfWork : IUnitOfWork, IScoped
 {

@@ -1,8 +1,5 @@
 ﻿namespace QianShiChat.Application.Contracts;
 
-public record UploadAttachmentRequest([Required] IFormFile File);
-
-
 public class AttachmentDto
 {
     public int Id { get; set; }

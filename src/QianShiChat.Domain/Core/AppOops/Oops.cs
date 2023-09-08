@@ -1,6 +1,4 @@
-﻿using System.Net;
-
-namespace QianShiChat.Domain.Core.AppOops;
+﻿namespace QianShiChat.Domain.Core.AppOops;
 
 public static class Oops
 {

@@ -28,7 +28,6 @@ public class UserInfo : IAuditable, ISoftDelete
     public long UpdateTime { get; set; }
     public long DeleteTime { get; set; }
 
-    public MessageCursor Cursor { get; set; } = default!;
     public virtual ICollection<UserRealtion> Realtions { get; set; }
     public virtual ICollection<UserRealtion> Friends { get; set; }
     public virtual ICollection<FriendApply> FriendApplyUsers { get; set; }

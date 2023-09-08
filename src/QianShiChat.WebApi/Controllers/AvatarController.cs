@@ -18,13 +18,13 @@ public class AvatarController : BaseController
     [HttpGet("defaults")]
     [AllowAnonymous]
     public Task<PagedList<AvatarDto>> GetDefaultAvatars(
-        [FromQuery] QueryUserAvatar query,
+        [FromQuery] QueryUserAvatarRequest query,
         CancellationToken cancellationToken = default)
         => _avatarService.GetDefaultAvatarsAsync(query, cancellationToken);
 
     [HttpGet]
     public Task<PagedList<AvatarDto>> GetUserAvatars(
-        [FromQuery] QueryUserAvatar query,
+        [FromQuery] QueryUserAvatarRequest query,
         CancellationToken cancellationToken = default)
         => _avatarService.GetUserAvatarsAsync(CurrentUserId, query, cancellationToken);
 

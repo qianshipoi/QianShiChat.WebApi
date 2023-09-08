@@ -1,6 +1,6 @@
 ﻿namespace QianShiChat.Application.Contracts;
 
-public class CreateUserDto : IValidatableObject
+public class CreateUserRequest : IValidatableObject
 {
     [Required, Range(1, int.MaxValue)]
     public int DefaultAvatarId { get; set; }

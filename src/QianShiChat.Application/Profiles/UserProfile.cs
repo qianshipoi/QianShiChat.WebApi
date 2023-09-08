@@ -1,12 +1,10 @@
-﻿using QianShiChat.Domain.Extensions;
-
-namespace QianShiChat.Application.Profiles;
+﻿namespace QianShiChat.Application.Profiles;
 
 public class UserProfile : Profile
 {
     public UserProfile()
     {
-        CreateMap<CreateUserDto, UserInfo>()
+        CreateMap<CreateUserRequest, UserInfo>()
             .ForMember(d => d.CreateTime, m => m.MapFrom(s => Timestamp.Now));
 
         CreateMap<UserInfo, UserDto>()
@@ -17,14 +15,5 @@ public class UserProfile : Profile
 
         CreateMap<UserDto, UserWithMessage>()
             .ReverseMap();
-    }
-}
-
-public class AvatarProfile : Profile
-{
-    public AvatarProfile()
-    {
-        CreateMap<DefaultAvatar, AvatarDto>();
-        CreateMap<UserAvatar, AvatarDto>();
     }
 }

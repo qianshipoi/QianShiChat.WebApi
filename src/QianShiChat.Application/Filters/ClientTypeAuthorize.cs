@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace QianShiChat.Application.Filters;
+﻿namespace QianShiChat.Application.Filters;
 
 public class ClientTypeAuthorize : IAsyncAuthorizationFilter
 {

@@ -1,5 +1,4 @@
-﻿
-namespace QianShiChat.WebApi.Controllers;
+﻿namespace QianShiChat.WebApi.Controllers;
 
 /// <summary>
 /// attachment api

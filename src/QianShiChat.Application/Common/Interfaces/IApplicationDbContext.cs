@@ -8,7 +8,6 @@ public interface IApplicationDbContext
     DbSet<UserRealtion> UserRealtions { get; set; }
     DbSet<FriendApply> FriendApplies { get; set; }
     DbSet<ChatMessage> ChatMessages { get; set; }
-    DbSet<MessageCursor> MessageCursors { get; set; }
     DbSet<Group> Groups { get; set; }
     DbSet<UserGroupRealtion> UserGroupRealtions { get; set; }
     DbSet<GroupApply> GroupApplies { get; set; }

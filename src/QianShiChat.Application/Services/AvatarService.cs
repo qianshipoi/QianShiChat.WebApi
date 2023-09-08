@@ -38,7 +38,7 @@ public class AvatarService : IAvatarService, ITransient
         _fileService = fileService;
     }
 
-    public async Task<PagedList<AvatarDto>> GetUserAvatarsAsync(int userId, QueryUserAvatar query, CancellationToken cancellationToken = default)
+    public async Task<PagedList<AvatarDto>> GetUserAvatarsAsync(int userId, QueryUserAvatarRequest query, CancellationToken cancellationToken = default)
     {
         var data = await _context.UserAvatars
             .AsNoTracking()
@@ -58,7 +58,7 @@ public class AvatarService : IAvatarService, ITransient
         return PagedList.Create(data, query.Count);
     }
 
-    public async Task<PagedList<AvatarDto>> GetDefaultAvatarsAsync(QueryUserAvatar query, CancellationToken cancellationToken = default)
+    public async Task<PagedList<AvatarDto>> GetDefaultAvatarsAsync(QueryUserAvatarRequest query, CancellationToken cancellationToken = default)
     {
         var data = await _context.DefaultAvatars
            .AsNoTracking()

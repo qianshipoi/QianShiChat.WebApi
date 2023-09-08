@@ -38,14 +38,11 @@ public class QrCheckResponse
     /// 800 二维码不存在或已过期 801 等待扫码 802 授权中 803 授权成功
     /// </summary>
     public int Code { get; set; }
-
     public string Message { get; set; } = default!;
-
     /// <summary>
     /// 802 有值
     /// </summary>
     public UserDto? User { get; set; }
-
     /// <summary>
     /// 803 有值
     /// </summary>

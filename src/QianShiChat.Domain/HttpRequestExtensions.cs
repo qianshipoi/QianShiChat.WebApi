@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Primitives;
-
-namespace QianShiChat.Domain.Shared;
+﻿namespace QianShiChat.Domain.Shared;
 
 public static class HttpRequestExtensions
 {

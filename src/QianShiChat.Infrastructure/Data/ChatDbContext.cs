@@ -8,7 +8,6 @@ public class ChatDbContext : DbContext, IApplicationDbContext
     public DbSet<UserRealtion> UserRealtions { get; set; }
     public DbSet<FriendApply> FriendApplies { get; set; }
     public DbSet<ChatMessage> ChatMessages { get; set; }
-    public DbSet<MessageCursor> MessageCursors { get; set; }
     public DbSet<Group> Groups { get; set; }
     public DbSet<UserGroupRealtion> UserGroupRealtions { get; set; }
     public DbSet<GroupApply> GroupApplies { get; set; }

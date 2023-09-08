@@ -1,4 +1,4 @@
-﻿namespace QianShiChat.Application.Services;
+﻿namespace QianShiChat.Application.Common.IRepositories;
 
 public interface IAttachmentRepository
 {

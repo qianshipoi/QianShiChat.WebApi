@@ -1,4 +1,5 @@
-﻿using QianShiChat.Domain.Extensions;
+﻿using QianShiChat.Application.Common.IRepositories;
+using QianShiChat.Domain.Extensions;
 
 namespace QianShiChat.Application.Services;
 

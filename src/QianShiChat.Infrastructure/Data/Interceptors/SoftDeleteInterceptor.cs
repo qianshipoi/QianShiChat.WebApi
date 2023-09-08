@@ -1,6 +1,4 @@
-﻿using QianShiChat.Domain.Extensions;
-
-namespace QianShiChat.Domain.Core.Interceptors;
+﻿namespace QianShiChat.Domain.Core.Interceptors;
 
 public class SoftDeleteInterceptor : SaveChangesInterceptor
 {

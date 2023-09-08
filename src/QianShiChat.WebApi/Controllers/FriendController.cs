@@ -20,19 +20,6 @@ public class FriendController : BaseController
     }
 
     /// <summary>
-    /// unread message friends.
-    /// </summary>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    [HttpGet("unread")]
-    public async Task<ActionResult<List<UserWithMessage>>> GetAllUnreadMessageFriends(CancellationToken cancellationToken = default)
-    {
-        var friends = await _friendService
-            .GetNewMessageFriendsAsync(CurrentUserId, cancellationToken);
-        return Ok(friends);
-    }
-
-    /// <summary>
     /// get all friends.
     /// </summary>
     /// <param name="cancellationToken"></param>

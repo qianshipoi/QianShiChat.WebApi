@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.Application.Services;
+﻿using QianShiChat.Application.Common.IRepositories;
+
+namespace QianShiChat.Application.Services;
 
 public class SessionService : ISessionService, ITransient
 {
