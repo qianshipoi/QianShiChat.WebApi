@@ -29,7 +29,7 @@ public interface IFriendApplyService
     /// <param name="dto"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<FriendApplyDto> ApplyAsync(int userId, CreateFriendApplyDto dto, CancellationToken cancellationToken = default);
+    Task<FriendApplyDto> ApplyAsync(int userId, CreateFriendApplyRequest dto, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 更新申请时间
@@ -38,7 +38,7 @@ public interface IFriendApplyService
     /// <param name="dto"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<FriendApplyDto> UpdateApplyAsync(int userId, CreateFriendApplyDto dto, CancellationToken cancellationToken = default);
+    Task<FriendApplyDto> UpdateApplyAsync(int userId, CreateFriendApplyRequest dto, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 获取申请列表数量

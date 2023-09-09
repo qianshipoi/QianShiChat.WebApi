@@ -6,9 +6,9 @@ public class UserAvatar : ISoftDelete, IAuditable
     public int UserId { get; set; }
     public long CreateTime { get; set; }
     public long UpdateTime { get; set; }
-    public string Path { get; set; } = default!;
+    public string Path { get; set; } = string.Empty;
     public ulong Size { get; set; }
     public bool IsDeleted { get; set; }
     public long DeleteTime { get; set; }
-    public UserInfo User { get; set; } = default!;
+    public UserInfo? User { get; set; } 
 }

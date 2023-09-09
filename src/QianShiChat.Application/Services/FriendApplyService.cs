@@ -39,7 +39,7 @@ public class FriendApplyService : IFriendApplyService, ITransient
             .AnyAsync(cancellationToken);
     }
 
-    public async Task<FriendApplyDto> ApplyAsync(int userId, CreateFriendApplyDto dto, CancellationToken cancellationToken = default)
+    public async Task<FriendApplyDto> ApplyAsync(int userId, CreateFriendApplyRequest dto, CancellationToken cancellationToken = default)
     {
         var apply = _mapper.Map<FriendApply>(dto);
         apply.UserId = userId;
@@ -48,7 +48,7 @@ public class FriendApplyService : IFriendApplyService, ITransient
         return _mapper.Map<FriendApplyDto>(apply);
     }
 
-    public async Task<FriendApplyDto> UpdateApplyAsync(int userId, CreateFriendApplyDto dto, CancellationToken cancellationToken = default)
+    public async Task<FriendApplyDto> UpdateApplyAsync(int userId, CreateFriendApplyRequest dto, CancellationToken cancellationToken = default)
     {
         var apply = await _context.FriendApplies
             .Where(x => x.UserId == userId && x.FriendId == dto.UserId && x.Status == ApplyStatus.Applied)

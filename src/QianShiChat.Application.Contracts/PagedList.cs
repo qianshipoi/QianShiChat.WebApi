@@ -3,15 +3,10 @@
 public class PagedList<T> where T : class
 {
     public IEnumerable<T> Items { get; set; } = default!;
-
     public long Total { get; set; }
-
     public int CurrentPage { get; set; }
-
     public int CurrentSize { get; set; }
-
     public bool HasPrev { get; set; }
-
     public bool HasNext { get; set; }
 }
 

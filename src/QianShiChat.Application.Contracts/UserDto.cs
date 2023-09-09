@@ -3,15 +3,10 @@
 public class UserDto
 {
     public int Id { get; set; }
-
-    public string Account { get; set; } = default!;
-
-    public string Avatar { get; set; } = default!;
-
-    public string NickName { get; set; } = default!;
-
+    public string Account { get; set; } = string.Empty;
+    public string Avatar { get; set; } = string.Empty;
+    public string NickName { get; set; } = string.Empty;
     public long CreateTime { get; set; }
-
     public bool IsOnline { get; set; }
 }
 

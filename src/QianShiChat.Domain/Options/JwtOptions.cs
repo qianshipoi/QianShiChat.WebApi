@@ -6,17 +6,14 @@
 public class JwtOptions
 {
     public const string OptionsKey = "Authentication:Jwt";
-
     /// <summary>
     /// 加密key
     /// </summary>
     public string SecretKey { get; set; } = null!;
-
     /// <summary>
     /// 颁发者
     /// </summary>
     public string Issuer { get; set; } = null!;
-
     /// <summary>
     /// 接受者
     /// </summary>

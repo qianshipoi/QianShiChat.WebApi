@@ -41,7 +41,7 @@ public class AuthController : BaseController
     /// auth.
     /// </summary>
     [HttpPost]
-    public async Task<ActionResult<UserDto>> Auth([FromBody] UserAuthDto dto, CancellationToken cancellationToken = default)
+    public async Task<ActionResult<UserDto>> Auth([FromBody] UserAuthRequest dto, CancellationToken cancellationToken = default)
     {
         var userInfo = await _userService.GetUserByAccountAsync(dto.Account, cancellationToken);
 

@@ -5,10 +5,8 @@ public class SendTextMessageRequest
     [Required]
     [Range(1,int.MaxValue)]
     public int ToId { get; set; }
-
     [Required, MaxLength(255)]
     public string Message { get; set; } = default!;
-
     [Required]
     [EnumDataType(typeof(ChatMessageSendType))]
     public ChatMessageSendType SendType { get; set; }

@@ -6,7 +6,7 @@ public class AvatarDto
 
     public long CreateTime { get; set; }
 
-    public string Path { get; set; } = default!;
+    public string Path { get; set; } = string.Empty;
 
     public ulong Size { get; set; }
 }

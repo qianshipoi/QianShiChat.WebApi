@@ -2,7 +2,7 @@
 
 public class SessionDto
 {
-    public string Id { get; set; } = default!;
+    public string Id { get; set; } = string.Empty;
     public ChatMessageSendType Type { get; set; }
     public int FromId { get; set; }
     public int ToId { get; set; }

@@ -7,7 +7,7 @@ public class FriendApplyProfile : Profile
         CreateMap<FriendApply, FriendApplyDto>()
             .ReverseMap();
 
-        CreateMap<CreateFriendApplyDto, FriendApply>()
+        CreateMap<CreateFriendApplyRequest, FriendApply>()
             .ForMember(d => d.CreateTime, m => m.MapFrom(s => Timestamp.Now))
             .ForMember(d => d.UpdateTime, m => m.MapFrom((s, d) => d.CreateTime))
             .ForMember(d => d.FriendId, m => m.MapFrom(s => s.UserId))

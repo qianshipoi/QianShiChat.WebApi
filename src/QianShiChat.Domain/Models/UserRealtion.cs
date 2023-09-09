@@ -21,6 +21,6 @@ public class UserRealtion
     /// 创建时间
     /// </summary>
     public long CreateTime { get; set; }
-    public virtual UserInfo User { get; set; } = default!;
-    public virtual UserInfo Friend { get; set; } = default!;
+    public virtual UserInfo? User { get; set; }
+    public virtual UserInfo? Friend { get; set; }
 }

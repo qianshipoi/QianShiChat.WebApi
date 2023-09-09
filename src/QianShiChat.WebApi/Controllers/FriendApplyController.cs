@@ -38,7 +38,7 @@ public class FriendApplyController : BaseController
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<IActionResult> Apply([FromBody] CreateFriendApplyDto dto, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Apply([FromBody] CreateFriendApplyRequest dto, CancellationToken cancellationToken = default)
     {
         var friend = await _userService.GetUserByIdAsync(dto.UserId, cancellationToken);
         var user = await _userService.GetUserByIdAsync(CurrentUserId, cancellationToken);
@@ -85,9 +85,9 @@ public class FriendApplyController : BaseController
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet("Pending")]
-    public async Task<PagedList<FriendApplyDto>> Pending([FromQuery] QueryFriendApplyPendingDto dto, CancellationToken cancellationToken = default)
+    public async Task<PagedList<FriendApplyDto>> Pending([FromQuery] QueryFriendApplyPendingRequest dto, CancellationToken cancellationToken = default)
     {
-        var items = await _friendApplyService.GetPendingListByUserAsync(dto.Size, CurrentUserId, dto.BeforeLastTime, cancellationToken);
+        var items = await _friendApplyService.GetPendingListByUserAsync(dto.Size, CurrentUserId, dto.BeforeLastTime ?? 0, cancellationToken);
 
         var total = await _friendApplyService.GetPendingListCountByUserAsync(CurrentUserId, default);
 
@@ -96,7 +96,7 @@ public class FriendApplyController : BaseController
 
 
     [HttpDelete("{id:int}")]
-    public async Task DeleteById([FromRoute,Range(1, int.MaxValue)]int id, CancellationToken cancellationToken = default)
+    public async Task DeleteById([FromRoute, Range(1, int.MaxValue)] int id, CancellationToken cancellationToken = default)
     {
         await _friendApplyService.RemoveByIdAsync(id, cancellationToken);
     }
