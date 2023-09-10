@@ -12,7 +12,7 @@ public interface IApplicationDbContext
     DbSet<UserGroupRealtion> UserGroupRealtions { get; set; }
     DbSet<GroupApply> GroupApplies { get; set; }
     DbSet<Attachment> Attachments { get; set; }
-    DbSet<Session> Sessions { get; set; }
+    DbSet<Room> Rooms { get; set; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

@@ -1,6 +1,6 @@
 ﻿namespace QianShiChat.Domain.Models;
 
-public class Session : IAuditable, ISoftDelete
+public class Room : IAuditable, ISoftDelete
 {
     public string Id { get; set; } = default!;
     public ChatMessageSendType Type { get; set; }

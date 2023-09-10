@@ -20,7 +20,7 @@ public class ChatMessageEntityTypeConfiguration : IEntityTypeConfiguration<ChatM
         builder.Property(p => p.ToId)
             .IsRequired();
 
-        builder.Property(p => p.SessionId)
+        builder.Property(p => p.RoomId)
             .IsRequired()
             .HasMaxLength(32);
 

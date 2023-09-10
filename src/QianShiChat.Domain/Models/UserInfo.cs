@@ -13,7 +13,7 @@ public class UserInfo : IAuditable, ISoftDelete
         Groups = new HashSet<Group>();
         UserGroups = new HashSet<UserGroupRealtion>();
         Attachments = new HashSet<Attachment>();
-        Sessions = new HashSet<Session>();
+        Rooms = new HashSet<Room>();
         Messages = new HashSet<ChatMessage>();
     }
 
@@ -37,6 +37,6 @@ public class UserInfo : IAuditable, ISoftDelete
     public virtual ICollection<Group> Groups { get; set; }
     public virtual ICollection<UserGroupRealtion> UserGroups { get; set; }
     public virtual ICollection<Attachment> Attachments { get; set; }
-    public virtual ICollection<Session> Sessions { get; set; }
+    public virtual ICollection<Room> Rooms { get; set; }
     public virtual ICollection<ChatMessage> Messages { get; set; }
 }

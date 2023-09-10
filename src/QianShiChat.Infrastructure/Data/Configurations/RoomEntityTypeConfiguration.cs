@@ -1,8 +1,8 @@
 ﻿namespace QianShiChat.Infrastructure.Data.Configurations;
 
-public class RoomEntityTypeConfiguration : EntityTypeConfiguration<Session>
+public class RoomEntityTypeConfiguration : EntityTypeConfiguration<Room>
 {
-    public override void Configure(EntityTypeBuilder<Session> builder)
+    public override void Configure(EntityTypeBuilder<Room> builder)
     {
         builder.HasKey(p => new { p.Id, p.FromId });
         builder.HasIndex(p => p.Id);
@@ -12,7 +12,7 @@ public class RoomEntityTypeConfiguration : EntityTypeConfiguration<Session>
         builder.HasIndex(p => p.IsDeleted);
 
         builder.HasOne(e => e.FromUser)
-            .WithMany(e => e.Sessions)
+            .WithMany(e => e.Rooms)
             .HasForeignKey(e => e.FromId)
             .IsRequired(false);
 

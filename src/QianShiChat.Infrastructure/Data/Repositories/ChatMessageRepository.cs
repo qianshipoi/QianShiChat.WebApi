@@ -1,6 +1,4 @@
-﻿using QianShiChat.Application.Common.IRepositories;
-
-namespace QianShiChat.Infrastructure.Data.Repositories;
+﻿namespace QianShiChat.Infrastructure.Data.Repositories;
 
 public class ChatMessageRepository : IChatMessageRepository, IScoped
 {
@@ -11,18 +9,18 @@ public class ChatMessageRepository : IChatMessageRepository, IScoped
         _context = context;
     }
 
-    public async Task<int> GetUnreadCountAsync(string sessionId, long position, CancellationToken cancellationToken = default)
+    public async Task<int> GetUnreadCountAsync(string roomId, long position, CancellationToken cancellationToken = default)
     {
         return await _context.ChatMessages
-            .Where(x => x.SessionId == sessionId)
+            .Where(x => x.RoomId == roomId)
             .Where(x => x.Id > position)
             .CountAsync(cancellationToken);
     }
 
-    public async Task<ChatMessage?> GetLastMessageAsync(string sessionId, CancellationToken cancellationToken = default)
+    public async Task<ChatMessage?> GetLastMessageAsync(string roomId, CancellationToken cancellationToken = default)
     {
         return await _context.ChatMessages.AsNoTracking()
-            .Where(x => x.SessionId == sessionId)
+            .Where(x => x.RoomId == roomId)
             .OrderByDescending(x => x.Id)
             .FirstOrDefaultAsync(cancellationToken);
     }

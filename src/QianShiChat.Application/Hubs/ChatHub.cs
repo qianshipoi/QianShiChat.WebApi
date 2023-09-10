@@ -11,7 +11,7 @@ public class ChatHub : Hub<IChatClient>
     private string CurrentClientType => Context.User!.FindFirstValue(CustomClaim.ClientType)!;
 
     private readonly IFriendService _friendService;
-    private readonly ISessionService _sessionService;
+    private readonly IRoomService _roomService;
     private readonly IOnlineManager _onlineManager;
     private readonly OnlineDataTransmission _onlineDataTransmission;
 
@@ -19,17 +19,17 @@ public class ChatHub : Hub<IChatClient>
     /// chat hub.
     /// </summary>
     /// <param name="friendService"></param>
-    /// <param name="sessionService"></param>
+    /// <param name="roomService"></param>
     /// <param name="onlineManager"></param>
     /// <param name="onlineDataTransmission"></param>
     public ChatHub(
         IFriendService friendService,
-        ISessionService sessionService,
+        IRoomService roomService,
         IOnlineManager onlineManager,
         OnlineDataTransmission onlineDataTransmission)
     {
         _friendService = friendService;
-        _sessionService = sessionService;
+        _roomService = roomService;
         _onlineManager = onlineManager;
         _onlineDataTransmission = onlineDataTransmission;
     }
@@ -82,34 +82,22 @@ public class ChatHub : Hub<IChatClient>
 
     private static string FormatOnlineUserKey(string userId, string clientType) => $"{userId}_{clientType}";
 
-    public IAsyncEnumerable<SessionDto> GetSessionsAsync(CancellationToken cancellationToken)
+    public IAsyncEnumerable<RoomDto> GetRoomsAsync(CancellationToken cancellationToken)
     {
-        return _sessionService.GetRoomsAsync(CurrentUserId, cancellationToken);
+        return _roomService.GetRoomsAsync(CurrentUserId, cancellationToken);
     }
 
-    public async Task ReadPositionAsync(string sessionId, long position)
+    public async Task ReadPositionAsync(string roomId, long position)
     {
-        await _sessionService.UpdateSessionPositionAsync(CurrentUserId, sessionId, position);
+        await _roomService.UpdateRoomPositionAsync(CurrentUserId, roomId, position);
     }
 
-    public async IAsyncEnumerable<int> Counter(int count, int delay, [EnumeratorCancellation] CancellationToken cancellationToken)
+    public Task<RoomDto?> GetRoomAsync(int toId, ChatMessageSendType type)
     {
-        for (int i = 0; i < count; i++)
+        return _roomService.GetRoomAsync(CurrentUserId, type switch
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            yield return i;
-
-            await Task.Delay(delay);
-        }
-    }
-
-    public Task<SessionDto?> GetRoomAsync(int toId, ChatMessageSendType type)
-    {
-        return _sessionService.GetRoomAsync(CurrentUserId, type switch
-        {
-            ChatMessageSendType.Personal => AppConsts.GetPrivateChatSessionId(CurrentUserId, toId),
-            ChatMessageSendType.Group => AppConsts.GetGroupChatSessionId(CurrentUserId, toId),
+            ChatMessageSendType.Personal => AppConsts.GetPrivateChatRoomId(CurrentUserId, toId),
+            ChatMessageSendType.Group => AppConsts.GetGroupChatRoomId(CurrentUserId, toId),
             _ => throw new NotSupportedException()
         });
     }

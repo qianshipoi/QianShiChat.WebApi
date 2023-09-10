@@ -9,6 +9,7 @@ global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
 
 global using QianShiChat.Application.Common.Interfaces;
+global using QianShiChat.Application.Common.IRepositories;
 global using QianShiChat.Domain;
 global using QianShiChat.Domain.Core.AutoDI;
 global using QianShiChat.Domain.Core.Interceptors;

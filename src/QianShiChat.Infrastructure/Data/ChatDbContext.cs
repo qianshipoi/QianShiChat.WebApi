@@ -12,7 +12,7 @@ public class ChatDbContext : DbContext, IApplicationDbContext
     public DbSet<UserGroupRealtion> UserGroupRealtions { get; set; }
     public DbSet<GroupApply> GroupApplies { get; set; }
     public DbSet<Attachment> Attachments { get; set; }
-    public DbSet<Session> Sessions { get; set; }
+    public DbSet<Room> Rooms { get; set; }
 
     public ChatDbContext(DbContextOptions options) : base(options)
     {
@@ -159,14 +159,14 @@ public class ChatDbContext : DbContext, IApplicationDbContext
         };
         modelBuilder.Entity<UserRealtion>().HasData(urs);
 
-        var sessions = new List<Session>()
+        var rooms = new List<Room>()
         {
-            new Session { Id = AppConsts.GetPrivateChatSessionId(1,2), CreateTime = nowTime, FromId = 1, ToId = 2, MessagePosition = nowTime, UpdateTime = nowTime, Type = ChatMessageSendType.Personal  },
-            new Session { Id = AppConsts.GetPrivateChatSessionId(2,1), CreateTime = nowTime, FromId = 2, ToId = 1, MessagePosition = nowTime, UpdateTime = nowTime, Type = ChatMessageSendType.Personal  },
-            new Session { Id = AppConsts.GetPrivateChatSessionId(2,3), CreateTime = nowTime, FromId = 2, ToId = 3, MessagePosition = nowTime, UpdateTime = nowTime, Type = ChatMessageSendType.Personal  },
-            new Session { Id = AppConsts.GetPrivateChatSessionId(3,2), CreateTime = nowTime, FromId = 3, ToId = 2, MessagePosition = nowTime, UpdateTime = nowTime, Type = ChatMessageSendType.Personal  },
+            new Room { Id = AppConsts.GetPrivateChatRoomId(1,2), CreateTime = nowTime, FromId = 1, ToId = 2, MessagePosition = nowTime, UpdateTime = nowTime, Type = ChatMessageSendType.Personal  },
+            new Room { Id = AppConsts.GetPrivateChatRoomId(2,1), CreateTime = nowTime, FromId = 2, ToId = 1, MessagePosition = nowTime, UpdateTime = nowTime, Type = ChatMessageSendType.Personal  },
+            new Room { Id = AppConsts.GetPrivateChatRoomId(2,3), CreateTime = nowTime, FromId = 2, ToId = 3, MessagePosition = nowTime, UpdateTime = nowTime, Type = ChatMessageSendType.Personal  },
+            new Room { Id = AppConsts.GetPrivateChatRoomId(3,2), CreateTime = nowTime, FromId = 3, ToId = 2, MessagePosition = nowTime, UpdateTime = nowTime, Type = ChatMessageSendType.Personal  },
         };
-        modelBuilder.Entity<Session>().HasData(sessions);
+        modelBuilder.Entity<Room>().HasData(rooms);
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {

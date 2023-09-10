@@ -51,9 +51,9 @@ public class AppConsts
         return id1 > id2 ? $"{id2}-{id1}" : $"{id1}-{id2}";
     }
 
-    public static string GetPrivateChatSessionId(int id1, int id2) => $"personal-{GetPrivateChatCacheKey(id1, id2)}";
+    public static string GetPrivateChatRoomId(int id1, int id2) => $"personal-{GetPrivateChatCacheKey(id1, id2)}";
 
-    public static string GetGroupChatSessionId(int id1, int id2) => $"group-{id1}-{id2}";
+    public static string GetGroupChatRoomId(int id1, int id2) => $"group-{id1}-{id2}";
 
     /// <summary>
     /// get group chat cache key.

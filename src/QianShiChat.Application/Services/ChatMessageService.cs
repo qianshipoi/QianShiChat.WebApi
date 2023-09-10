@@ -10,8 +10,8 @@ public class ChatMessageService : IChatMessageService, ITransient
 {
     public static Dictionary<ChatMessageSendType, Func<int, int, string>> SendTypeMapper = new()
     {
-        { ChatMessageSendType.Personal, AppConsts.GetPrivateChatSessionId },
-        { ChatMessageSendType.Group, AppConsts.GetGroupChatSessionId },
+        { ChatMessageSendType.Personal, AppConsts.GetPrivateChatRoomId },
+        { ChatMessageSendType.Group, AppConsts.GetGroupChatRoomId },
     };
 
     private readonly IApplicationDbContext _context;
@@ -19,7 +19,7 @@ public class ChatMessageService : IChatMessageService, ITransient
     private readonly IHubContext<ChatHub, IChatClient> _hubContext;
     private readonly IFileService _fileService;
     private readonly IUserManager _userManager;
-    private readonly ISessionService _sessionService;
+    private readonly IRoomService _roomService;
     private readonly IAttachmentRepository _attachmentRepository;
 
     /// <summary>
@@ -31,7 +31,7 @@ public class ChatMessageService : IChatMessageService, ITransient
         IHubContext<ChatHub, IChatClient> hubContext,
         IFileService fileService,
         IUserManager userManager,
-        ISessionService sessionService,
+        IRoomService roomService,
         IAttachmentRepository attachmentRepository)
     {
         _context = context;
@@ -39,14 +39,14 @@ public class ChatMessageService : IChatMessageService, ITransient
         _hubContext = hubContext;
         _fileService = fileService;
         _userManager = userManager;
-        _sessionService = sessionService;
+        _roomService = roomService;
         _attachmentRepository = attachmentRepository;
     }
 
     public Task<PagedList<ChatMessageDto>> GetGroupHistoryAsync(int toId, QueryMessagesRequest request, CancellationToken cancellationToken = default)
     {
-        var sessionId = GetRoomId(_userManager.CurrentUserId, toId, ChatMessageSendType.Group);
-        return GetHistoryAsync(sessionId, request, cancellationToken);
+        var roomId = GetRoomId(_userManager.CurrentUserId, toId, ChatMessageSendType.Group);
+        return GetHistoryAsync(roomId, request, cancellationToken);
     }
 
     public async Task<PagedList<ChatMessageDto>> GetHistoryAsync(string roomId, QueryMessagesRequest request, CancellationToken cancellationToken = default)
@@ -54,7 +54,7 @@ public class ChatMessageService : IChatMessageService, ITransient
         var queryable = _context.ChatMessages
             .AsNoTracking()
             .OrderByDescending(x => x.CreateTime)
-            .Where(x => x.SessionId == roomId)
+            .Where(x => x.RoomId == roomId)
             .Where(x => x.SendType == ChatMessageSendType.Personal);
 
         var messages = await queryable
@@ -87,8 +87,8 @@ public class ChatMessageService : IChatMessageService, ITransient
 
     public Task<PagedList<ChatMessageDto>> GetUserHistoryAsync(int userId, QueryMessagesRequest request, CancellationToken cancellationToken = default)
     {
-        var sessionId = GetRoomId(_userManager.CurrentUserId, userId, ChatMessageSendType.Personal);
-        return GetHistoryAsync(sessionId, request, cancellationToken);
+        var roomId = GetRoomId(_userManager.CurrentUserId, userId, ChatMessageSendType.Personal);
+        return GetHistoryAsync(roomId, request, cancellationToken);
     }
 
     public async Task<ChatMessageDto> SendMessageAsync(ChatMessage chatMessage, CancellationToken cancellationToken = default)
@@ -122,7 +122,7 @@ public class ChatMessageService : IChatMessageService, ITransient
             throw new NotSupportedException();
         }
 
-        await _sessionService.AddOrUpdatePositionAsync(
+        await _roomService.AddOrUpdatePositionAsync(
             chatMessage.FromId,
             chatMessage.ToId,
             chatMessage.SendType,
@@ -143,7 +143,7 @@ public class ChatMessageService : IChatMessageService, ITransient
             Id = YitIdHelper.NextId(),
             Content = request.Message,
             CreateTime = now,
-            SessionId = GetRoomId(_userManager.CurrentUserId, request.ToId, request.SendType),
+            RoomId = GetRoomId(_userManager.CurrentUserId, request.ToId, request.SendType),
             FromId = _userManager.CurrentUserId,
             ToId = request.ToId,
             UpdateTime = now,
@@ -174,7 +174,7 @@ public class ChatMessageService : IChatMessageService, ITransient
             CreateTime = now,
             FromId = _userManager.CurrentUserId,
             ToId = request.ToId,
-            SessionId = GetRoomId(_userManager.CurrentUserId, request.ToId, request.SendType),
+            RoomId = GetRoomId(_userManager.CurrentUserId, request.ToId, request.SendType),
             UpdateTime = now,
             MessageType = dto.ContentType.ToLower() switch
             {

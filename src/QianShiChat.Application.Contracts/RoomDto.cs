@@ -1,6 +1,6 @@
 ﻿namespace QianShiChat.Application.Contracts;
 
-public class SessionDto
+public class RoomDto
 {
     public string Id { get; set; } = string.Empty;
     public ChatMessageSendType Type { get; set; }
