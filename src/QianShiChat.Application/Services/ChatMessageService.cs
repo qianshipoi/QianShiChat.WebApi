@@ -1,4 +1,5 @@
 ﻿using QianShiChat.Application.Common.IRepositories;
+using QianShiChat.Application.Contracts;
 using QianShiChat.Domain.Extensions;
 
 namespace QianShiChat.Application.Services;
@@ -43,13 +44,13 @@ public class ChatMessageService : IChatMessageService, ITransient
         _attachmentRepository = attachmentRepository;
     }
 
-    public Task<PagedList<ChatMessageDto>> GetGroupHistoryAsync(int toId, QueryMessagesRequest request, CancellationToken cancellationToken = default)
+    public Task<PagedList<ChatMessageDto>> GetGroupHistoryAsync(int toId, QueryMessageRequest request, CancellationToken cancellationToken = default)
     {
         var roomId = GetRoomId(_userManager.CurrentUserId, toId, ChatMessageSendType.Group);
         return GetHistoryAsync(roomId, request, cancellationToken);
     }
 
-    public async Task<PagedList<ChatMessageDto>> GetHistoryAsync(string roomId, QueryMessagesRequest request, CancellationToken cancellationToken = default)
+    public async Task<PagedList<ChatMessageDto>> GetHistoryAsync(string roomId, QueryMessageRequest request, CancellationToken cancellationToken = default)
     {
         var queryable = _context.ChatMessages
             .AsNoTracking()
@@ -85,7 +86,7 @@ public class ChatMessageService : IChatMessageService, ITransient
         return PagedList.Create(messageDtos, total, request.Size);
     }
 
-    public Task<PagedList<ChatMessageDto>> GetUserHistoryAsync(int userId, QueryMessagesRequest request, CancellationToken cancellationToken = default)
+    public Task<PagedList<ChatMessageDto>> GetUserHistoryAsync(int userId, QueryMessageRequest request, CancellationToken cancellationToken = default)
     {
         var roomId = GetRoomId(_userManager.CurrentUserId, userId, ChatMessageSendType.Personal);
         return GetHistoryAsync(roomId, request, cancellationToken);

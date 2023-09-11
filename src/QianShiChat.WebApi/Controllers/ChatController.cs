@@ -49,7 +49,7 @@ public class ChatController : BaseController
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet("{roomId}/history")]
-    public Task<PagedList<ChatMessageDto>> GetHistory([FromRoute] string roomId, [FromQuery] QueryMessagesRequest request, CancellationToken cancellationToken = default)
+    public Task<PagedList<ChatMessageDto>> GetHistory([FromRoute] string roomId, [FromQuery] QueryMessageRequest request, CancellationToken cancellationToken = default)
     {
         return _chatMessageService.GetHistoryAsync(roomId, request, cancellationToken);
     }

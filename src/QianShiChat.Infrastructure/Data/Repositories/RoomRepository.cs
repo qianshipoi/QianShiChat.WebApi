@@ -15,12 +15,17 @@ public class RoomRepository : IRoomRepository, IScoped
     }
 
     public async Task<bool> RoomExistsAsync(int fromId, string id, CancellationToken cancellationToken = default)
-        => await _context.Rooms.Where(x => x.FromId == fromId && x.Id == id).AnyAsync(cancellationToken);
+        => await _context.Rooms
+            .Where(x => x.FromId == fromId && x.Id == id)
+            .AnyAsync(cancellationToken);
 
     public async Task<Room?> FindAsync(int fromId, string id, CancellationToken cancellationToken = default)
     {
-        return await _context.Rooms.Where(x => x.FromId == fromId && x.Id == id).FirstOrDefaultAsync(cancellationToken);
+        return await _context.Rooms
+            .Where(x => x.FromId == fromId && x.Id == id)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task AddAsync(Room room, CancellationToken cancellationToken = default) => await _context.Rooms.AddAsync(room, cancellationToken);
+    public async Task AddAsync(Room room, CancellationToken cancellationToken = default) 
+        => await _context.Rooms.AddAsync(room, cancellationToken);
 }
