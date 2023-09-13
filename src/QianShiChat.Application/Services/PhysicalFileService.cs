@@ -118,6 +118,10 @@ public class PhysicalFileService : IFileService, IScoped
                 image.Save(prevPath);
                 previewPath = FormatPublicFile(absPrevFilepath);
             }
+            else
+            {
+                absPrevFilepath = absFilepath;
+            }
 
             stream.Seek(0, SeekOrigin.Begin);
         }
