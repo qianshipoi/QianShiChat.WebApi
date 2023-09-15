@@ -13,4 +13,9 @@ public class AttachmentRepositiory : IAttachmentRepository, IScoped
     {
         return await _chatDbContext.Attachments.FindAsync(new object[] { id }, cancellationToken);
     }
+
+    public async Task<List<Attachment>> GetByIdsAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default)
+    {
+        return await _chatDbContext.Attachments.Where(x => ids.Contains(x.Id)).ToListAsync(cancellationToken);
+    }
 }

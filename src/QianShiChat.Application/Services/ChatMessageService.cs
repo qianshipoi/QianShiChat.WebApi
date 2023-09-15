@@ -1,8 +1,4 @@
-﻿using QianShiChat.Application.Common.IRepositories;
-using QianShiChat.Application.Contracts;
-using QianShiChat.Domain.Extensions;
-
-namespace QianShiChat.Application.Services;
+﻿namespace QianShiChat.Application.Services;
 
 /// <summary>
 /// chat message service
@@ -55,6 +51,7 @@ public class ChatMessageService : IChatMessageService, ITransient
         var queryable = _context.ChatMessages
             .AsNoTracking()
             .OrderByDescending(x => x.CreateTime)
+            .Include(x => x.Attachments)
             .Where(x => x.RoomId == roomId)
             .Where(x => x.SendType == ChatMessageSendType.Personal);
 
@@ -67,23 +64,33 @@ public class ChatMessageService : IChatMessageService, ITransient
             .CountAsync(cancellationToken);
         var messageDtos = _mapper.Map<List<ChatMessageDto>>(messages);
 
-        Parallel.ForEach(messageDtos, message => {
-            if (message.MessageType != ChatMessageType.Text
-                && message.Content is not null
-                && message.Content is string content
-                && !string.IsNullOrWhiteSpace(content))
-            {
-                var attachment = JsonSerializer.Deserialize<Attachment>(content);
-                if (attachment is not null)
-                {
-                    var attachmentDto = _mapper.Map<AttachmentDto>(attachment);
-                    FormatAttachment(attachmentDto);
-                    message.Content = attachmentDto;
-                }
-            }
-        });
+        Parallel.ForEach(messageDtos, FormatAttachmentMessage);
 
         return PagedList.Create(messageDtos, total, request.Size);
+    }
+
+    private void FormatAttachmentMessage(ChatMessageDto message)
+    {
+        if (message.MessageType is not ChatMessageType.Text
+        && message.Content is not null
+           && message.Content is string content
+           && !string.IsNullOrWhiteSpace(content))
+        {
+            if (content.StartsWith("["))
+            {
+                var attachments = JsonSerializer.Deserialize<List<Attachment>>(content)!;
+                var attachmentDtos = _mapper.Map<List<AttachmentDto>>(attachments);
+                attachmentDtos.ForEach(FormatAttachment);
+                message.Content = attachmentDtos;
+            }
+            else
+            {
+                var attachment = JsonSerializer.Deserialize<Attachment>(content)!;
+                var attachmentDto = _mapper.Map<AttachmentDto>(attachment);
+                FormatAttachment(attachmentDto);
+                message.Content = attachmentDto;
+            }
+        }
     }
 
     public Task<PagedList<ChatMessageDto>> GetUserHistoryAsync(int userId, QueryMessageRequest request, CancellationToken cancellationToken = default)
@@ -95,16 +102,7 @@ public class ChatMessageService : IChatMessageService, ITransient
     public async Task<ChatMessageDto> SendMessageAsync(ChatMessage chatMessage, CancellationToken cancellationToken = default)
     {
         var chatMessageDto = _mapper.Map<ChatMessageDto>(chatMessage);
-        if (chatMessageDto.MessageType is not ChatMessageType.Text
-            && chatMessageDto.Content is not null
-            && chatMessageDto.Content is string content
-            && !string.IsNullOrWhiteSpace(content))
-        {
-            var attachment = JsonSerializer.Deserialize<Attachment>(content)!;
-            var attachmentDto = _mapper.Map<AttachmentDto>(attachment);
-            FormatAttachment(attachmentDto);
-            chatMessageDto.Content = attachmentDto;
-        }
+        FormatAttachmentMessage(chatMessageDto);
 
         if (chatMessageDto.SendType == ChatMessageSendType.Personal)
         {
@@ -184,10 +182,56 @@ public class ChatMessageService : IChatMessageService, ITransient
                 "image/gif" => ChatMessageType.Image,
                 "image/x-icon" => ChatMessageType.Image,
                 "video/mpeg4" => ChatMessageType.Video,
+                "audio/mpeg" => ChatMessageType.Audio,
                 _ => ChatMessageType.OtherFile
             },
             SendType = request.SendType
         };
+        chatMessage.Attachments.Add(attachment);
+
+        return await SendMessageAsync(chatMessage);
+    }
+
+    public async Task<ChatMessageDto> SendFilesAsync(SendFilesMessageRequest request, CancellationToken cancellationToken = default)
+    {
+        var now = Timestamp.Now;
+        var attachments = await _attachmentRepository.GetByIdsAsync(request.AttachmentIds, cancellationToken);
+
+        if (!attachments.Any())
+        {
+            throw Oops.Bah("attachment not exists.");
+        }
+
+        var dtos = _mapper.Map<List<AttachmentDto>>(attachments);
+        dtos.ForEach(FormatAttachment);
+        ChatMessageType messageType = ChatMessageType.OtherFile;
+        if (dtos.Count == 1)
+        {
+            messageType = dtos[0].ContentType.ToLower() switch
+            {
+                "image/png" => ChatMessageType.Image,
+                "image/jpeg" => ChatMessageType.Image,
+                "image/gif" => ChatMessageType.Image,
+                "image/x-icon" => ChatMessageType.Image,
+                "video/mpeg4" => ChatMessageType.Video,
+                "audio/mpeg" => ChatMessageType.Audio,
+                _ => ChatMessageType.OtherFile
+            };
+        }
+
+        var chatMessage = new ChatMessage()
+        {
+            Id = YitIdHelper.NextId(),
+            Content = JsonSerializer.Serialize(dtos),
+            CreateTime = now,
+            FromId = _userManager.CurrentUserId,
+            ToId = request.ToId,
+            RoomId = GetRoomId(_userManager.CurrentUserId, request.ToId, request.SendType),
+            UpdateTime = now,
+            MessageType = messageType,
+            SendType = request.SendType
+        };
+        attachments.ForEach(chatMessage.Attachments.Add);
 
         return await SendMessageAsync(chatMessage);
     }

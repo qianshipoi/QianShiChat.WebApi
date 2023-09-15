@@ -11,4 +11,6 @@ public class ChatMessageDto
     public object Content { get; set; } = string.Empty;
     public long CreateTime { get; set; }
     public UserDto? FromUser { get; set; }
+
+    public List<AttachmentDto> Attachments { get; set; } = new List<AttachmentDto>();
 }

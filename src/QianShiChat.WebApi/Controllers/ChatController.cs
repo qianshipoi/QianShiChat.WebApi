@@ -42,6 +42,18 @@ public class ChatController : BaseController
     }
 
     /// <summary>
+    /// send files message.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    [HttpPost("files")]
+    public async Task<ChatMessageDto> SendFiles([FromBody] SendFilesMessageRequest request, CancellationToken cancellationToken = default)
+    {
+        return await _chatMessageService.SendFilesAsync(request, cancellationToken);
+    }
+
+    /// <summary>
     /// get room history.
     /// </summary>
     /// <param name="roomId">room id</param>

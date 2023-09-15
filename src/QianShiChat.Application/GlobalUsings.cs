@@ -19,6 +19,7 @@ global using Microsoft.Extensions.Options;
 global using Microsoft.IdentityModel.Tokens;
 
 global using QianShiChat.Application.Common.Interfaces;
+global using QianShiChat.Application.Common.IRepositories;
 global using QianShiChat.Application.Contracts;
 global using QianShiChat.Application.Filters;
 global using QianShiChat.Application.Hubs;
