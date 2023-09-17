@@ -1,5 +1,7 @@
 ﻿using QianShiChat.Domain.Extensions;
+using QianShiChat.Domain.Models;
 
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 
 namespace QianShiChat.Application.Services;
@@ -11,14 +13,22 @@ public class GroupService : IGroupService, ITransient
     private readonly IMapper _mapper;
     private readonly IUserService _userService;
     private readonly IFileService _fileService;
+    private readonly IHubContext<ChatHub, IChatClient> _hubContext;
 
-    public GroupService(IApplicationDbContext context, ILogger<GroupService> logger, IMapper mapper, IUserService userService, IFileService fileService)
+    public GroupService(
+        IApplicationDbContext context,
+        ILogger<GroupService> logger,
+        IMapper mapper,
+        IUserService userService,
+        IFileService fileService,
+        IHubContext<ChatHub, IChatClient> hubContext)
     {
         _context = context;
         _logger = logger;
         _mapper = mapper;
         _userService = userService;
         _fileService = fileService;
+        _hubContext = hubContext;
     }
 
     /// <summary>
@@ -124,7 +134,6 @@ public class GroupService : IGroupService, ITransient
                 Remark = request.Remark,
                 Status = ApplyStatus.Applied,
             };
-
             await _context.GroupApplies.AddAsync(apply, cancellationToken);
         }
         else
@@ -201,6 +210,61 @@ public class GroupService : IGroupService, ITransient
 
         dtos.ForEach(FormatGroupAvatar);
         return dtos;
+    }
+
+    public async Task ApplyAsync(int userId, GroupApplyRequest request, CancellationToken cancellationToken = default)
+    {
+        var userInfo = await _context.UserInfos
+            .Where(x => x.Id == userId && !x.IsDeleted)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (userInfo == null) throw Oops.Bah("user not found.");
+
+        var group = await _context.Groups
+            .AsNoTracking()
+            .Where(x => x.Id == request.GroupId && !x.IsDeleted)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (group is null) throw Oops.Bah("group not found.");
+
+        var entity = await _context.GroupApplies
+            .Where(x => x.GroupId == request.GroupId && x.UserId == userId && x.Status == ApplyStatus.Applied && !x.IsDeleted)
+            .FirstOrDefaultAsync(cancellationToken);
+        var now = Timestamp.Now;
+
+        if (entity is null)
+        {
+            entity = new GroupApply
+            {
+                CreateTime = now,
+                GroupId = request.GroupId,
+                Status = ApplyStatus.Applied,
+                UpdateTime = now,
+                UserId = userId,
+            };
+            _context.GroupApplies.Add(entity);
+        }
+        entity.Remark = request.Remark;
+
+        // save
+        try
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "join group apply error.");
+            throw Oops.Oh();
+        }
+
+        // send group apply message.
+        _ = SendApplyNotify(group, userInfo);
+    }
+
+    private async Task SendApplyNotify(Group group, UserInfo user)
+    {
+        var dto = new GroupApplyDto(_mapper.Map<GroupDto>(group), _mapper.Map<UserDto>(user));
+        await _hubContext.Clients.User(group.UserId.ToString()).Notification(new NotificationMessage(NotificationType.GroupApply, dto));
     }
 
     private void FormatGroupAvatar(GroupDto item)

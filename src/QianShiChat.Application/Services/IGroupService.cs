@@ -2,6 +2,7 @@
 
 public interface IGroupService
 {
+    Task ApplyAsync(int userId, GroupApplyRequest request, CancellationToken cancellationToken = default);
     Task ApplyJoin(int userId, int id, JoinGroupRequest request, CancellationToken cancellationToken = default);
     Task<GroupDto> Create(int userId, string name, CancellationToken cancellationToken = default);
     Task<GroupDto> CreateByFriendAsync(int userId, CreateGroupRequest request, CancellationToken cancellationToken = default);

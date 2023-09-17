@@ -76,3 +76,11 @@ public class UserAuthRequest
     [Required, MaxLength(32)]
     public string Password { get; set; } = string.Empty;
 }
+
+public class GroupApplyRequest
+{
+    [Required, Range(1, int.MaxValue)]
+    public int GroupId { get; set; }
+    [MaxLength(50)]
+    public string? Remark { get; set; }
+}

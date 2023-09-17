@@ -16,41 +16,31 @@ public class GroupController : BaseController
     }
 
     [HttpGet]
-    public async Task<List<GroupDto>> GetMyGroupsAsync(CancellationToken cancellationToken = default)
-    {
-        return await _groupService.GetAllByUserIdAsync(CurrentUserId, cancellationToken);
-    }
+    public Task<List<GroupDto>> GetMyGroupsAsync(CancellationToken cancellationToken = default)
+        => _groupService.GetAllByUserIdAsync(CurrentUserId, cancellationToken);
 
     [HttpPost]
-    public async Task<GroupDto> CreateAsync(
+    public Task<GroupDto> CreateAsync(
         [FromBody] CreateGroupRequest request,
         CancellationToken cancellationToken = default)
-    {
-        return await _groupService.CreateByFriendAsync(CurrentUserId, request, cancellationToken);
-    }
+         => _groupService.CreateByFriendAsync(CurrentUserId, request, cancellationToken);
 
     [HttpPost("{id:int}/join")]
-    public async Task JoinAsync(
+    public Task JoinAsync(
         [FromRoute, Range(1, int.MaxValue)] int id,
         [FromBody] JoinGroupRequest request,
         CancellationToken cancellationToken = default)
-    {
-        await _groupService.ApplyJoin(CurrentUserId, id, request, cancellationToken);
-    }
+        => _groupService.ApplyJoin(CurrentUserId, id, request, cancellationToken);
 
     [HttpDelete("{id:int}")]
-    public async Task DeleteAsync(
+    public Task DeleteAsync(
         [FromRoute, Range(1, int.MaxValue)] int id,
         CancellationToken cancellationToken = default)
-    {
-        await _groupService.Delete(CurrentUserId, id, cancellationToken);
-    }
+        => _groupService.Delete(CurrentUserId, id, cancellationToken);
 
     [HttpDelete("{id:int}/leave")]
-    public async Task LeaveAsync(
+    public Task LeaveAsync(
         [FromRoute, Range(1, int.MaxValue)] int id,
         CancellationToken cancellationToken = default)
-    {
-        await _groupService.Leave(CurrentUserId, id, cancellationToken);
-    }
+        => _groupService.Leave(CurrentUserId, id, cancellationToken);
 }

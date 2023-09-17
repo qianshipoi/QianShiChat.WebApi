@@ -33,6 +33,8 @@ public enum NotificationType
     FriendApply,
     /// <summary> 新好友 </summary>
     NewFriend,
+    /// <summary> 加群申请 </summary>
+    GroupApply,
     /// <summary> 强制注销（其他地方登录） </summary>
     Signed,
     /// <summary> 询问在线文件传输 </summary>
