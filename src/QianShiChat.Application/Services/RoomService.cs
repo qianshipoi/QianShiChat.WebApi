@@ -30,6 +30,7 @@ public class RoomService : IRoomService, ITransient
             ChatMessageType.Image => typeof(Attachment),
             ChatMessageType.Video => typeof(Attachment),
             ChatMessageType.OtherFile => typeof(Attachment),
+            ChatMessageType.Audio => typeof(Attachment),
             _ => throw new NotSupportedException()
         };
 
