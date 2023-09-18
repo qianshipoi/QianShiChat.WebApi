@@ -285,6 +285,30 @@ public class GroupService : IGroupService, ITransient
         return PagedList.Create(data, total, request.Size);
     }
 
+    public async Task<PagedList<GroupDto>> SearchGroupAsync(GroupSearchRequest request, CancellationToken cancellationToken = default)
+    {
+        var query = _context.Groups.Where(x => !x.IsDeleted);
+        if (!string.IsNullOrWhiteSpace(request.Search))
+        {
+            if (int.TryParse(request.Search, out var id))
+            {
+                query = query.Where(x => x.Id == id || x.Name.Contains(request.Search));
+            }
+            else
+            {
+                query = query.Where(x => x.Name.Contains(request.Search));
+            }
+        }
+        var total = await query.CountAsync(cancellationToken);
+        var list = await query.OrderByDescending(x => x.CreateTime)
+            .Skip((request.Page - 1) * request.Size)
+            .Take(request.Size)
+            .ProjectTo<GroupDto>(_mapper.ConfigurationProvider)
+            .ToListAsync(cancellationToken);
+        list.ForEach(FormatGroupAvatar);
+        return PagedList.Create(list, total, request.Size);
+    }
+
     private async Task SendNewGroup(Group group, int userId)
     {
         await _hubContext.Clients.User(userId.ToString())

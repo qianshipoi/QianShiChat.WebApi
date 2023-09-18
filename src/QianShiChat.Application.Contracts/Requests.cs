@@ -40,6 +40,12 @@ public class BasePagedRequest
     public virtual int Size { get; set; } = 30;
 }
 
+public class GroupSearchRequest : BasePagedRequest
+{
+    [MaxLength(32)]
+    public string? Search { get; set; }
+}
+
 public class QueryMessageRequest: BasePagedRequest
 {
 

@@ -12,5 +12,6 @@ public class FriendApplyProfile : Profile
             .ForMember(d => d.UpdateTime, m => m.MapFrom((s, d) => d.CreateTime))
             .ForMember(d => d.FriendId, m => m.MapFrom(s => s.UserId))
             .ForMember(d => d.Status, m => m.MapFrom(s => ApplyStatus.Applied));
+
     }
 }
