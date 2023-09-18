@@ -35,6 +35,8 @@ public enum NotificationType
     NewFriend,
     /// <summary> 加群申请 </summary>
     GroupApply,
+    /// <summary> 新群组 </summary>
+    NewGroup,
     /// <summary> 强制注销（其他地方登录） </summary>
     Signed,
     /// <summary> 询问在线文件传输 </summary>

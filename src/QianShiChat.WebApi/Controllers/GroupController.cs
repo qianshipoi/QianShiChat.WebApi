@@ -28,19 +28,41 @@ public class GroupController : BaseController
     [HttpPost("{id:int}/join")]
     public Task JoinAsync(
         [FromRoute, Range(1, int.MaxValue)] int id,
-        [FromBody] JoinGroupRequest request,
+        [FromBody] GroupApplyRequest request,
         CancellationToken cancellationToken = default)
-        => _groupService.ApplyJoin(CurrentUserId, id, request, cancellationToken);
+        => _groupService.ApplyAsync(id, CurrentUserId, request, cancellationToken);
 
     [HttpDelete("{id:int}")]
     public Task DeleteAsync(
         [FromRoute, Range(1, int.MaxValue)] int id,
         CancellationToken cancellationToken = default)
-        => _groupService.Delete(CurrentUserId, id, cancellationToken);
+        => _groupService.DeleteAsync(CurrentUserId, id, cancellationToken);
 
     [HttpDelete("{id:int}/leave")]
     public Task LeaveAsync(
         [FromRoute, Range(1, int.MaxValue)] int id,
         CancellationToken cancellationToken = default)
-        => _groupService.Leave(CurrentUserId, id, cancellationToken);
+        => _groupService.LeaveAsync(CurrentUserId, id, cancellationToken);
+
+    [HttpGet("apply/pending")]
+    public Task<PagedList<GroupApplyDto>> GetApplyPendingAsync([FromQuery] QueryGroupApplyPendingRequest request, CancellationToken cancellationToken = default)
+        => _groupService.GetApplyPendingAsync(CurrentUserId, request, cancellationToken);
+
+    [HttpPut("approval/{applyId:int}/pass")]
+    public Task ApprovalPassAync(
+        [FromRoute, Range(1, int.MaxValue)] int applyId, 
+        CancellationToken cancellationToken = default)
+        => _groupService.ApprovalAync(applyId, CurrentUserId, ApplyStatus.Passed, cancellationToken);
+
+    [HttpPut("approval/{applyId:int}/reject")]
+    public Task ApprovalRejectAync(
+        [FromRoute, Range(1, int.MaxValue)] int applyId,
+        CancellationToken cancellationToken = default)
+        => _groupService.ApprovalAync(applyId, CurrentUserId, ApplyStatus.Rejected, cancellationToken);
+
+    [HttpPut("approval/{applyId:int}/ignore")]
+    public Task ApprovalIgnoreAync(
+        [FromRoute, Range(1, int.MaxValue)] int applyId, 
+        CancellationToken cancellationToken = default)
+        => _groupService.ApprovalAync(applyId, CurrentUserId, ApplyStatus.Ignored, cancellationToken);
 }

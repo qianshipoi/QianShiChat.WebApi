@@ -1,10 +1,4 @@
-﻿using QianShiChat.Domain.Extensions;
-using QianShiChat.Domain.Models;
-
-using System.ComponentModel.DataAnnotations;
-using System.Net;
-
-namespace QianShiChat.Application.Services;
+﻿namespace QianShiChat.Application.Services;
 
 public class GroupService : IGroupService, ITransient
 {
@@ -38,7 +32,7 @@ public class GroupService : IGroupService, ITransient
     /// <param name="name"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task<GroupDto> Create(int userId, string name, CancellationToken cancellationToken = default)
+    public async Task<GroupDto> CreateAsync(int userId, string name, CancellationToken cancellationToken = default)
     {
         var now = Timestamp.Now;
         var group = new Group()
@@ -59,6 +53,8 @@ public class GroupService : IGroupService, ITransient
 
         var dto = _mapper.Map<GroupDto>(group);
         FormatGroupAvatar(dto);
+
+        await _hubContext.Clients.User(userId.ToString()).Notification(new NotificationMessage(NotificationType.NewGroup, dto));
         return dto;
     }
 
@@ -109,39 +105,9 @@ public class GroupService : IGroupService, ITransient
         await _context.SaveChangesAsync(cancellationToken);
         var dto = _mapper.Map<GroupDto>(group);
         FormatGroupAvatar(dto);
+        await _hubContext.Clients.Users(new List<string>(request.FriendIds.Select(x => x.ToString())) { userId.ToString() }).Notification(new NotificationMessage(NotificationType.NewGroup, dto));
+
         return dto;
-    }
-
-    /// <summary>
-    /// 申请加入
-    /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="id"></param>
-    /// <param name="request"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    public async Task ApplyJoin(int userId, int id, JoinGroupRequest request, CancellationToken cancellationToken = default)
-    {
-        var apply = await _context.GroupApplies
-            .FirstOrDefaultAsync(x => x.GroupId == id && x.UserId == userId && x.Status == ApplyStatus.Applied, cancellationToken);
-
-        if (apply is null)
-        {
-            apply = new GroupApply()
-            {
-                GroupId = id,
-                UserId = userId,
-                Remark = request.Remark,
-                Status = ApplyStatus.Applied,
-            };
-            await _context.GroupApplies.AddAsync(apply, cancellationToken);
-        }
-        else
-        {
-            apply.Remark = request.Remark;
-            apply.UpdateTime = Timestamp.Now;
-        }
-        await _context.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
@@ -151,7 +117,7 @@ public class GroupService : IGroupService, ITransient
     /// <param name="id"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task Leave(int userId, int id, CancellationToken cancellationToken = default)
+    public async Task LeaveAsync(int userId, int id, CancellationToken cancellationToken = default)
     {
         var group = await _context.UserGroupRealtions.FindAsync(new object[] { userId, id }, cancellationToken);
 
@@ -171,7 +137,7 @@ public class GroupService : IGroupService, ITransient
     /// <param name="id"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task Delete(int userId, int id, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(int userId, int id, CancellationToken cancellationToken = default)
     {
         var group = await _context.Groups.FindAsync(new object[] { id }, cancellationToken);
 
@@ -212,7 +178,7 @@ public class GroupService : IGroupService, ITransient
         return dtos;
     }
 
-    public async Task ApplyAsync(int userId, GroupApplyRequest request, CancellationToken cancellationToken = default)
+    public async Task ApplyAsync(int id, int userId, GroupApplyRequest request, CancellationToken cancellationToken = default)
     {
         var userInfo = await _context.UserInfos
             .Where(x => x.Id == userId && !x.IsDeleted)
@@ -222,13 +188,13 @@ public class GroupService : IGroupService, ITransient
 
         var group = await _context.Groups
             .AsNoTracking()
-            .Where(x => x.Id == request.GroupId && !x.IsDeleted)
+            .Where(x => x.Id == id && !x.IsDeleted)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (group is null) throw Oops.Bah("group not found.");
 
         var entity = await _context.GroupApplies
-            .Where(x => x.GroupId == request.GroupId && x.UserId == userId && x.Status == ApplyStatus.Applied && !x.IsDeleted)
+            .Where(x => x.GroupId == id && x.UserId == userId && x.Status == ApplyStatus.Applied && !x.IsDeleted)
             .FirstOrDefaultAsync(cancellationToken);
         var now = Timestamp.Now;
 
@@ -237,7 +203,7 @@ public class GroupService : IGroupService, ITransient
             entity = new GroupApply
             {
                 CreateTime = now,
-                GroupId = request.GroupId,
+                GroupId = id,
                 Status = ApplyStatus.Applied,
                 UpdateTime = now,
                 UserId = userId,
@@ -259,6 +225,70 @@ public class GroupService : IGroupService, ITransient
 
         // send group apply message.
         _ = SendApplyNotify(group, userInfo);
+    }
+
+    public async Task ApprovalAync(int applyId, int userId, ApplyStatus status, CancellationToken cancellationToken = default)
+    {
+        var apply = await _context.GroupApplies
+            .Include(x => x.Group)
+            .Where(x => x.Id == applyId && x.Group!.UserId == userId)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (apply is null) throw Oops.Bah("apply not exists.");
+        var now = Timestamp.Now;
+
+        if (apply.Status == status) return;
+
+        apply.Status = status;
+
+        if (status == ApplyStatus.Passed)
+        {
+            apply.Group!.UserGroupRealtions.Add(new UserGroupRealtion
+            {
+                UserId = apply.UserId,
+                GroupId = apply.GroupId,
+                CreateTime = now,
+            });
+            _ = SendNewGroup(apply.Group!, apply.UserId);
+        }
+
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<PagedList<GroupApplyDto>> GetApplyPendingAsync(int userId, QueryGroupApplyPendingRequest request, CancellationToken cancellationToken = default)
+    {
+        if (!request.BeforeLastTime.HasValue) request.BeforeLastTime = 0L;
+
+        var query = _context.GroupApplies
+          .AsNoTracking()
+          .Include(x => x.User)
+          .Include(x => x.Group)
+          .Where(x => x.Group!.UserId == userId)
+          .Where(x => x.CreateTime > request.BeforeLastTime);
+
+        var data = await query
+          .OrderByDescending(x => x.UpdateTime)
+          .ThenByDescending(x => x.Id)
+          .Take(request.Size)
+          .ProjectTo<GroupApplyDto>(_mapper.ConfigurationProvider)
+          .ToListAsync(cancellationToken);
+
+        var total = await query.CountAsync(cancellationToken);
+
+        data.ForEach(item => {
+            if (item.User != null)
+                item.User.Avatar = _fileService.FormatPublicFile(item.User.Avatar);
+            if (item.Group != null)
+                item.Group.Avatar = _fileService.FormatPublicFile(item.Group.Avatar);
+        });
+
+        return PagedList.Create(data, total, request.Size);
+    }
+
+    private async Task SendNewGroup(Group group, int userId)
+    {
+        await _hubContext.Clients.User(userId.ToString())
+            .Notification(new NotificationMessage(NotificationType.NewGroup, _mapper.Map<GroupDto>(group)));
     }
 
     private async Task SendApplyNotify(Group group, UserInfo user)

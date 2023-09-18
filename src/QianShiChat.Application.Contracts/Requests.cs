@@ -68,6 +68,15 @@ public class QueryFriendApplyPendingRequest
 }
 
 
+public class QueryGroupApplyPendingRequest
+{
+    [Required, Range(1, 100)]
+    public int Size { get; set; }
+    [Range(0, long.MaxValue)]
+    public long? BeforeLastTime { get; set; }
+}
+
+
 public class UserAuthRequest
 {
     [Required, MaxLength(32)]
@@ -79,8 +88,6 @@ public class UserAuthRequest
 
 public class GroupApplyRequest
 {
-    [Required, Range(1, int.MaxValue)]
-    public int GroupId { get; set; }
-    [MaxLength(50)]
+    [MaxLength(250)]
     public string? Remark { get; set; }
 }

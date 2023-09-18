@@ -36,6 +36,7 @@ global using SixLabors.ImageSharp;
 global using SixLabors.ImageSharp.Processing;
 
 global using System.IdentityModel.Tokens.Jwt;
+global using System.Net;
 global using System.Runtime.CompilerServices;
 global using System.Security.Claims;
 global using System.Text;

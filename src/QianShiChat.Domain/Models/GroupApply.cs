@@ -12,5 +12,5 @@ public class GroupApply : ApplyBase
     /// <summary>
     /// 群组
     /// </summary>
-    public virtual Group? Group { get; set; } 
+    public virtual Group? Group { get; set; }
 }
