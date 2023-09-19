@@ -1,6 +1,4 @@
-﻿using QianShiChat.Application.Common.IRepositories;
-
-namespace QianShiChat.Application.Services;
+﻿namespace QianShiChat.Application.Services;
 
 public class RoomService : IRoomService, ITransient
 {

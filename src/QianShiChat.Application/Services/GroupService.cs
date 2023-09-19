@@ -8,6 +8,8 @@ public class GroupService : IGroupService, ITransient
     private readonly IUserService _userService;
     private readonly IFileService _fileService;
     private readonly IHubContext<ChatHub, IChatClient> _hubContext;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly ITransaction _transaction;
 
     public GroupService(
         IApplicationDbContext context,
@@ -15,7 +17,9 @@ public class GroupService : IGroupService, ITransient
         IMapper mapper,
         IUserService userService,
         IFileService fileService,
-        IHubContext<ChatHub, IChatClient> hubContext)
+        IHubContext<ChatHub, IChatClient> hubContext,
+        IUnitOfWork unitOfWork,
+        ITransaction transaction)
     {
         _context = context;
         _logger = logger;
@@ -23,6 +27,8 @@ public class GroupService : IGroupService, ITransient
         _userService = userService;
         _fileService = fileService;
         _hubContext = hubContext;
+        _unitOfWork = unitOfWork;
+        _transaction = transaction;
     }
 
     /// <summary>
@@ -83,7 +89,7 @@ public class GroupService : IGroupService, ITransient
         {
             Name = $"{currentUserName}、{friendName}",
             UserId = userId,
-            TotalUser = 1,
+            TotalUser = 1 + request.FriendIds.Count,
             CreateTime = now,
         };
         group.UserGroupRealtions.Add(new UserGroupRealtion()
@@ -101,8 +107,43 @@ public class GroupService : IGroupService, ITransient
             });
         }
 
-        await _context.Groups.AddAsync(group, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
+        using var trans = await _transaction.BeginTransactionAsync();
+        try
+        {
+            await _context.Groups.AddAsync(group, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            var userIds = request.FriendIds.Select(x => x).ToList();
+            userIds.Add(userId);
+
+            foreach (var id in userIds)
+            {
+                var roomId = AppConsts.GetGroupChatRoomId(id, group.Id);
+                var room = new Room
+                {
+                    Id = roomId,
+                    CreateTime = now,
+                    FromId = userId,
+                    MessagePosition = YitIdHelper.NextId(),
+                    ToId = group.Id,
+                    Type = ChatMessageSendType.Group,
+                    UpdateTime = now,
+                };
+
+                _context.Rooms.Add(room);
+            }
+
+            await _context.SaveChangesAsync(cancellationToken);
+            await _transaction.CommitTransactionAsync(trans);
+        }
+        catch (Exception ex)
+        {
+            _transaction.RollbackTransaction();
+            _logger.LogError(ex, "create group error - userId: {userId}, request: {request}", userId, JsonSerializer.Serialize(request));
+            throw Oops.Oh("create group error.");
+        }
+
+
         var dto = _mapper.Map<GroupDto>(group);
         FormatGroupAvatar(dto);
         await _hubContext.Clients.Users(new List<string>(request.FriendIds.Select(x => x.ToString())) { userId.ToString() }).Notification(new NotificationMessage(NotificationType.NewGroup, dto));

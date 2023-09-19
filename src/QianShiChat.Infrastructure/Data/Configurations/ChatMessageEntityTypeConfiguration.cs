@@ -9,10 +9,10 @@ public class ChatMessageEntityTypeConfiguration : IEntityTypeConfiguration<ChatM
         builder.Property(x => x.Id)
             .IsRequired()
             .ValueGeneratedOnAdd();
-        builder.Property(p => p.FromId)
-            .IsRequired();
+
         builder.HasOne(e => e.FromUser)
-            .WithMany(e => e.Messages)
+            .WithMany(p => p.Messages)
+            .HasForeignKey(e => e.FromId)
             .IsRequired(false);
         builder.Property(p => p.ToId)
             .IsRequired();
