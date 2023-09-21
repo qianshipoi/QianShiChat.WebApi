@@ -53,7 +53,7 @@ public class AppConsts
 
     public static string GetPrivateChatRoomId(int id1, int id2) => $"personal-{GetPrivateChatCacheKey(id1, id2)}";
 
-    public static string GetGroupChatRoomId(int userId, int groupId) => $"group-{userId}-{groupId}";
+    public static string GetGroupChatRoomId(int userId, int groupId) => $"group-{groupId}";
 
     /// <summary>
     /// get group chat cache key.

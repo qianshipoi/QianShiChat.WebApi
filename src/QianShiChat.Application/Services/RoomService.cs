@@ -1,19 +1,27 @@
-﻿namespace QianShiChat.Application.Services;
+﻿using AutoMapper.QueryableExtensions;
+
+namespace QianShiChat.Application.Services;
 
 public class RoomService : IRoomService, ITransient
 {
     private readonly IRoomRepository _roomRepository;
     private readonly IChatMessageRepository _chatMessageRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IApplicationDbContext _context;
+    private readonly IMapper _mapper;
 
     public RoomService(
         IRoomRepository roomRepository,
         IChatMessageRepository chatMessageRepository,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IApplicationDbContext context,
+        IMapper mapper)
     {
         _roomRepository = roomRepository;
         _chatMessageRepository = chatMessageRepository;
         _unitOfWork = unitOfWork;
+        _context = context;
+        _mapper = mapper;
     }
 
     private object? FormatMessageContent(string content, ChatMessageType type)
@@ -69,6 +77,11 @@ public class RoomService : IRoomService, ITransient
         return roomDtos;
     }
 
+    public async Task<List<string>> GetRoomIdsAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        return await _roomRepository.GetByUser(userId).AsNoTracking().Select(x => x.Id).ToListAsync(cancellationToken);
+    }
+
     public async IAsyncEnumerable<RoomDto> GetRoomsAsync(int userId, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var rooms = await _roomRepository.GetByUser(userId).ToListAsync(cancellationToken);
@@ -107,15 +120,21 @@ public class RoomService : IRoomService, ITransient
             return null;
         }
 
-        var message = await _chatMessageRepository.GetLastMessageAsync(roomId, cancellationToken);
+        var fromUser = await _context.UserInfos
+            .AsNoTracking()
+            .Where(x => x.Id == room.FromId)
+            .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
+            .FirstOrDefaultAsync(cancellationToken);
 
+        var message = await _chatMessageRepository.GetLastMessageAsync(roomId, cancellationToken);
         var roomDto = new RoomDto
         {
             Id = room.Id,
             FromId = room.FromId,
+            FromUser = fromUser,
             ToId = room.ToId,
             Type = room.Type,
-            UnreadCount = 0
+            UnreadCount = 0,
         };
 
         if (message is not null)

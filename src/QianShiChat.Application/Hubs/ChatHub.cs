@@ -69,14 +69,24 @@ public class ChatHub : Hub<IChatClient>
                 isOnline ? NotificationType.FriendOnline : NotificationType.FriendOffline,
                 CurrentUserId));
 
+        var roomIds = await _roomService.GetRoomIdsAsync(CurrentUserId);
+
         var cacheKey = FormatOnlineUserKey(CurrentUserId.ToString(), CurrentClientType!);
         if (isOnline)
         {
             await _onlineManager.ConnectedAsync(CurrentUserId, Context.ConnectionId, CurrentClientType);
+            foreach (var item in roomIds)
+            {
+                await Groups.AddToGroupAsync(Context.ConnectionId, item);
+            }
         }
         else
         {
             await _onlineManager.DisconnectedAsync(CurrentUserId, Context.ConnectionId, CurrentClientType);
+            foreach (var item in roomIds)
+            {
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, item);
+            }
         }
     }
 

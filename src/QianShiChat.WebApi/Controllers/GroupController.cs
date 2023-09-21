@@ -19,6 +19,10 @@ public class GroupController : BaseController
     public Task<List<GroupDto>> GetMyGroupsAsync(CancellationToken cancellationToken = default)
         => _groupService.GetAllByUserIdAsync(CurrentUserId, cancellationToken);
 
+    [HttpGet("{groupId:int}")]
+    public Task<GroupDto?> FindAsync([FromRoute, Range(1, int.MaxValue)]int groupId, CancellationToken cancellationToken = default)
+        => _groupService.FindByIdAsync(groupId, cancellationToken);
+
     [HttpPost]
     public Task<GroupDto> CreateAsync(
         [FromBody] CreateGroupRequest request,
@@ -70,7 +74,7 @@ public class GroupController : BaseController
     public Task<PagedList<GroupDto>> SearchAsync([FromQuery] GroupSearchRequest request, CancellationToken cancellationToken = default)
         => _groupService.SearchGroupAsync(request, cancellationToken);
 
-    [HttpGet("{groupId:int}")]
+    [HttpGet("{groupId:int}/members")]
     public Task<PagedList<UserDto>> GetMembersAsync([FromRoute] int groupId, [FromQuery] GroupMemberQueryRequest request, CancellationToken cancellationToken = default)
         => _groupService.GetMembersByGroupAsync(groupId, request, cancellationToken);
 }

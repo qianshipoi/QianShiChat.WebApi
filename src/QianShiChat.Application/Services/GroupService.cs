@@ -218,6 +218,10 @@ public class GroupService : IGroupService, ITransient
         dtos.ForEach(FormatGroupAvatar);
         return dtos;
     }
+    public Task<GroupDto?> FindByIdAsync(int groupId, CancellationToken cancellationToken = default)
+    {
+        return _context.Groups.AsNoTracking().Where(x => x.Id == groupId).ProjectTo<GroupDto>(_mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
+    }
 
     public async Task ApplyAsync(int id, int userId, GroupApplyRequest request, CancellationToken cancellationToken = default)
     {
@@ -349,7 +353,6 @@ public class GroupService : IGroupService, ITransient
         list.ForEach(FormatGroupAvatar);
         return PagedList.Create(list, total, request.Size);
     }
-
 
     public async Task<PagedList<UserDto>> GetMembersByGroupAsync(int groupId, GroupMemberQueryRequest request, CancellationToken cancellationToken = default)
     {

@@ -113,7 +113,7 @@ public class ChatMessageService : IChatMessageService, ITransient
         else if (chatMessageDto.SendType == ChatMessageSendType.Group)
         {
             await _hubContext.Clients
-                .Group(chatMessageDto.ToId.ToString())
+                .Group(AppConsts.GetGroupChatRoomId(_userManager.CurrentUserId, chatMessageDto.ToId))
                 .PrivateChat(chatMessageDto);
         }
         else
