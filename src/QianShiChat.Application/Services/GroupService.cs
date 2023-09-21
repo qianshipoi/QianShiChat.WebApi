@@ -350,6 +350,36 @@ public class GroupService : IGroupService, ITransient
         return PagedList.Create(list, total, request.Size);
     }
 
+
+    public async Task<PagedList<UserDto>> GetMembersByGroupAsync(int groupId, GroupMemberQueryRequest request, CancellationToken cancellationToken = default)
+    {
+        var query = _context.UserGroupRealtions
+              .AsNoTracking()
+              .Include(x => x.User)
+              .Where(x => x.GroupId == groupId)
+              .OrderBy(x => x.CreateTime)
+              .Select(x => x.User);
+
+        var total = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
+            .Skip((request.Page - 1) * request.Size)
+            .Take(request.Size)
+            .ToListAsync(cancellationToken);
+        items.ForEach(FormatUserAvatar);
+
+        return PagedList.Create(items, total, request.Size);
+    }
+
+    private void FormatUserAvatar(UserDto user)
+    {
+        if (!string.IsNullOrWhiteSpace(user.Avatar))
+        {
+            user.Avatar = _fileService.FormatPublicFile(user.Avatar);
+        }
+    }
+
     private async Task SendNewGroup(Group group, int userId)
     {
         await _hubContext.Clients.User(userId.ToString())

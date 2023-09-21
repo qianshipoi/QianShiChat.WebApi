@@ -9,6 +9,7 @@ public interface IGroupService
     Task DeleteAsync(int userId, int id, CancellationToken cancellationToken = default);
     Task<List<GroupDto>> GetAllByUserIdAsync(int userId, CancellationToken cancellationToken = default);
     Task<PagedList<GroupApplyDto>> GetApplyPendingAsync(int userId, QueryGroupApplyPendingRequest request, CancellationToken cancellationToken = default);
+    Task<PagedList<UserDto>> GetMembersByGroupAsync(int groupId, GroupMemberQueryRequest request, CancellationToken cancellationToken = default);
     Task LeaveAsync(int userId, int id, CancellationToken cancellationToken = default);
     Task<PagedList<GroupDto>> SearchGroupAsync(GroupSearchRequest request, CancellationToken cancellationToken = default);
 }

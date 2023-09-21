@@ -69,4 +69,8 @@ public class GroupController : BaseController
     [HttpGet("search")]
     public Task<PagedList<GroupDto>> SearchAsync([FromQuery] GroupSearchRequest request, CancellationToken cancellationToken = default)
         => _groupService.SearchGroupAsync(request, cancellationToken);
+
+    [HttpGet("{groupId:int}")]
+    public Task<PagedList<UserDto>> GetMembersAsync([FromRoute] int groupId, [FromQuery] GroupMemberQueryRequest request, CancellationToken cancellationToken = default)
+        => _groupService.GetMembersByGroupAsync(groupId, request, cancellationToken);
 }
