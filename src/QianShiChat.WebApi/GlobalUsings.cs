@@ -1,5 +1,7 @@
 ﻿global using AutoMapper;
 
+global using Carter;
+
 global using EasyCaching.Core;
 global using EasyCaching.Serialization.SystemTextJson.Configurations;
 
@@ -7,6 +9,7 @@ global using FluentValidation;
 
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.Http.HttpResults;
 global using Microsoft.AspNetCore.HttpOverrides;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Mvc.Controllers;
@@ -27,7 +30,6 @@ global using QianShiChat.Application.Hubs;
 global using QianShiChat.Application.Services;
 global using QianShiChat.Domain;
 global using QianShiChat.Domain.Core.AppOops;
-global using QianShiChat.Domain.Extensions;
 global using QianShiChat.Domain.Models;
 global using QianShiChat.Domain.Options;
 global using QianShiChat.Domain.Shared;

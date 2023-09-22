@@ -7,6 +7,12 @@ public enum ApplyStatus : sbyte
     Rejected,
     Ignored
 }
+public enum ApprovalState : sbyte
+{
+    Approved,
+    Rejected,
+    Ignored
+}
 
 public enum ChatMessageType : sbyte
 {

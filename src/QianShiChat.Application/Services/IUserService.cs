@@ -73,4 +73,5 @@ public interface IUserService
     Task<string?> GetNickNameByIdAsync(int userId, CancellationToken cancellationToken = default);
 
     Task<bool> IsFriendAsync(int userId, int friendId, CancellationToken cancellationToken = default);
+    Task<PagedList<UserDto>> SearchUsersAsync(UserSearchRequest request, CancellationToken cancellationToken = default);
 }

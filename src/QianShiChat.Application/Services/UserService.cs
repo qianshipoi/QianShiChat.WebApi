@@ -1,4 +1,6 @@
-﻿using QianShiChat.Domain.Extensions;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+
+using QianShiChat.Domain.Extensions;
 
 namespace QianShiChat.Application.Services;
 
@@ -106,11 +108,37 @@ public class UserService : IUserService, ITransient
             .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
             .ToListAsync(cancellationToken);
 
-        users.ForEach(item =>
-        {
+        users.ForEach(item => {
             item.Avatar = _fileService.FormatPublicFile(item.Avatar);
         });
         return users;
+    }
+
+    public async Task<PagedList<UserDto>> SearchUsersAsync(UserSearchRequest request, CancellationToken cancellationToken = default)
+    {
+        var query = _context.UserInfos
+            .AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(request.Search))
+        {
+            query = query.Where(x => EF.Functions.Like(x.NickName, $"%{request.Search}%"));
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+        var items = await query.OrderBy(x => x.CreateTime)
+            .Skip((request.Page - 1) * request.Size)
+            .Take(request.Size)
+            .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
+            .ToListAsync(cancellationToken);
+
+        items.ForEach(FormatAvatar);
+        return PagedList.Create(items, totalCount, request.Size);
+    }
+
+    private void FormatAvatar(UserDto user)
+    {
+        if (!string.IsNullOrWhiteSpace(user.Avatar))
+            user.Avatar = _fileService.FormatPublicFile(user.Avatar);
     }
 
     public async Task<List<UserDto>> GetUserByNickNameAsync(int page, int size, string nickName, CancellationToken cancellationToken = default)
@@ -122,11 +150,7 @@ public class UserService : IUserService, ITransient
             .Take(size)
             .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
             .ToListAsync(cancellationToken);
-
-        users.ForEach(item =>
-        {
-            item.Avatar = _fileService.FormatPublicFile(item.Avatar);
-        });
+        users.ForEach(FormatAvatar);
         return users;
     }
 
@@ -137,12 +161,12 @@ public class UserService : IUserService, ITransient
                 .CountAsync(cancellationToken);
     }
 
-    public async Task<string?> GetNickNameByIdAsync(int userId, CancellationToken cancellationToken= default)
+    public async Task<string?> GetNickNameByIdAsync(int userId, CancellationToken cancellationToken = default)
     {
         return await _context.UserInfos.Where(x => x.Id == userId).Select(x => x.NickName).FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<bool> IsFriendAsync(int userId, int friendId,CancellationToken cancellationToken= default)
+    public async Task<bool> IsFriendAsync(int userId, int friendId, CancellationToken cancellationToken = default)
     {
         return await _context.UserRealtions.AnyAsync(x => x.UserId == userId && x.FriendId == friendId, cancellationToken);
     }
