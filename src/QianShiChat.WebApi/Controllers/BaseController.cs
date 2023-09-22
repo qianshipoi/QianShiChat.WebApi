@@ -1,6 +1,7 @@
 ﻿namespace QianShiChat.WebApi.Controllers;
 
 [Route("api/[controller]")]
+[ApiExplorerSettings(GroupName = "v1")]
 public abstract class BaseController : ControllerBase
 {
     /// <summary>

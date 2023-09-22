@@ -5,6 +5,7 @@ public class GroupEndpoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/groups")
+            .WithGroupName("endpoint")
             .RequireAuthorization();
 
         group.MapGet("{groupId:int}/pending_joining", GetPendingJoining);

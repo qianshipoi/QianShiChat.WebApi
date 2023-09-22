@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.Application.Contracts;
+﻿using QianShiChat.Domain.Shared.Attributes;
+
+namespace QianShiChat.Application.Contracts;
 
 public class FileBaseInfo
 {

@@ -13,9 +13,12 @@ public static class ApplicationBuilderExtensions
     public static IApplicationBuilder UseOpenApi(this IApplicationBuilder app)
     {
         app.UseSwagger();
-        app.UseSwaggerUI(c =>
-        {
-            c.EnablePersistAuthorization();
+        app.UseSwaggerUI(options => {
+            options.EnablePersistAuthorization();
+            options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+            options.SwaggerEndpoint("/swagger/endpoint/swagger.json", "endpoint");
+            options.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);
+            options.DefaultModelsExpandDepth(-1);
         });
         return app;
     }

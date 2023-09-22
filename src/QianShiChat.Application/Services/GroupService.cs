@@ -317,7 +317,7 @@ public class GroupService : IGroupService, ITransient
         if (apply is null) throw Oops.Bah("apply not exists.");
         var now = Timestamp.Now;
 
-        if (apply.Status == status) return;
+        if (apply.Status == status) return _mapper.Map<GroupApplyDto>(apply);
 
         apply.Status = status;
 

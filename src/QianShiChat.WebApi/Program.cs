@@ -1,6 +1,4 @@
 // config distributed id.
-using Carter;
-
 using QianShiChat.Infrastructure.Data;
 
 var options = new IdGeneratorOptions(1);
@@ -15,10 +13,8 @@ builder.Services
         setup.Filters.Add<ClientAuthotizationFilter>();
         setup.Filters.Add<ResultWrapperFilter>();
         setup.Filters.Add<GlobalExceptionFilter>();
-    })
-    .AddJsonOptions(options => {
-        //options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter());
     });
+builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.Configure<ForwardedHeadersOptions>(options => {
     options.ForwardedHeaders =

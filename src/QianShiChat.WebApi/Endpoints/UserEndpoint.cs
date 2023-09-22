@@ -5,6 +5,7 @@ public class UserEndpoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("/api/user")
+            .WithGroupName("endpoint")
             .RequireAuthorization();
         var friendsGroup = group.MapGroup("friends");
         friendsGroup.MapGet(string.Empty, GetMyFriends);
@@ -38,7 +39,7 @@ public class UserEndpoint : ICarterModule
 
     public static async Task<Results<NoContent, NotFound, UnauthorizedHttpResult>> JoinGroup(
         [FromRoute] int groupId,
-        [AsParameters] GroupApplyRequest request,
+        [FromBody] GroupApplyRequest request,
         IUserManager userManager,
         IGroupService groupService,
         CancellationToken cancellationToken = default)
@@ -79,7 +80,7 @@ public class UserEndpoint : ICarterModule
     }
 
     public static async Task<Results<Ok<GroupDto>, UnauthorizedHttpResult>> CreateGroup(
-        [AsParameters] CreateGroupRequest request,
+        [FromBody] CreateGroupRequest request,
         IUserManager userManager,
         IGroupService groupService,
         CancellationToken cancellationToken = default)
@@ -139,7 +140,7 @@ public class UserEndpoint : ICarterModule
     }
 
     public static async Task<Results<Ok<FriendApplyDto>, NoContent, UnauthorizedHttpResult>> AddFriend(
-        [AsParameters] CreateFriendApplyRequest request,
+        [FromBody] CreateFriendApplyRequest request,
         IUserManager userManager,
         IFriendApplyService friendApplyService,
         IFriendService friendService,
