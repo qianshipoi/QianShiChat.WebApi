@@ -21,8 +21,7 @@ public static class DependencyInjection
 
         services.AddScoped<ApplicationDbContextInitialiser>();
 
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
-        services.AddScoped<ITransaction, Transaction>();
+        //services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
     }

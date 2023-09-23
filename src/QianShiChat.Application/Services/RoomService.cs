@@ -1,25 +1,20 @@
-﻿using AutoMapper.QueryableExtensions;
-
-namespace QianShiChat.Application.Services;
+﻿namespace QianShiChat.Application.Services;
 
 public class RoomService : IRoomService, ITransient
 {
     private readonly IRoomRepository _roomRepository;
     private readonly IChatMessageRepository _chatMessageRepository;
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IApplicationDbContext _context;
     private readonly IMapper _mapper;
 
     public RoomService(
         IRoomRepository roomRepository,
         IChatMessageRepository chatMessageRepository,
-        IUnitOfWork unitOfWork,
         IApplicationDbContext context,
         IMapper mapper)
     {
         _roomRepository = roomRepository;
         _chatMessageRepository = chatMessageRepository;
-        _unitOfWork = unitOfWork;
         _context = context;
         _mapper = mapper;
     }
@@ -154,7 +149,7 @@ public class RoomService : IRoomService, ITransient
 
         room.MessagePosition = position;
 
-        await _unitOfWork.SaveChangeAsync(cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task AddOrUpdatePositionAsync(
@@ -191,6 +186,6 @@ public class RoomService : IRoomService, ITransient
             room.MessagePosition = position;
         }
 
-        await _unitOfWork.SaveChangeAsync(cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
     }
 }

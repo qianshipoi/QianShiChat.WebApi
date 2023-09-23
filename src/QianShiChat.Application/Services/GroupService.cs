@@ -8,8 +8,6 @@ public class GroupService : IGroupService, ITransient
     private readonly IUserService _userService;
     private readonly IFileService _fileService;
     private readonly IHubContext<ChatHub, IChatClient> _hubContext;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly ITransaction _transaction;
 
     public GroupService(
         IApplicationDbContext context,
@@ -17,9 +15,7 @@ public class GroupService : IGroupService, ITransient
         IMapper mapper,
         IUserService userService,
         IFileService fileService,
-        IHubContext<ChatHub, IChatClient> hubContext,
-        IUnitOfWork unitOfWork,
-        ITransaction transaction)
+        IHubContext<ChatHub, IChatClient> hubContext)
     {
         _context = context;
         _logger = logger;
@@ -27,8 +23,6 @@ public class GroupService : IGroupService, ITransient
         _userService = userService;
         _fileService = fileService;
         _hubContext = hubContext;
-        _unitOfWork = unitOfWork;
-        _transaction = transaction;
     }
 
     /// <summary>
@@ -107,7 +101,8 @@ public class GroupService : IGroupService, ITransient
             });
         }
 
-        using var trans = await _transaction.BeginTransactionAsync();
+        using var trans = await _context.BeginTransactionAsync();
+
         try
         {
             await _context.Groups.AddAsync(group, cancellationToken);
@@ -134,11 +129,11 @@ public class GroupService : IGroupService, ITransient
             }
 
             await _context.SaveChangesAsync(cancellationToken);
-            await _transaction.CommitTransactionAsync(trans);
+            await _context.CommitAsync(trans!);
         }
         catch (Exception ex)
         {
-            _transaction.RollbackTransaction();
+            _context.RollbackTransaction();
             _logger.LogError(ex, "create group error - userId: {userId}, request: {request}", userId, JsonSerializer.Serialize(request));
             throw Oops.Oh("create group error.");
         }

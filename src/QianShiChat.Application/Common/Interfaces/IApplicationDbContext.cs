@@ -1,6 +1,6 @@
 ﻿namespace QianShiChat.Application.Common.Interfaces;
 
-public interface IApplicationDbContext
+public interface IApplicationDbContext : IUnitOfWork
 {
     DbSet<UserInfo> UserInfos { get; set; }
     DbSet<UserAvatar> UserAvatars { get; set; }
@@ -13,6 +13,4 @@ public interface IApplicationDbContext
     DbSet<GroupApply> GroupApplies { get; set; }
     DbSet<Attachment> Attachments { get; set; }
     DbSet<Room> Rooms { get; set; }
-
-    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

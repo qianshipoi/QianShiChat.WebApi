@@ -13,6 +13,19 @@ public class UserManager : IUserManager, IScoped
         _chatDbContext = chatDbContext;
     }
 
+    public string CurrentClientType
+    {
+        get
+        {
+            var val = _contextAccessor.HttpContext!.User.Claims?.FirstOrDefault(x => x.Type == CustomClaim.ClientType)?.Value;
+            if (string.IsNullOrWhiteSpace(val))
+            {
+                throw Oops.Bah(string.Empty).StatusCode(HttpStatusCode.Unauthorized);
+            }
+            return val;
+        }
+    }
+
     public int CurrentUserId
     {
         get
@@ -22,7 +35,7 @@ public class UserManager : IUserManager, IScoped
                 var val = _contextAccessor.HttpContext!.User.Claims?.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrWhiteSpace(val))
                 {
-                    throw Oops.Bah("").StatusCode(System.Net.HttpStatusCode.Unauthorized);
+                    throw Oops.Bah(string.Empty).StatusCode(HttpStatusCode.Unauthorized);
                 }
                 _userId = int.Parse(val);
             }
