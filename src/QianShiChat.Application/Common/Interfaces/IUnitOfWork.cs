@@ -2,25 +2,17 @@
 
 namespace QianShiChat.Application.Common.Interfaces;
 
-public interface IUnitOfWork
+public interface IUnitOfWork : IDisposable
 {
-    Task<int> SaveChangeAsync(CancellationToken cancellationToken = default);
-}
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 
-public interface ITransaction
-{
-    // 获取当前事务
-    IDbContextTransaction GetCurrentTransaction();
-
-    // 判断当前事务是否开启
     bool HasActiveTransaction { get; }
 
-    // 开启事务
-    Task<IDbContextTransaction> BeginTransactionAsync();
+    IDbContextTransaction? GetCurrentTransaction { get; }
 
-    // 提交事务
-    Task CommitTransactionAsync(IDbContextTransaction transaction);
+    Task<IDbContextTransaction?> BeginTransactionAsync();
 
-    // 事务回滚
+    Task CommitAsync(IDbContextTransaction transaction);
+
     void RollbackTransaction();
 }

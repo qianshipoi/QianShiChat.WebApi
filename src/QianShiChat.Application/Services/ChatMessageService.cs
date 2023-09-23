@@ -18,6 +18,7 @@ public class ChatMessageService : IChatMessageService, ITransient
     private readonly IUserManager _userManager;
     private readonly IRoomService _roomService;
     private readonly IAttachmentRepository _attachmentRepository;
+    private readonly IOnlineManager _onlineManager;
 
     /// <summary>
     /// chat message service
@@ -29,7 +30,8 @@ public class ChatMessageService : IChatMessageService, ITransient
         IFileService fileService,
         IUserManager userManager,
         IRoomService roomService,
-        IAttachmentRepository attachmentRepository)
+        IAttachmentRepository attachmentRepository,
+        IOnlineManager onlineManager)
     {
         _context = context;
         _mapper = mapper;
@@ -38,6 +40,7 @@ public class ChatMessageService : IChatMessageService, ITransient
         _userManager = userManager;
         _roomService = roomService;
         _attachmentRepository = attachmentRepository;
+        _onlineManager = onlineManager;
     }
 
     public Task<PagedList<ChatMessageDto>> GetGroupHistoryAsync(int toId, QueryMessageRequest request, CancellationToken cancellationToken = default)
@@ -52,8 +55,7 @@ public class ChatMessageService : IChatMessageService, ITransient
             .AsNoTracking()
             .OrderByDescending(x => x.CreateTime)
             .Include(x => x.Attachments)
-            .Where(x => x.RoomId == roomId)
-            .Where(x => x.SendType == ChatMessageSendType.Personal);
+            .Where(x => x.RoomId == roomId);
 
         var messages = await queryable
             .Skip((request.Page - 1) * request.Size)
@@ -72,9 +74,9 @@ public class ChatMessageService : IChatMessageService, ITransient
     private void FormatAttachmentMessage(ChatMessageDto message)
     {
         if (message.MessageType is not ChatMessageType.Text
-        && message.Content is not null
-           && message.Content is string content
-           && !string.IsNullOrWhiteSpace(content))
+            && message.Content is not null
+            && message.Content is string content
+            && !string.IsNullOrWhiteSpace(content))
         {
             if (content.StartsWith("["))
             {
@@ -104,17 +106,27 @@ public class ChatMessageService : IChatMessageService, ITransient
         var chatMessageDto = _mapper.Map<ChatMessageDto>(chatMessage);
         FormatAttachmentMessage(chatMessageDto);
 
+        var currentConnectionId = await _onlineManager.GetUserClientConnectionIdAsync(chatMessage.FromId, _userManager.CurrentClientType);
+
         if (chatMessageDto.SendType == ChatMessageSendType.Personal)
         {
             await _hubContext.Clients
                 .User(chatMessageDto.ToId.ToString())
                 .PrivateChat(chatMessageDto);
+
+            var ownOtherClients = _onlineManager.GetConnections(chatMessage.FromId).Except(new string[] { currentConnectionId });
+            if (ownOtherClients.Any())
+            {
+                await _hubContext.Clients
+                     .Clients(ownOtherClients)
+                     .OwnOtherClientMessage(chatMessageDto);
+            }
         }
         else if (chatMessageDto.SendType == ChatMessageSendType.Group)
         {
             await _hubContext.Clients
-                .Group(AppConsts.GetGroupChatRoomId(_userManager.CurrentUserId, chatMessageDto.ToId))
-                .PrivateChat(chatMessageDto);
+                .GroupExcept(AppConsts.GetGroupChatRoomId(_userManager.CurrentUserId, chatMessageDto.ToId), currentConnectionId)
+                .GroupMessage(chatMessageDto);
         }
         else
         {
@@ -126,7 +138,6 @@ public class ChatMessageService : IChatMessageService, ITransient
             chatMessage.ToId,
             chatMessage.SendType,
             chatMessage.Id);
-
         await _context.ChatMessages.AddAsync(chatMessage, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
 

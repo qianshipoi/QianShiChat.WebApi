@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.Infrastructure.Data;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+
+namespace QianShiChat.Infrastructure.Data;
 
 public class ChatDbContext : DbContext, IApplicationDbContext
 {
@@ -176,6 +178,60 @@ public class ChatDbContext : DbContext, IApplicationDbContext
                 var parameter = Expression.Parameter(entityType.ClrType, "p");
                 var deletedCheck = Expression.Lambda(Expression.Equal(Expression.Property(parameter, nameof(ISoftDelete.IsDeleted)), Expression.Constant(false)), parameter);
                 modelBuilder.Entity(entityType.ClrType).HasQueryFilter(deletedCheck);
+            }
+        }
+    }
+
+    private IDbContextTransaction? _currentTransaction;
+
+    public bool HasActiveTransaction => _currentTransaction != null;
+
+    public IDbContextTransaction? GetCurrentTransaction => _currentTransaction;
+
+    public async Task<IDbContextTransaction?> BeginTransactionAsync()
+    {
+        if (_currentTransaction != null) return null;
+        _currentTransaction = await Database.BeginTransactionAsync();
+        return _currentTransaction;
+    }
+
+    public async Task CommitAsync(IDbContextTransaction transaction)
+    {
+        if (transaction == null) throw new ArgumentNullException(nameof(transaction));
+        if (transaction != _currentTransaction) throw new InvalidOperationException($"Transaction {transaction.TransactionId} is not current");
+
+        try
+        {
+            await SaveChangesAsync();
+            transaction.Commit();
+        }
+        catch
+        {
+            RollbackTransaction();
+            throw;
+        }
+        finally
+        {
+            if (_currentTransaction != null)
+            {
+                _currentTransaction.Dispose();
+                _currentTransaction = null!;
+            }
+        }
+    }
+
+    public void RollbackTransaction()
+    {
+        try
+        {
+            _currentTransaction?.Rollback();
+        }
+        finally
+        {
+            if (_currentTransaction != null)
+            {
+                _currentTransaction.Dispose();
+                _currentTransaction = null!;
             }
         }
     }
