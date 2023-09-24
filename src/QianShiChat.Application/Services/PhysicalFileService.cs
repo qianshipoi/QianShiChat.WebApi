@@ -1,6 +1,4 @@
-﻿using QianShiChat.Domain.Extensions;
-
-namespace QianShiChat.Application.Services;
+﻿namespace QianShiChat.Application.Services;
 
 public class PhysicalFileService : IFileService, IScoped
 {
@@ -52,6 +50,7 @@ public class PhysicalFileService : IFileService, IScoped
 
     public string FormatPublicFile(string filePath)
     {
+        if (string.IsNullOrWhiteSpace(filePath)) return string.Empty;
         return _httpContextAccessor.HttpContext!.Request.GetBaseUrl() + '/' + filePath.TrimStart('/').Replace("\\", "/");
     }
 
