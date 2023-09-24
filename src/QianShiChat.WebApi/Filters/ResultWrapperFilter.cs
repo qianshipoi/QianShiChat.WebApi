@@ -13,31 +13,37 @@ public class ResultWrapperFilter : ActionFilterAttribute
             return;
         }
 
-        if (context.Result is BadRequestObjectResult badRequestObjectResult)
+        switch (context.Result)
         {
-            return;
-        }
-        else if (context.Result is ObjectResult objectResult)
-        {
-            if(objectResult.StatusCode == 401)
-            {
+            case BadRequestObjectResult:
                 return;
-            }
-
-            if (objectResult.Value == null)
-            {
-                context.Result = new ObjectResult(GlobalResult<object>.SuccessResult(null));
-            }
-            else
-            {
-                if ((objectResult.DeclaredType?.IsGenericType ?? false) && objectResult.DeclaredType?.GetGenericTypeDefinition() == typeof(GlobalResult<>))
+            case ObjectResult objectResult:
+                if (objectResult.StatusCode == 401)
                 {
                     return;
                 }
 
-                context.Result = new ObjectResult(GlobalResult<object>.SuccessResult(objectResult.Value));
-            }
-            return;
+                if (objectResult.Value == null)
+                {
+                    context.Result = new ObjectResult(GlobalResult<object>.SuccessResult(null));
+                }
+                else
+                {
+                    if ((objectResult.DeclaredType?.IsGenericType ?? false) && objectResult.DeclaredType?.GetGenericTypeDefinition() == typeof(GlobalResult<>))
+                    {
+                        return;
+                    }
+
+                    context.Result = new ObjectResult(GlobalResult<object>.SuccessResult(objectResult.Value));
+                }
+                return;
+            case EmptyResult:
+                {
+                    context.Result = new ObjectResult(GlobalResult<object>.SuccessResult(null));
+                }
+                return;
+            default:
+                break;
         }
 
         base.OnResultExecuting(context);
