@@ -53,7 +53,7 @@ public class ChatMessageService : IChatMessageService, ITransient
     {
         var queryable = _context.ChatMessages
             .AsNoTracking()
-            .OrderByDescending(x => x.CreateTime)
+            .OrderByDescending(x => x.Id)
             .Include(x => x.Attachments)
             .Where(x => x.RoomId == roomId);
 
