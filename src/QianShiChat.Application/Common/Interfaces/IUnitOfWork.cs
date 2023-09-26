@@ -8,9 +8,9 @@ public interface IUnitOfWork : IDisposable
 
     bool HasActiveTransaction { get; }
 
-    IDbContextTransaction? GetCurrentTransaction { get; }
+    IDbContextTransaction GetCurrentTransaction { get; }
 
-    Task<IDbContextTransaction?> BeginTransactionAsync();
+    Task<IDbContextTransaction> BeginTransactionAsync();
 
     Task CommitAsync(IDbContextTransaction transaction);
 

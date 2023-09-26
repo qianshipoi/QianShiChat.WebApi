@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.Application.Services;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace QianShiChat.Application.Services;
 
 public class GroupService : IGroupService, ITransient
 {
@@ -270,7 +272,7 @@ public class GroupService : IGroupService, ITransient
     public async Task<List<GroupApplyDto>> ApprovalAsync(int userId, GroupJoiningApprovalRequest request, CancellationToken cancellationToken = default)
     {
         var result = new List<GroupApplyDto>();
-        using var tran = await _transaction.BeginTransactionAsync();
+        using var tran = await _context.BeginTransactionAsync();
         try
         {
             var status = request.State switch
@@ -284,17 +286,16 @@ public class GroupService : IGroupService, ITransient
             {
                 result.Add(await ApprovalAsync(applyId, userId, status, cancellationToken));
             }
-
-            await tran.CommitAsync();
+            await _context.CommitAsync(tran);
         }
         catch (BusinessException)
         {
-            tran.Rollback();
+            _context.RollbackTransaction();
             throw;
         }
         catch (Exception ex)
         {
-            tran.Rollback();
+            _context.RollbackTransaction();
             _logger.LogError(ex, "appoval join group error.");
             throw Oops.Oh();
         }
