@@ -88,7 +88,8 @@ public class UserController : BaseController
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateUserRequest dto, CancellationToken cancellationToken = default)
+    [AllowAnonymous]
+    public async Task<ActionResult<UserDto>> Create([FromBody] CreateUserRequest dto, CancellationToken cancellationToken = default)
     {
         var avatarPath = await _avatarService.GetDefaultAvatarByIdAsync(dto.DefaultAvatarId, cancellationToken);
         if (string.IsNullOrWhiteSpace(avatarPath))
@@ -103,6 +104,6 @@ public class UserController : BaseController
 
         var user = await _userService.AddAsync(dto, avatarPath, cancellationToken);
 
-        return CreatedAtAction(nameof(GetUser), new { user.Id }, user);
+        return Ok(user);
     }
 }
