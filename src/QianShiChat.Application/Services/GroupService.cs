@@ -267,7 +267,41 @@ public class GroupService : IGroupService, ITransient
         _ = SendApplyNotify(group, userInfo);
     }
 
-    public async Task ApprovalAync(int applyId, int userId, ApplyStatus status, CancellationToken cancellationToken = default)
+    public async Task<List<GroupApplyDto>> ApprovalAsync(int userId, GroupJoiningApprovalRequest request, CancellationToken cancellationToken = default)
+    {
+        var result = new List<GroupApplyDto>();
+        using var tran = await _context.BeginTransactionAsync();
+        try
+        {
+            var status = request.State switch
+            {
+                ApprovalState.Approved => ApplyStatus.Passed,
+                ApprovalState.Rejected => ApplyStatus.Rejected,
+                ApprovalState.Ignored => ApplyStatus.Ignored,
+                _ => throw new NotSupportedException()
+            };
+            foreach (var applyId in request.ApplyIds)
+            {
+                result.Add(await ApprovalAsync(applyId, userId, status, cancellationToken));
+            }
+            await _context.CommitAsync(tran);
+        }
+        catch (BusinessException)
+        {
+            _context.RollbackTransaction();
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _context.RollbackTransaction();
+            _logger.LogError(ex, "appoval join group error.");
+            throw Oops.Oh();
+        }
+
+        return result;
+    }
+
+    public async Task<GroupApplyDto> ApprovalAsync(int applyId, int userId, ApplyStatus status, CancellationToken cancellationToken = default)
     {
         var apply = await _context.GroupApplies
             .Include(x => x.Group)
@@ -277,7 +311,7 @@ public class GroupService : IGroupService, ITransient
         if (apply is null) throw Oops.Bah("apply not exists.");
         var now = Timestamp.Now;
 
-        if (apply.Status == status) return;
+        if (apply.Status == status) return _mapper.Map<GroupApplyDto>(apply);
 
         apply.Status = status;
 
@@ -293,6 +327,8 @@ public class GroupService : IGroupService, ITransient
         }
 
         await _context.SaveChangesAsync(cancellationToken);
+
+        return _mapper.Map<GroupApplyDto>(apply);
     }
 
     public async Task<PagedList<GroupApplyDto>> GetApplyPendingAsync(int userId, QueryGroupApplyPendingRequest request, CancellationToken cancellationToken = default)
@@ -324,6 +360,14 @@ public class GroupService : IGroupService, ITransient
 
         return PagedList.Create(data, total, request.Size);
     }
+
+    public async Task<bool> GroupExistsAsync(int groupId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Groups.Where(x => !x.IsDeleted && x.Id == groupId).AnyAsync(cancellationToken);
+    }
+
+    public Task<bool> IsJoinedAsync(int userId, int groupId, CancellationToken cancellationToken = default)
+        => _context.GroupApplies.Where(x => x.GroupId == groupId && x.UserId == userId && !x.IsDeleted).AnyAsync(cancellationToken);
 
     public async Task<PagedList<GroupDto>> SearchGroupAsync(GroupSearchRequest request, CancellationToken cancellationToken = default)
     {

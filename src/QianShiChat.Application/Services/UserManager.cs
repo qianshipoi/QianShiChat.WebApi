@@ -44,6 +44,8 @@ public class UserManager : IUserManager, IScoped
         }
     }
 
+    public bool IsLogin => _contextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false;
+
     public UserInfo GetCurrentUser()
     {
         if (_currentUserInfo is null)

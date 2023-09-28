@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.Application.Contracts;
+﻿using QianShiChat.Domain.Shared.Attributes;
+
+namespace QianShiChat.Application.Contracts;
 
 public class FileBaseInfo
 {
@@ -51,6 +53,12 @@ public class GroupSearchRequest : BasePagedRequest
     public string? Search { get; set; }
 }
 
+public class UserSearchRequest : BasePagedRequest
+{
+    [MaxLength(32)]
+    public string? Search { get; set; }
+}
+
 public class QueryMessageRequest: BasePagedRequest
 {
 
@@ -87,6 +95,15 @@ public class QueryGroupApplyPendingRequest
     public long? BeforeLastTime { get; set; }
 }
 
+
+public class GroupJoiningApprovalRequest
+{
+    [Required, ListNotEmpty]
+    public List<int> ApplyIds { get; set; } = new List<int>();
+
+    [Required, EnumDataType(typeof(ApprovalState))]
+    public ApprovalState State { get; set; }
+}
 
 public class UserAuthRequest
 {

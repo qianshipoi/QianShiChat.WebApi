@@ -9,10 +9,10 @@ public class FriendService : IFriendService, ITransient
     private readonly IOnlineManager _onlineManager;
 
     public FriendService(
-        IApplicationDbContext context, 
-        ILogger<FriendService> logger, 
-        IMapper mapper, 
-        IFileService fileService, 
+        IApplicationDbContext context,
+        ILogger<FriendService> logger,
+        IMapper mapper,
+        IFileService fileService,
         IOnlineManager onlineManager)
     {
         _context = context;
@@ -34,6 +34,15 @@ public class FriendService : IFriendService, ITransient
             .Where(x => x.UserId == userId)
             .Select(x => x.FriendId)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task DeleteAsync(int userId, int friendId, CancellationToken cancellationToken = default)
+    {
+        var realtions= await _context.UserRealtions.Where(x => (x.UserId == userId && x.FriendId == friendId) || (x.FriendId == userId && x.UserId == friendId)).ToListAsync(cancellationToken);
+
+        _context.UserRealtions.RemoveRange(realtions);
+
+        await _context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<List<UserDto>> GetFriendsAsync(int userId, CancellationToken cancellationToken = default)

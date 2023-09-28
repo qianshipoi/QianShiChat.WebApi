@@ -1,6 +1,4 @@
-﻿using QianShiChat.Domain.Extensions;
-
-namespace QianShiChat.Application.Services;
+﻿namespace QianShiChat.Application.Services;
 
 /// <summary>
 /// firend apply service.

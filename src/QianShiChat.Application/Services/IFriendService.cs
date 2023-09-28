@@ -5,6 +5,8 @@
 /// </summary>
 public interface IFriendService
 {
+    Task DeleteAsync(int userId, int friendId, CancellationToken cancellationToken = default);
+
     /// <summary>
     /// 获取所有好友编号
     /// </summary>

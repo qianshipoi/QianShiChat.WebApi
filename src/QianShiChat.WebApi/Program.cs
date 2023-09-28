@@ -13,10 +13,8 @@ builder.Services
         setup.Filters.Add<ClientAuthotizationFilter>();
         setup.Filters.Add<ResultWrapperFilter>();
         setup.Filters.Add<GlobalExceptionFilter>();
-    })
-    .AddJsonOptions(options => {
-        //options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter());
     });
+builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.Configure<ForwardedHeadersOptions>(options => {
     options.ForwardedHeaders =
@@ -59,6 +57,8 @@ builder.Services
     .AddHttpContextAccessor()
     .AddDirectoryBrowser();
 
+builder.Services.AddCarter();
+
 builder.Services.AddSingleton<TusDiskStorageOptionHelper>();
 builder.Services.AddSingleton(serviceProvider => serviceProvider.CreateTusConfigurationForCleanupService());
 builder.Services.AddHostedService<ExpiredFilesCleanupService>();
@@ -98,7 +98,7 @@ app.MapTus("/api/tusfiles", HttpContextExtensions.TusConfigurationFactory)
         }
         return await next(context);
     });
+app.MapCarter();
 app.MapControllers();
 app.MapHub<ChatHub>("/Hubs/Chat");
-
 app.Run();

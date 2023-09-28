@@ -56,19 +56,19 @@ public class GroupController : BaseController
     public Task ApprovalPassAync(
         [FromRoute, Range(1, int.MaxValue)] int applyId,
         CancellationToken cancellationToken = default)
-        => _groupService.ApprovalAync(applyId, CurrentUserId, ApplyStatus.Passed, cancellationToken);
+        => _groupService.ApprovalAsync(applyId, CurrentUserId, ApplyStatus.Passed, cancellationToken);
 
     [HttpPut("approval/{applyId:int}/reject")]
     public Task ApprovalRejectAync(
         [FromRoute, Range(1, int.MaxValue)] int applyId,
         CancellationToken cancellationToken = default)
-        => _groupService.ApprovalAync(applyId, CurrentUserId, ApplyStatus.Rejected, cancellationToken);
+        => _groupService.ApprovalAsync(applyId, CurrentUserId, ApplyStatus.Rejected, cancellationToken);
 
     [HttpPut("approval/{applyId:int}/ignore")]
     public Task ApprovalIgnoreAync(
         [FromRoute, Range(1, int.MaxValue)] int applyId,
         CancellationToken cancellationToken = default)
-        => _groupService.ApprovalAync(applyId, CurrentUserId, ApplyStatus.Ignored, cancellationToken);
+        => _groupService.ApprovalAsync(applyId, CurrentUserId, ApplyStatus.Ignored, cancellationToken);
 
     [HttpGet("search")]
     public Task<PagedList<GroupDto>> SearchAsync([FromQuery] GroupSearchRequest request, CancellationToken cancellationToken = default)

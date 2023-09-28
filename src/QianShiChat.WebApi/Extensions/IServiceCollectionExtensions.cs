@@ -104,7 +104,6 @@ public static class IServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddOpenApi(this IServiceCollection services)
     {
-        services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(options => {
             options.SwaggerDoc("v1", new OpenApiInfo
             {
@@ -112,9 +111,15 @@ public static class IServiceCollectionExtensions
                 Title = "QianShiChat API",
             });
 
+            options.SwaggerDoc("endpoint", new OpenApiInfo
+            {
+                Version = "Endpoint",
+                Title = "QianShiChat Api Endpoint",
+            });
+
             // using System.Reflection;
             var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+            options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename), true);
 
             options.OperationFilter<AddClientTypeHeaderFilter>();
             //添加授权
