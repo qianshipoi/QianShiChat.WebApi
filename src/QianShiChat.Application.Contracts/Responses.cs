@@ -1,7 +1,5 @@
 ﻿namespace QianShiChat.Application.Contracts;
 
-public record GroupApplyDto(GroupDto Group, UserDto User);
-
 public class QrAuthResponse
 {
     /// <summary>

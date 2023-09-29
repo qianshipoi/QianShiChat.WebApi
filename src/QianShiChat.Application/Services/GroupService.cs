@@ -264,7 +264,10 @@ public class GroupService : IGroupService, ITransient
         }
 
         // send group apply message.
-        _ = SendApplyNotify(group, userInfo);
+        entity.User = userInfo;
+        entity.Group = group;
+        var dto = _mapper.Map<GroupApplyDto>(entity);
+        _ = SendApplyNotify(dto);
     }
 
     public async Task<List<GroupApplyDto>> ApprovalAsync(int userId, GroupJoiningApprovalRequest request, CancellationToken cancellationToken = default)
@@ -428,10 +431,9 @@ public class GroupService : IGroupService, ITransient
             .Notification(new NotificationMessage(NotificationType.NewGroup, _mapper.Map<GroupDto>(group)));
     }
 
-    private async Task SendApplyNotify(Group group, UserInfo user)
+    private async Task SendApplyNotify(GroupApplyDto apply)
     {
-        var dto = new GroupApplyDto(_mapper.Map<GroupDto>(group), _mapper.Map<UserDto>(user));
-        await _hubContext.Clients.User(group.UserId.ToString()).Notification(new NotificationMessage(NotificationType.GroupApply, dto));
+        await _hubContext.Clients.User(apply.UserId.ToString()).Notification(new NotificationMessage(NotificationType.GroupApply, apply));
     }
 
     private void FormatGroupAvatar(GroupDto item)
