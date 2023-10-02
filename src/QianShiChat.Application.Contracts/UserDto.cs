@@ -1,6 +1,6 @@
 ﻿namespace QianShiChat.Application.Contracts;
 
-public class UserDto
+public class UserDto : IRoomToObject
 {
     public int Id { get; set; }
     public string Account { get; set; } = string.Empty;

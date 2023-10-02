@@ -14,6 +14,8 @@ public class ChatHub : Hub<IChatClient>
     private readonly IRoomService _roomService;
     private readonly IOnlineManager _onlineManager;
     private readonly OnlineDataTransmission _onlineDataTransmission;
+    private readonly IUserService _userService;
+    private readonly IGroupService _groupService;
 
     /// <summary>
     /// chat hub.
@@ -26,12 +28,16 @@ public class ChatHub : Hub<IChatClient>
         IFriendService friendService,
         IRoomService roomService,
         IOnlineManager onlineManager,
-        OnlineDataTransmission onlineDataTransmission)
+        OnlineDataTransmission onlineDataTransmission,
+        IUserService userService,
+        IGroupService groupService)
     {
         _friendService = friendService;
         _roomService = roomService;
         _onlineManager = onlineManager;
         _onlineDataTransmission = onlineDataTransmission;
+        _userService = userService;
+        _groupService = groupService;
     }
 
     /// <summary>
@@ -102,14 +108,34 @@ public class ChatHub : Hub<IChatClient>
         await _roomService.UpdateRoomPositionAsync(CurrentUserId, roomId, position);
     }
 
-    public Task<RoomDto?> GetRoomAsync(int toId, ChatMessageSendType type)
+    public async Task<RoomDto?> GetRoomAsync(int toId, ChatMessageSendType type)
     {
-        return _roomService.GetRoomAsync(CurrentUserId, type switch
+        var roomId = type switch
         {
             ChatMessageSendType.Personal => AppConsts.GetPrivateChatRoomId(CurrentUserId, toId),
             ChatMessageSendType.Group => AppConsts.GetGroupChatRoomId(CurrentUserId, toId),
             _ => throw new NotSupportedException()
-        });
+        };
+
+        var room = await _roomService.GetRoomAsync(CurrentUserId, roomId);
+        if (room is null)
+        {
+            var user = await _userService.GetUserByIdAsync(CurrentUserId);
+
+            IRoomToObject? toObject = type switch
+            {
+                ChatMessageSendType.Personal => await _userService.GetUserByIdAsync(toId),
+                ChatMessageSendType.Group => await _groupService.FindByIdAsync(toId),
+                _ => throw new NotSupportedException()
+            };
+            if (toObject is null)
+            {
+                return null;
+            }
+
+            room = RoomDto.CreateEmpty(roomId, user!, toObject);
+        }
+        return room;
     }
 
     public bool UserIsOnline(int id) => _onlineManager.CheckOnline(id);

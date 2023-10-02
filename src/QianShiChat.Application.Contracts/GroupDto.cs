@@ -1,6 +1,6 @@
 ﻿namespace QianShiChat.Application.Contracts;
 
-public class GroupDto
+public class GroupDto : IRoomToObject
 {
     public int Id { get; set; }
     public int UserId { get; set; }

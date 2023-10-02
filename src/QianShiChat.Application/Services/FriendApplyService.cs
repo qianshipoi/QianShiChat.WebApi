@@ -153,6 +153,39 @@ public class FriendApplyService : IFriendApplyService, ITransient
             });
         }
 
+        if (status == ApplyStatus.Passed)
+        {
+            var roomId = AppConsts.GetPrivateChatRoomId(apply.UserId, apply.FriendId);
+            var messagePosition = YitIdHelper.NextId();
+
+            if (!await _context.Rooms.AnyAsync(x => x.Id == roomId && x.FromId == apply.UserId))
+            {
+                _context.Rooms.Add(new Room
+                {
+                    CreateTime = apply.UpdateTime,
+                    FromId = apply.UserId,
+                    ToId = apply.FriendId,
+                    Type = ChatMessageSendType.Personal,
+                    Id = roomId,
+                    MessagePosition = messagePosition,
+                    UpdateTime = apply.UpdateTime
+                });
+            }
+            if(!await _context.Rooms.AnyAsync(x=>x.Id == roomId && x.FromId == apply.FriendId))
+            {
+                _context.Rooms.Add(new Room
+                {
+                    CreateTime = apply.UpdateTime,
+                    FromId = apply.FriendId,
+                    ToId = apply.UserId,
+                    Type = ChatMessageSendType.Personal,
+                    Id = roomId,
+                    MessagePosition = messagePosition,
+                    UpdateTime = apply.UpdateTime
+                });
+            }
+        }
+
         await _context.SaveChangesAsync(cancellationToken);
 
         return _mapper.Map<FriendApplyDto>(apply);
