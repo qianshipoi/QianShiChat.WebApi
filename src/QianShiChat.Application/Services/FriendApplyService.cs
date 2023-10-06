@@ -10,17 +10,19 @@ public class FriendApplyService : IFriendApplyService, ITransient
     private readonly IMapper _mapper;
     private readonly IFileService _fileService;
     private readonly IUserManager _userManager;
+    private readonly IHubContext<ChatHub, IChatClient> _hubContext;
 
     /// <summary>
     /// firend apply service.
     /// </summary>
-    public FriendApplyService(ILogger<FriendApplyService> logger, IApplicationDbContext context, IMapper mapper, IFileService fileService, IUserManager userManager)
+    public FriendApplyService(ILogger<FriendApplyService> logger, IApplicationDbContext context, IMapper mapper, IFileService fileService, IUserManager userManager, IHubContext<ChatHub, IChatClient> hubContext)
     {
         _logger = logger;
         _context = context;
         _mapper = mapper;
         _fileService = fileService;
         _userManager = userManager;
+        _hubContext = hubContext;
     }
 
     public async Task<bool> IsApplyAsync(int userId, int friendId, CancellationToken cancellationToken = default)
@@ -171,7 +173,7 @@ public class FriendApplyService : IFriendApplyService, ITransient
                     UpdateTime = apply.UpdateTime
                 });
             }
-            if(!await _context.Rooms.AnyAsync(x=>x.Id == roomId && x.FromId == apply.FriendId))
+            if (!await _context.Rooms.AnyAsync(x => x.Id == roomId && x.FromId == apply.FriendId))
             {
                 _context.Rooms.Add(new Room
                 {
@@ -188,6 +190,31 @@ public class FriendApplyService : IFriendApplyService, ITransient
 
         await _context.SaveChangesAsync(cancellationToken);
 
+
+        if(status == ApplyStatus.Passed)
+        {
+            // send new friend notification
+            var userDto = _mapper.Map<UserDto>(apply.User);
+            var friendDto = _mapper.Map<UserDto>(apply.Friend);
+            FormatAvatar(userDto);
+            FormatAvatar(friendDto);
+            _ = SendNewFriendNotificationAsync(userDto, friendDto);
+        }
+
         return _mapper.Map<FriendApplyDto>(apply);
+    }
+
+    private void FormatAvatar(UserDto user)
+    {
+        if (!string.IsNullOrWhiteSpace(user.Avatar))
+            user.Avatar = _fileService.FormatPublicFile(user.Avatar);
+    }
+
+    private async Task SendNewFriendNotificationAsync(UserDto user, UserDto friend, CancellationToken cancellationToken = default)
+    {
+        var task1 = _hubContext.Clients.User(user.Id.ToString()).Notification(new NotificationMessage(NotificationType.NewFriend, friend));
+        var task2 = _hubContext.Clients.User(friend.Id.ToString()).Notification(new NotificationMessage(NotificationType.NewFriend, user));
+
+        await Task.WhenAll(task1, task2);
     }
 }

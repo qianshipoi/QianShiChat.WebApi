@@ -8,6 +8,7 @@ public class UserDto : IRoomToObject
     public string NickName { get; set; } = string.Empty;
     public long CreateTime { get; set; }
     public bool IsOnline { get; set; }
+    public string? Alias { get; set; }
 }
 
 public class UserWithMessage : UserDto

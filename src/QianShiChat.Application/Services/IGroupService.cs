@@ -15,5 +15,7 @@ public interface IGroupService
     Task<bool> GroupExistsAsync(int groupId, CancellationToken cancellationToken = default);
     Task<bool> IsJoinedAsync(int userId, int groupId, CancellationToken cancellationToken = default);
     Task LeaveAsync(int userId, int id, CancellationToken cancellationToken = default);
+    Task RenameAsync(int userId, int groupId, string name, CancellationToken cancellationToken = default);
     Task<PagedList<GroupDto>> SearchGroupAsync(GroupSearchRequest request, CancellationToken cancellationToken = default);
+    Task SetAliasAsync(int userId, int groupId, string? name, CancellationToken cancellationToken = default);
 }

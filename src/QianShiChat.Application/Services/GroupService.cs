@@ -5,24 +5,27 @@ public class GroupService : IGroupService, ITransient
     private readonly IApplicationDbContext _context;
     private readonly ILogger<GroupService> _logger;
     private readonly IMapper _mapper;
-    private readonly IUserService _userService;
     private readonly IFileService _fileService;
     private readonly IHubContext<ChatHub, IChatClient> _hubContext;
+    private readonly IGroupRepository _groupRepository;
+    private readonly IUserRepository _userRepository;
 
     public GroupService(
         IApplicationDbContext context,
         ILogger<GroupService> logger,
         IMapper mapper,
-        IUserService userService,
         IFileService fileService,
-        IHubContext<ChatHub, IChatClient> hubContext)
+        IHubContext<ChatHub, IChatClient> hubContext,
+        IGroupRepository groupRepository,
+        IUserRepository userRepository)
     {
         _context = context;
         _logger = logger;
         _mapper = mapper;
-        _userService = userService;
         _fileService = fileService;
         _hubContext = hubContext;
+        _groupRepository = groupRepository;
+        _userRepository = userRepository;
     }
 
     /// <summary>
@@ -67,7 +70,7 @@ public class GroupService : IGroupService, ITransient
 
         foreach (var friendId in request.FriendIds)
         {
-            var isFriend = await _userService.IsFriendAsync(userId, friendId, cancellationToken);
+            var isFriend = await _userRepository.IsFriendAsync(userId, friendId, cancellationToken);
 
             if (!isFriend)
             {
@@ -75,8 +78,8 @@ public class GroupService : IGroupService, ITransient
             }
         }
 
-        var currentUserName = await _userService.GetNickNameByIdAsync(userId, cancellationToken);
-        var friendName = await _userService.GetNickNameByIdAsync(request.FriendIds.First(), cancellationToken);
+        var currentUserName = await _userRepository.GetNicknameAsync(userId, cancellationToken);
+        var friendName = await _userRepository.GetNicknameAsync(request.FriendIds.First(), cancellationToken);
 
         var now = Timestamp.Now;
         var group = new Group()
@@ -138,7 +141,6 @@ public class GroupService : IGroupService, ITransient
             throw Oops.Oh("create group error.");
         }
 
-
         var dto = _mapper.Map<GroupDto>(group);
         FormatGroupAvatar(dto);
         await _hubContext.Clients.Users(new List<string>(request.FriendIds.Select(x => x.ToString())) { userId.ToString() }).Notification(new NotificationMessage(NotificationType.NewGroup, dto));
@@ -163,6 +165,7 @@ public class GroupService : IGroupService, ITransient
         }
 
         _context.UserGroupRealtions.Remove(group);
+        await _groupRepository.TotalUserDecrementAsync(group.GroupId, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
     }
 
@@ -213,29 +216,32 @@ public class GroupService : IGroupService, ITransient
         dtos.ForEach(FormatGroupAvatar);
         return dtos;
     }
-    public Task<GroupDto?> FindByIdAsync(int groupId, CancellationToken cancellationToken = default)
+
+    public async Task<GroupDto?> FindByIdAsync(int groupId, CancellationToken cancellationToken = default)
     {
-        return _context.Groups.AsNoTracking().Where(x => x.Id == groupId).ProjectTo<GroupDto>(_mapper.ConfigurationProvider).FirstOrDefaultAsync(cancellationToken);
+        var dto = await _context.Groups
+            .AsNoTracking()
+            .Where(x => x.Id == groupId)
+            .ProjectTo<GroupDto>(_mapper.ConfigurationProvider)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (dto is null) return null;
+        FormatGroupAvatar(dto);
+        return dto;
     }
 
     public async Task ApplyAsync(int id, int userId, GroupApplyRequest request, CancellationToken cancellationToken = default)
     {
-        var userInfo = await _context.UserInfos
-            .Where(x => x.Id == userId && !x.IsDeleted)
-            .FirstOrDefaultAsync(cancellationToken);
-
+        var userInfo = await _userRepository.FindByIdAsync(userId, cancellationToken);
         if (userInfo == null) throw Oops.Bah("user not found.");
 
-        var group = await _context.Groups
-            .AsNoTracking()
-            .Where(x => x.Id == id && !x.IsDeleted)
-            .FirstOrDefaultAsync(cancellationToken);
-
+        var group = await _groupRepository.FindByIdAsync(id, cancellationToken);
         if (group is null) throw Oops.Bah("group not found.");
 
         var entity = await _context.GroupApplies
             .Where(x => x.GroupId == id && x.UserId == userId && x.Status == ApplyStatus.Applied && !x.IsDeleted)
             .FirstOrDefaultAsync(cancellationToken);
+
         var now = Timestamp.Now;
 
         if (entity is null)
@@ -326,10 +332,16 @@ public class GroupService : IGroupService, ITransient
                 GroupId = apply.GroupId,
                 CreateTime = now,
             });
-            _ = SendNewGroup(apply.Group!, apply.UserId);
+
+            await _groupRepository.TotalUserIncrementAsync(apply.Group.Id, cancellationToken);
         }
 
         await _context.SaveChangesAsync(cancellationToken);
+
+        if (status == ApplyStatus.Passed)
+        {
+            _ = SendNewGroup(apply.Group!, apply.UserId);
+        }
 
         return _mapper.Map<GroupApplyDto>(apply);
     }
@@ -403,18 +415,42 @@ public class GroupService : IGroupService, ITransient
               .Include(x => x.User)
               .Where(x => x.GroupId == groupId)
               .OrderBy(x => x.CreateTime)
-              .Select(x => x.User);
+              .Select(x => new UserDto
+              {
+                  Account = x.User!.Account,
+                  Avatar = x.User.Avatar!,
+                  CreateTime = x.User.CreateTime,
+                  Id = x.User.Id,
+                  IsOnline = false,
+                  NickName = x.User.NickName,
+                  Alias = x.Alias,
+              });
 
         var total = await query.CountAsync(cancellationToken);
 
         var items = await query
-            .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
             .Skip((request.Page - 1) * request.Size)
             .Take(request.Size)
             .ToListAsync(cancellationToken);
+
         items.ForEach(FormatUserAvatar);
 
         return PagedList.Create(items, total, request.Size);
+    }
+
+    public async Task RenameAsync(int userId, int groupId, string name, CancellationToken cancellationToken = default)
+    {
+        var isCreator = await _groupRepository.IsCreatorAsync(userId, groupId, cancellationToken);
+        if (!isCreator) throw Oops.Bah("not permission").StatusCode(HttpStatusCode.Forbidden);
+
+        await _groupRepository.UpdateGroupNameAsync(userId, name, cancellationToken);
+    }
+
+    public async Task SetAliasAsync(int userId, int groupId, string? name, CancellationToken cancellationToken = default)
+    {
+        var isJoined = await _groupRepository.IsJoinGroupAsync(userId, groupId, cancellationToken);
+        if (!isJoined) throw Oops.Bah("").StatusCode(HttpStatusCode.Forbidden);
+        await _groupRepository.SetAliasAsync(userId, groupId, name, cancellationToken);
     }
 
     private void FormatUserAvatar(UserDto user)
@@ -427,8 +463,10 @@ public class GroupService : IGroupService, ITransient
 
     private async Task SendNewGroup(Group group, int userId)
     {
+        var groupDto = _mapper.Map<GroupDto>(group);
+        FormatGroupAvatar(groupDto);
         await _hubContext.Clients.User(userId.ToString())
-            .Notification(new NotificationMessage(NotificationType.NewGroup, _mapper.Map<GroupDto>(group)));
+            .Notification(new NotificationMessage(NotificationType.NewGroup, groupDto));
     }
 
     private async Task SendApplyNotify(GroupApplyDto apply)

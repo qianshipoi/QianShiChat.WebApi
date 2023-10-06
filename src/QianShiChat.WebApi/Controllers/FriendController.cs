@@ -31,4 +31,8 @@ public class FriendController : BaseController
         var result = await _friendService.GetFriendsAsync(CurrentUserId, cancellationToken);
         return Ok(result);
     }
+
+    [HttpPut("{friendId:int}/alias")]
+    public Task ReMyAliasAsync([FromRoute] int friendId, [Required, StringLength(32)] string? name, CancellationToken cancellationToken = default)
+        => _friendService.SetAliasAsync(CurrentUserId, friendId, name, cancellationToken);
 }

@@ -20,7 +20,7 @@ public class GroupController : BaseController
         => _groupService.GetAllByUserIdAsync(CurrentUserId, cancellationToken);
 
     [HttpGet("{groupId:int}")]
-    public Task<GroupDto?> FindAsync([FromRoute, Range(1, int.MaxValue)]int groupId, CancellationToken cancellationToken = default)
+    public Task<GroupDto?> FindAsync([FromRoute, Range(1, int.MaxValue)] int groupId, CancellationToken cancellationToken = default)
         => _groupService.FindByIdAsync(groupId, cancellationToken);
 
     [HttpPost]
@@ -77,4 +77,12 @@ public class GroupController : BaseController
     [HttpGet("{groupId:int}/members")]
     public Task<PagedList<UserDto>> GetMembersAsync([FromRoute] int groupId, [FromQuery] GroupMemberQueryRequest request, CancellationToken cancellationToken = default)
         => _groupService.GetMembersByGroupAsync(groupId, request, cancellationToken);
+
+    [HttpPut("{groupId:int}/name")]
+    public Task RenameAsync([FromRoute] int groupId, [Required, StringLength(32, MinimumLength = 1)] string name, CancellationToken cancellationToken = default)
+        => _groupService.RenameAsync(CurrentUserId, groupId, name, cancellationToken);
+
+    [HttpPut("{groupId:int}/alias")]
+    public Task ReMyAliasAsync([FromRoute] int groupId, [Required, StringLength(32)] string? name, CancellationToken cancellationToken = default)
+        => _groupService.SetAliasAsync(CurrentUserId, groupId, name, cancellationToken);
 }

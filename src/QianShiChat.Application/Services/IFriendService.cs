@@ -31,4 +31,5 @@ public interface IFriendService
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<bool> IsFriendAsync(int userId, int friendId, CancellationToken cancellationToken = default);
+    Task SetAliasAsync(int userId, int friendId, string? name, CancellationToken cancellationToken = default);
 }

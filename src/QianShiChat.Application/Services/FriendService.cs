@@ -7,19 +7,22 @@ public class FriendService : IFriendService, ITransient
     private readonly IMapper _mapper;
     private readonly IFileService _fileService;
     private readonly IOnlineManager _onlineManager;
+    private readonly IUserRepository _userRepository;
 
     public FriendService(
         IApplicationDbContext context,
         ILogger<FriendService> logger,
         IMapper mapper,
         IFileService fileService,
-        IOnlineManager onlineManager)
+        IOnlineManager onlineManager,
+        IUserRepository userRepository)
     {
         _context = context;
         _logger = logger;
         _mapper = mapper;
         _fileService = fileService;
         _onlineManager = onlineManager;
+        _userRepository = userRepository;
     }
 
     public async Task<bool> IsFriendAsync(int userId, int friendId, CancellationToken cancellationToken = default)
@@ -51,7 +54,6 @@ public class FriendService : IFriendService, ITransient
             .AsNoTracking()
             .Where(x => x.UserId == userId)
             .Include(x => x.Friend)
-            .Select(x => x.Friend)
             .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
             .ToListAsync(cancellationToken);
 
@@ -61,5 +63,12 @@ public class FriendService : IFriendService, ITransient
         });
 
         return friends;
+    }
+
+    public async Task SetAliasAsync(int userId, int friendId, string? name, CancellationToken cancellationToken = default)
+    {
+        var isFriend =await _userRepository.IsFriendAsync(userId, friendId, cancellationToken);
+        if (!isFriend) throw Oops.Bah("").StatusCode(HttpStatusCode.Forbidden);
+        await _userRepository.SetAliasAsync(userId, friendId, name, cancellationToken);
     }
 }

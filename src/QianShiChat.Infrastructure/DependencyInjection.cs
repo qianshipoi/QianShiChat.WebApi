@@ -1,6 +1,4 @@
-﻿using QianShiChat.Infrastructure.Data.Repositories;
-
-namespace Microsoft.Extensions.DependencyInjection;
+﻿namespace Microsoft.Extensions.DependencyInjection;
 
 public static class DependencyInjection
 {
