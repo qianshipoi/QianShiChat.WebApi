@@ -6,5 +6,8 @@ public interface IUserManager
     string CurrentClientType { get; }
     bool IsLogin { get; }
 
+    Task ChangePasswordAsync(string oldPasswrod, string newPassword, CancellationToken cancellationToken = default);
     UserInfo GetCurrentUser();
+    Task SetDescriptionAsync(string? description, CancellationToken cancellationToken = default);
+    Task SetNicknameAsync(string name, CancellationToken cancellationToken = default);
 }

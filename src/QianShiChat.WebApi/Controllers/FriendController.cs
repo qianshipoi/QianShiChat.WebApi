@@ -33,6 +33,6 @@ public class FriendController : BaseController
     }
 
     [HttpPut("{friendId:int}/alias")]
-    public Task ReMyAliasAsync([FromRoute] int friendId, [Required, StringLength(32)] string? name, CancellationToken cancellationToken = default)
-        => _friendService.SetAliasAsync(CurrentUserId, friendId, name, cancellationToken);
+    public Task ReMyAliasAsync([FromRoute] int friendId, AliasRequest request, CancellationToken cancellationToken = default)
+        => _friendService.SetAliasAsync(CurrentUserId, friendId, request.Alias, cancellationToken);
 }

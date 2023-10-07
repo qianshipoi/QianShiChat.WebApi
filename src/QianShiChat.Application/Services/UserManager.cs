@@ -13,6 +13,31 @@ public class UserManager : IUserManager, IScoped
         _chatDbContext = chatDbContext;
     }
 
+    public async Task SetDescriptionAsync(string? description, CancellationToken cancellationToken = default)
+    {
+        var user = GetCurrentUser();
+        user.Description = description;
+        await _chatDbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task SetNicknameAsync(string name, CancellationToken cancellationToken = default)
+    {
+        var user = GetCurrentUser();
+        user.NickName = name;
+        await _chatDbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task ChangePasswordAsync(string oldPasswrod, string newPassword, CancellationToken cancellationToken = default)
+    {
+        var user = GetCurrentUser();
+        if (user.Password != oldPasswrod)
+        {
+            throw Oops.Bah("old password is wrong.");
+        }
+        user.Password = newPassword;
+        await _chatDbContext.SaveChangesAsync(cancellationToken);
+    }
+
     public string CurrentClientType
     {
         get
@@ -51,10 +76,9 @@ public class UserManager : IUserManager, IScoped
         if (_currentUserInfo is null)
         {
             var user = _chatDbContext.UserInfos.Find(CurrentUserId);
-
             if (user is null)
             {
-                throw Oops.Bah("").StatusCode(System.Net.HttpStatusCode.Unauthorized);
+                throw Oops.Bah("").StatusCode(HttpStatusCode.Unauthorized);
             }
             _currentUserInfo = user;
         }

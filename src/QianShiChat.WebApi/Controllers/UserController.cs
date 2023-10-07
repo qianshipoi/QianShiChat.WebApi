@@ -12,6 +12,7 @@ public class UserController : BaseController
     private readonly IUserService _userService;
     private readonly IRedisCachingProvider _redisCachingProvider;
     private readonly IAvatarService _avatarService;
+    private readonly IUserManager _userManager;
 
     /// <summary>
     /// user controller
@@ -21,13 +22,15 @@ public class UserController : BaseController
         IMapper mapper,
         ILogger<UserController> logger,
         IUserService userService,
-        IRedisCachingProvider redisCachingProvider)
+        IRedisCachingProvider redisCachingProvider,
+        IUserManager userManager)
     {
         _mapper = mapper;
         _logger = logger;
         _userService = userService;
         _redisCachingProvider = redisCachingProvider;
         _avatarService = avatarService;
+        _userManager = userManager;
     }
 
     /// <summary>

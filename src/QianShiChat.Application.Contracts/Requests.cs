@@ -1,6 +1,16 @@
-﻿using QianShiChat.Domain.Shared.Attributes;
+﻿namespace QianShiChat.Application.Contracts;
 
-namespace QianShiChat.Application.Contracts;
+public class AliasRequest
+{
+    [MaxLength(32)]
+    public string? Alias { get; set; }
+}
+
+public class NameRequest
+{
+    [Required, StringLength(32, MinimumLength = 1)]
+    public string Name { get; set; } = string.Empty;
+}
 
 public class FileBaseInfo
 {
@@ -8,13 +18,13 @@ public class FileBaseInfo
     public string Name { get; set; } = string.Empty;
     [Required, MaxLength(128)]
     public string ContentType { get; set; } = string.Empty;
-    [Required,Range(1,int.MaxValue)]
+    [Required, Range(1, int.MaxValue)]
     public int Size { get; set; }
 }
 
 public class QueryUserAvatarRequest
 {
-    [Required,Range(1,100)]
+    [Required, Range(1, 100)]
     public int Count { get; set; }
     public int? BeforeId { get; set; }
 }
@@ -59,7 +69,7 @@ public class UserSearchRequest : BasePagedRequest
     public string? Search { get; set; }
 }
 
-public class QueryMessageRequest: BasePagedRequest
+public class QueryMessageRequest : BasePagedRequest
 {
 
 }

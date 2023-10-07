@@ -79,10 +79,10 @@ public class GroupController : BaseController
         => _groupService.GetMembersByGroupAsync(groupId, request, cancellationToken);
 
     [HttpPut("{groupId:int}/name")]
-    public Task RenameAsync([FromRoute] int groupId, [Required, StringLength(32, MinimumLength = 1)] string name, CancellationToken cancellationToken = default)
-        => _groupService.RenameAsync(CurrentUserId, groupId, name, cancellationToken);
+    public Task RenameAsync([FromRoute] int groupId, NameRequest request, CancellationToken cancellationToken = default)
+        => _groupService.RenameAsync(CurrentUserId, groupId, request.Name, cancellationToken);
 
     [HttpPut("{groupId:int}/alias")]
-    public Task ReMyAliasAsync([FromRoute] int groupId, [Required, StringLength(32)] string? name, CancellationToken cancellationToken = default)
-        => _groupService.SetAliasAsync(CurrentUserId, groupId, name, cancellationToken);
+    public Task ReMyAliasAsync([FromRoute] int groupId, AliasRequest request, CancellationToken cancellationToken = default)
+        => _groupService.SetAliasAsync(CurrentUserId, groupId, request.Alias, cancellationToken);
 }
