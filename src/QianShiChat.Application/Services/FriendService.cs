@@ -72,3 +72,72 @@ public class FriendService : IFriendService, ITransient
         await _userRepository.SetAliasAsync(userId, friendId, name, cancellationToken);
     }
 }
+
+public class FriendGroupService : IFriendGroupService
+{
+    private readonly IApplicationDbContext _context;
+    private readonly ILogger<FriendGroupService> _logger;
+    private readonly IMapper _mapper;
+
+    public FriendGroupService(
+        IApplicationDbContext context, 
+        ILogger<FriendGroupService> logger, 
+        IMapper mapper)
+    {
+        _context = context;
+        _logger = logger;
+        _mapper = mapper;
+    }
+
+    public async Task<List<FriendGroupDto>> GetGroupsAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        var groups = await _context.FriendGroups.AsNoTracking()
+            .Where(x => x.UserId == userId)
+            .OrderBy(x => x.Sort)
+            .ThenBy(x => x.Id)
+            .ProjectTo<FriendGroupDto>(_mapper.ConfigurationProvider)
+            .ToListAsync(cancellationToken);
+
+        return groups;
+    }
+
+    public async Task<FriendGroupDto> AddAsync(int userId, string? name, CancellationToken cancellationToken = default)
+    {
+        var group = new FriendGroup
+        {
+            UserId = userId,
+            Name = name,
+            Sort = 0,
+            IsDefault = false
+        };
+
+        _context.FriendGroups.Add(group);
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return _mapper.Map<FriendGroupDto>(group);
+    }
+
+    public async Task<FriendGroupDto> UpdateAsync(int userId, int groupId, string? name, CancellationToken cancellationToken = default)
+    {
+        var group = await _context.FriendGroups.FirstOrDefaultAsync(x => x.Id == groupId && x.UserId == userId, cancellationToken);
+        if (group == null) throw Oops.Bah("").StatusCode(HttpStatusCode.Forbidden);
+
+        group.Name = name;
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return _mapper.Map<FriendGroupDto>(group);
+    }
+
+    public async Task DeleteAsync(int userId, int groupId, CancellationToken cancellationToken = default)
+    {
+        var group = await _context.FriendGroups.FirstOrDefaultAsync(x => x.Id == groupId && x.UserId == userId, cancellationToken);
+        if (group == null) throw Oops.Bah("").StatusCode(HttpStatusCode.Forbidden);
+        if (group.IsDefault) throw Oops.Bah("cannot delete the default group");
+
+        _context.FriendGroups.Remove(group);
+
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+}

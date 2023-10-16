@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.Application.Services;
+﻿using QianShiChat.Application.Services.IServices;
+
+namespace QianShiChat.Application.Services;
 
 /// <summary>
 /// chat message service

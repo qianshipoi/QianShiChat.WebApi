@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.WebApi.Extensions;
+﻿using QianShiChat.Application.Services.IServices;
+
+namespace QianShiChat.WebApi.Extensions;
 
 public static class HttpContextExtensions
 {

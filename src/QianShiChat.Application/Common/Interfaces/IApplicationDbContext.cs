@@ -13,4 +13,5 @@ public interface IApplicationDbContext : IUnitOfWork
     DbSet<GroupApply> GroupApplies { get; set; }
     DbSet<Attachment> Attachments { get; set; }
     DbSet<Room> Rooms { get; set; }
+    DbSet<FriendGroup> FriendGroups { get; set; }
 }

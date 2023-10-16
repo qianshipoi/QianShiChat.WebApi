@@ -10,6 +10,8 @@ public class UserRealtion
     public int FriendId { get; set; }
     public string? Alias { get; set; }
     public long CreateTime { get; set; }
+    public int FriendGroupId { get; set; }
     public virtual UserInfo? User { get; set; }
     public virtual UserInfo? Friend { get; set; }
+    public virtual FriendGroup? FriendGroup { get; set; }
 }

@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.WebApi.Controllers;
+﻿using QianShiChat.Application.Services.IServices;
+
+namespace QianShiChat.WebApi.Controllers;
 
 /// <summary>
 /// friend apply api.

@@ -21,5 +21,11 @@ public class UserRealtionEntityTypeConfiguration : IEntityTypeConfiguration<User
         builder.HasOne(e => e.Friend)
             .WithMany(e => e.Friends)
             .IsRequired(false);
+
+        builder.Property(p => p.FriendGroupId)
+            .IsRequired();
+        builder.HasOne(e => e.FriendGroup)
+            .WithMany(e => e.FriendRealtions)
+            .IsRequired(false);
     }
 }

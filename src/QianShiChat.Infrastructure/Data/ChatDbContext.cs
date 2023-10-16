@@ -15,6 +15,7 @@ public class ChatDbContext : DbContext, IApplicationDbContext
     public DbSet<GroupApply> GroupApplies { get; set; }
     public DbSet<Attachment> Attachments { get; set; }
     public DbSet<Room> Rooms { get; set; }
+    public DbSet<FriendGroup> FriendGroups { get; set; }
 
     public ChatDbContext(DbContextOptions options) : base(options)
     {

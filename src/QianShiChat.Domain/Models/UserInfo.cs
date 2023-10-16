@@ -15,6 +15,7 @@ public class UserInfo : IAuditable, ISoftDelete
         Attachments = new HashSet<Attachment>();
         Rooms = new HashSet<Room>();
         Messages = new HashSet<ChatMessage>();
+        FriendGroups = new HashSet<FriendGroup>();
     }
 
     public int Id { get; set; }
@@ -39,4 +40,5 @@ public class UserInfo : IAuditable, ISoftDelete
     public virtual ICollection<Attachment> Attachments { get; set; }
     public virtual ICollection<Room> Rooms { get; set; }
     public virtual ICollection<ChatMessage> Messages { get; set; }
+    public virtual ICollection<FriendGroup> FriendGroups { get; set; }
 }

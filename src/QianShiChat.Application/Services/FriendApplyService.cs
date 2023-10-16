@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.Application.Services;
+﻿using QianShiChat.Application.Common.IRepositories;
+
+namespace QianShiChat.Application.Services;
 
 /// <summary>
 /// firend apply service.
@@ -11,11 +13,12 @@ public class FriendApplyService : IFriendApplyService, ITransient
     private readonly IFileService _fileService;
     private readonly IUserManager _userManager;
     private readonly IHubContext<ChatHub, IChatClient> _hubContext;
+    private readonly IFriendGroupRepository _friendGroupRepository;
 
     /// <summary>
     /// firend apply service.
     /// </summary>
-    public FriendApplyService(ILogger<FriendApplyService> logger, IApplicationDbContext context, IMapper mapper, IFileService fileService, IUserManager userManager, IHubContext<ChatHub, IChatClient> hubContext)
+    public FriendApplyService(ILogger<FriendApplyService> logger, IApplicationDbContext context, IMapper mapper, IFileService fileService, IUserManager userManager, IHubContext<ChatHub, IChatClient> hubContext, IFriendGroupRepository friendGroupRepository)
     {
         _logger = logger;
         _context = context;
@@ -23,6 +26,7 @@ public class FriendApplyService : IFriendApplyService, ITransient
         _fileService = fileService;
         _userManager = userManager;
         _hubContext = hubContext;
+        _friendGroupRepository = friendGroupRepository;
     }
 
     public async Task<bool> IsApplyAsync(int userId, int friendId, CancellationToken cancellationToken = default)
@@ -126,6 +130,27 @@ public class FriendApplyService : IFriendApplyService, ITransient
             .CountAsync(cancellationToken);
     }
 
+    private async Task<FriendGroup> GetUserFriendGroupAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        var group = await _friendGroupRepository.FindUserDefaultGroupByIdAsync(userId, cancellationToken);
+
+        if (group == null)
+        {
+            group = new FriendGroup
+            {
+                IsDefault = true,
+                Name = "My friend",
+                UserId = userId,
+                Sort = 9999,
+                CreateTime = Timestamp.Now,
+            };
+
+            _context.FriendGroups.Add(group);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+        return group;
+    }
+
     public async Task<FriendApplyDto> ApprovalAsync(int userId, int id, ApplyStatus status, CancellationToken cancellationToken = default)
     {
         var apply = await _context.FriendApplies
@@ -140,18 +165,22 @@ public class FriendApplyService : IFriendApplyService, ITransient
         if (status == ApplyStatus.Passed
             && !await _context.UserRealtions.AnyAsync(x => x.UserId == apply.UserId && x.FriendId == apply.FriendId, cancellationToken))
         {
+            var currentUserDefaultFriendGroup = GetUserFriendGroupAsync(apply.UserId, cancellationToken);
             _context.UserRealtions.Add(new UserRealtion
             {
                 UserId = apply.FriendId,
                 FriendId = apply.UserId,
-                CreateTime = apply.UpdateTime
+                CreateTime = apply.UpdateTime,
+                FriendGroupId = currentUserDefaultFriendGroup.Id
             });
 
+            var friendDefaultFriendGroup = await GetUserFriendGroupAsync(apply.FriendId, cancellationToken);
             _context.UserRealtions.Add(new UserRealtion
             {
                 UserId = apply.UserId,
                 FriendId = apply.FriendId,
-                CreateTime = apply.UpdateTime
+                CreateTime = apply.UpdateTime,
+                FriendGroupId = friendDefaultFriendGroup.Id
             });
         }
 
@@ -190,8 +219,7 @@ public class FriendApplyService : IFriendApplyService, ITransient
 
         await _context.SaveChangesAsync(cancellationToken);
 
-
-        if(status == ApplyStatus.Passed)
+        if (status == ApplyStatus.Passed)
         {
             // send new friend notification
             var userDto = _mapper.Map<UserDto>(apply.User);

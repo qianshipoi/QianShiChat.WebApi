@@ -1,3 +1,5 @@
+using QianShiChat.Application.Services.IServices;
+
 namespace QianShiChat.Application.Hubs;
 
 /// <summary>

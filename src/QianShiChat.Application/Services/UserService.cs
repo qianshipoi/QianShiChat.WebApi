@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
-
-using QianShiChat.Domain.Extensions;
-
-namespace QianShiChat.Application.Services;
+﻿namespace QianShiChat.Application.Services;
 
 /// <summary>
 /// user service.
@@ -87,9 +83,17 @@ public class UserService : IUserService, ITransient
         {
             File.Copy(defaultAvatarPath, newAvatarPath);
             user.Avatar = newPath.Replace('\\', '/');
+            // add default friend group;
+            var friendGroup = new FriendGroup
+            {
+                Name = "My friend",
+                CreateTime = Timestamp.Now,
+                IsDefault = true,
+                Sort = 999,
+            };
+            user.FriendGroups.Add(friendGroup);
             await _context.UserInfos.AddAsync(user, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
-
             user.Avatar = _fileService.FormatPublicFile(user.Avatar);
             return _mapper.Map<UserDto>(user);
         }
