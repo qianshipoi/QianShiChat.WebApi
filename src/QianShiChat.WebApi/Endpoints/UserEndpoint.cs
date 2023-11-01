@@ -1,6 +1,4 @@
-﻿using QianShiChat.Application.Services.IServices;
-
-namespace QianShiChat.WebApi.Endpoints;
+﻿namespace QianShiChat.WebApi.Endpoints;
 
 public class UserEndpoint : ICarterModule
 {

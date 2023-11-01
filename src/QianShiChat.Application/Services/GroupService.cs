@@ -1,6 +1,4 @@
-﻿using QianShiChat.Application.Services.IServices;
-
-namespace QianShiChat.Application.Services;
+﻿namespace QianShiChat.Application.Services;
 
 public class GroupService : IGroupService, ITransient
 {
@@ -11,6 +9,10 @@ public class GroupService : IGroupService, ITransient
     private readonly IHubContext<ChatHub, IChatClient> _hubContext;
     private readonly IGroupRepository _groupRepository;
     private readonly IUserRepository _userRepository;
+    private readonly IAttachmentRepository _attachmentRepository;
+    private readonly IWebHostEnvironment _webHostEnvironment;
+
+    private const string AvatarPrefix = "/Raw/GroupAvatar";
 
     public GroupService(
         IApplicationDbContext context,
@@ -19,7 +21,9 @@ public class GroupService : IGroupService, ITransient
         IFileService fileService,
         IHubContext<ChatHub, IChatClient> hubContext,
         IGroupRepository groupRepository,
-        IUserRepository userRepository)
+        IUserRepository userRepository,
+        IAttachmentRepository attachmentRepository,
+        IWebHostEnvironment webHostEnvironment)
     {
         _context = context;
         _logger = logger;
@@ -28,6 +32,8 @@ public class GroupService : IGroupService, ITransient
         _hubContext = hubContext;
         _groupRepository = groupRepository;
         _userRepository = userRepository;
+        _attachmentRepository = attachmentRepository;
+        _webHostEnvironment = webHostEnvironment;
     }
 
     /// <summary>
@@ -83,6 +89,21 @@ public class GroupService : IGroupService, ITransient
         var currentUserName = await _userRepository.GetNicknameAsync(userId, cancellationToken);
         var friendName = await _userRepository.GetNicknameAsync(request.FriendIds.First(), cancellationToken);
 
+        var avatarPath = string.Empty;
+
+        if (request.AvatarId.HasValue && request.AvatarId.Value > 0)
+        {
+            var attachment = await _attachmentRepository.FindByIdAsync(request.AvatarId.Value, cancellationToken);
+            if(attachment != null)
+            {
+                var defaultAvatarPath = Path.Combine(_webHostEnvironment.WebRootPath, attachment.RawPath.Trim('/').Trim('\\'));
+                var newPath = Path.Combine(AvatarPrefix, YitIdHelper.NextId() + Path.GetExtension(attachment.RawPath));
+                var newAvatarPath = Path.Combine(_webHostEnvironment.WebRootPath, newPath.Trim('/').Trim('\\'));
+                File.Copy(defaultAvatarPath, newAvatarPath);
+                avatarPath = newPath;
+            }
+        }
+
         var now = Timestamp.Now;
         var group = new Group()
         {
@@ -90,6 +111,7 @@ public class GroupService : IGroupService, ITransient
             UserId = userId,
             TotalUser = 1 + request.FriendIds.Count,
             CreateTime = now,
+            Avatar = avatarPath
         };
         group.UserGroupRealtions.Add(new UserGroupRealtion()
         {

@@ -1,7 +1,4 @@
-﻿using QianShiChat.Application.Services.IServices;
-using QianShiChat.Domain.Extensions;
-
-namespace QianShiChat.Application.Services;
+﻿namespace QianShiChat.Application.Services;
 
 /// <summary>
 /// user avatar service.

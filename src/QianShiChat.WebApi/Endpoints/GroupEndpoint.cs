@@ -1,6 +1,22 @@
-﻿using QianShiChat.Application.Services.IServices;
+﻿using Microsoft.Extensions.Localization;
 
 namespace QianShiChat.WebApi.Endpoints;
+
+
+public class LocaliationEndpoint : ICarterModule
+{
+    public void AddRoutes(IEndpointRouteBuilder app)
+    {
+        app.MapGroup("/api/locale")
+            .WithGroupName("endpoint")
+            .MapPost("", GetIndex);
+    }
+
+    private static IResult GetIndex([FromBody]NameRequest localeRequest, [FromServices] IStringLocalizer<SharedResource> stringLocalizer)
+    {
+        return Results.Ok(stringLocalizer["password_not_empty"]);
+    }
+}
 
 public class GroupEndpoint : ICarterModule
 {

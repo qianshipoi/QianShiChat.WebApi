@@ -12,6 +12,12 @@ public class NameRequest
     public string Name { get; set; } = string.Empty;
 }
 
+public class LocaleRequest
+{
+    [Required(ErrorMessage = "name_can_not_be_empty")]
+    public string Name { get; set; } = string.Empty;
+}
+
 public class FileBaseInfo
 {
     [Required, MaxLength(255)]
@@ -35,6 +41,7 @@ public class CreateGroupRequest
     public List<int> FriendIds { get; set; } = new List<int>();
     [MaxLength(32)]
     public string? Name { get; set; }
+    public int? AvatarId { get; set; }
 }
 
 public class JoinGroupRequest
@@ -104,7 +111,6 @@ public class QueryGroupApplyPendingRequest
     [Range(0, long.MaxValue)]
     public long? BeforeLastTime { get; set; }
 }
-
 
 public class GroupJoiningApprovalRequest
 {

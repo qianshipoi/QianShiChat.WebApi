@@ -14,4 +14,10 @@
     <ProjectReference Include="..\QianShiChat.Domain.Shared\QianShiChat.Domain.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\LocaleRequest.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

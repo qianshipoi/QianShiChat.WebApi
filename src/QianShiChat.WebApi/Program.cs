@@ -1,4 +1,5 @@
 // config distributed id.
+
 using QianShiChat.Infrastructure.Data;
 
 var options = new IdGeneratorOptions(1);
@@ -9,11 +10,23 @@ builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, relo
 
 // config mvc builder.
 builder.Services
+    .AddLocalization(options => options.ResourcesPath = "Resources");
+builder.Services
     .AddControllers(setup => {
         setup.Filters.Add<ClientAuthotizationFilter>();
         setup.Filters.Add<ResultWrapperFilter>();
         setup.Filters.Add<GlobalExceptionFilter>();
-    });
+    })
+    .AddDataAnnotationsLocalization();
+
+builder.Services.Configure<RequestLocalizationOptions>(options => {
+    var supportedCultures = new[] { "zh-CN", "en-US" };
+    options.SetDefaultCulture(supportedCultures[0])
+        .AddSupportedCultures(supportedCultures)
+        .AddSupportedUICultures(supportedCultures);
+    options.ApplyCurrentCultureToResponseHeaders = true;
+});
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.Configure<ForwardedHeadersOptions>(options => {
@@ -67,6 +80,8 @@ var app = builder.Build();
 
 await app.InitialiseDatabaseAsync();
 
+app.UseRequestLocalization();
+
 app.UseForwardedHeaders();
 app.UseOpenApi();
 
@@ -81,12 +96,12 @@ app.UseDirectoryBrowser(new DirectoryBrowserOptions
     RequestPath = new PathString("/Raw")
 });
 
+app.UseHttpLogging();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/", async (context) => {
-    await context.Response.WriteAsync(context.Request.GetBaseUrl());
-});
+app.MapGet("/", (context) => context.Response.WriteAsync(context.Request.GetBaseUrl()));
 
 app.MapTus("/api/tusfiles", HttpContextExtensions.TusConfigurationFactory)
     .RequireAuthorization()
