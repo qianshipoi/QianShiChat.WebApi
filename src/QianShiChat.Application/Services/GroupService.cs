@@ -6,11 +6,11 @@ public class GroupService : IGroupService, ITransient
     private readonly ILogger<GroupService> _logger;
     private readonly IMapper _mapper;
     private readonly IFileService _fileService;
-    private readonly IHubContext<ChatHub, IChatClient> _hubContext;
     private readonly IGroupRepository _groupRepository;
     private readonly IUserRepository _userRepository;
     private readonly IAttachmentRepository _attachmentRepository;
     private readonly IWebHostEnvironment _webHostEnvironment;
+    private readonly IChatService _chatService;
 
     private const string AvatarPrefix = "/Raw/GroupAvatar";
 
@@ -19,21 +19,21 @@ public class GroupService : IGroupService, ITransient
         ILogger<GroupService> logger,
         IMapper mapper,
         IFileService fileService,
-        IHubContext<ChatHub, IChatClient> hubContext,
         IGroupRepository groupRepository,
         IUserRepository userRepository,
         IAttachmentRepository attachmentRepository,
-        IWebHostEnvironment webHostEnvironment)
+        IWebHostEnvironment webHostEnvironment,
+        IChatService chatService)
     {
         _context = context;
         _logger = logger;
         _mapper = mapper;
         _fileService = fileService;
-        _hubContext = hubContext;
         _groupRepository = groupRepository;
         _userRepository = userRepository;
         _attachmentRepository = attachmentRepository;
         _webHostEnvironment = webHostEnvironment;
+        _chatService = chatService;
     }
 
     /// <summary>
@@ -63,10 +63,27 @@ public class GroupService : IGroupService, ITransient
         await _context.SaveChangesAsync(cancellationToken);
 
         var dto = _mapper.Map<GroupDto>(group);
-        FormatGroupAvatar(dto);
-
-        await _hubContext.Clients.User(userId.ToString()).Notification(new NotificationMessage(NotificationType.NewGroup, dto));
+        _fileService.FormatAvatar(dto);
+        _ = _chatService.SendNewGroupNotifyByUsersAsync(group.Id, new[] { userId });
         return dto;
+    }
+
+    private string CopyToGroupAvatarFolder(string filePath)
+    {
+        var defaultAvatarPath = string.Empty;
+        if (filePath.StartsWith(_webHostEnvironment.WebRootPath))
+        {
+            defaultAvatarPath = filePath;
+        }
+        else
+        {
+            defaultAvatarPath = Path.Combine(_webHostEnvironment.WebRootPath, filePath.Trim('/').Trim('\\'));
+        }
+
+        var newPath = Path.Combine(AvatarPrefix, YitIdHelper.NextId() + Path.GetExtension(filePath));
+        var newAvatarPath = Path.Combine(_webHostEnvironment.WebRootPath, newPath.Trim('/').Trim('\\'));
+        File.Copy(defaultAvatarPath, newAvatarPath);
+        return newPath;
     }
 
     public async Task<GroupDto> CreateByFriendAsync(int userId, CreateGroupRequest request, CancellationToken cancellationToken = default)
@@ -94,13 +111,9 @@ public class GroupService : IGroupService, ITransient
         if (request.AvatarId.HasValue && request.AvatarId.Value > 0)
         {
             var attachment = await _attachmentRepository.FindByIdAsync(request.AvatarId.Value, cancellationToken);
-            if(attachment != null)
+            if (attachment != null)
             {
-                var defaultAvatarPath = Path.Combine(_webHostEnvironment.WebRootPath, attachment.RawPath.Trim('/').Trim('\\'));
-                var newPath = Path.Combine(AvatarPrefix, YitIdHelper.NextId() + Path.GetExtension(attachment.RawPath));
-                var newAvatarPath = Path.Combine(_webHostEnvironment.WebRootPath, newPath.Trim('/').Trim('\\'));
-                File.Copy(defaultAvatarPath, newAvatarPath);
-                avatarPath = newPath;
+                avatarPath = CopyToGroupAvatarFolder(attachment.RawPath);
             }
         }
 
@@ -166,8 +179,8 @@ public class GroupService : IGroupService, ITransient
         }
 
         var dto = _mapper.Map<GroupDto>(group);
-        FormatGroupAvatar(dto);
-        await _hubContext.Clients.Users(new List<string>(request.FriendIds.Select(x => x.ToString())) { userId.ToString() }).Notification(new NotificationMessage(NotificationType.NewGroup, dto));
+        _fileService.FormatAvatar(dto);
+        _ = _chatService.SendNewGroupNotifyByUsersAsync(group.Id, request.FriendIds);
 
         return dto;
     }
@@ -237,7 +250,7 @@ public class GroupService : IGroupService, ITransient
 
         var dtos = _mapper.Map<List<GroupDto>>(groups);
 
-        dtos.ForEach(FormatGroupAvatar);
+        dtos.ForEach(_fileService.FormatAvatar);
         return dtos;
     }
 
@@ -250,7 +263,7 @@ public class GroupService : IGroupService, ITransient
             .FirstOrDefaultAsync(cancellationToken);
 
         if (dto is null) return null;
-        FormatGroupAvatar(dto);
+        _fileService.FormatAvatar(dto);
         return dto;
     }
 
@@ -294,10 +307,7 @@ public class GroupService : IGroupService, ITransient
         }
 
         // send group apply message.
-        entity.User = userInfo;
-        entity.Group = group;
-        var dto = _mapper.Map<GroupApplyDto>(entity);
-        _ = SendApplyNotify(dto);
+        _ = _chatService.SendGroupApplyNotifyAsync(entity.Id);
     }
 
     public async Task<List<GroupApplyDto>> ApprovalAsync(int userId, GroupJoiningApprovalRequest request, CancellationToken cancellationToken = default)
@@ -364,7 +374,7 @@ public class GroupService : IGroupService, ITransient
 
         if (status == ApplyStatus.Passed)
         {
-            _ = SendNewGroup(apply.Group!, apply.UserId);
+            _ = _chatService.SendNewGroupNotifyByUsersAsync(apply.GroupId, new List<int> { apply.UserId });
         }
 
         return _mapper.Map<GroupApplyDto>(apply);
@@ -428,7 +438,7 @@ public class GroupService : IGroupService, ITransient
             .Take(request.Size)
             .ProjectTo<GroupDto>(_mapper.ConfigurationProvider)
             .ToListAsync(cancellationToken);
-        list.ForEach(FormatGroupAvatar);
+        list.ForEach(_fileService.FormatAvatar);
         return PagedList.Create(list, total, request.Size);
     }
 
@@ -457,7 +467,7 @@ public class GroupService : IGroupService, ITransient
             .Take(request.Size)
             .ToListAsync(cancellationToken);
 
-        items.ForEach(FormatUserAvatar);
+        items.ForEach(_fileService.FormatAvatar);
 
         return PagedList.Create(items, total, request.Size);
     }
@@ -468,6 +478,8 @@ public class GroupService : IGroupService, ITransient
         if (!isCreator) throw Oops.Bah("not permission").StatusCode(HttpStatusCode.Forbidden);
 
         await _groupRepository.UpdateGroupNameAsync(userId, name, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+        _ = _chatService.SendNewGroupNotifyAsync(groupId);
     }
 
     public async Task SetAliasAsync(int userId, int groupId, string? name, CancellationToken cancellationToken = default)
@@ -475,38 +487,20 @@ public class GroupService : IGroupService, ITransient
         var isJoined = await _groupRepository.IsJoinGroupAsync(userId, groupId, cancellationToken);
         if (!isJoined) throw Oops.Bah("").StatusCode(HttpStatusCode.Forbidden);
         await _groupRepository.SetAliasAsync(userId, groupId, name, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
     }
 
-    private void FormatUserAvatar(UserDto user)
+    public async Task ChangeAvatarAsync(int userId, int groupId, int attachmentId, CancellationToken cancellationToken = default)
     {
-        if (!string.IsNullOrWhiteSpace(user.Avatar))
-        {
-            user.Avatar = _fileService.FormatPublicFile(user.Avatar);
-        }
-    }
+        var isCreator = await _groupRepository.IsCreatorAsync(userId, groupId, cancellationToken);
+        if (!isCreator) throw Oops.Bah("not permission").StatusCode(HttpStatusCode.Forbidden);
 
-    private async Task SendNewGroup(Group group, int userId)
-    {
-        var groupDto = _mapper.Map<GroupDto>(group);
-        FormatGroupAvatar(groupDto);
-        await _hubContext.Clients.User(userId.ToString())
-            .Notification(new NotificationMessage(NotificationType.NewGroup, groupDto));
-    }
-
-    private async Task SendApplyNotify(GroupApplyDto apply)
-    {
-        await _hubContext.Clients.User(apply.UserId.ToString()).Notification(new NotificationMessage(NotificationType.GroupApply, apply));
-    }
-
-    private void FormatGroupAvatar(GroupDto item)
-    {
-        if (string.IsNullOrWhiteSpace(item.Avatar))
-        {
-            item.Avatar = _fileService.GetDefaultGroupAvatar();
-        }
-        else
-        {
-            item.Avatar = _fileService.FormatPublicFile(item.Avatar);
-        }
+        var attachment = await _attachmentRepository.FindByIdAsync(attachmentId, cancellationToken);
+        if (attachment is null) throw Oops.Bah("avatar not exists");
+        // copy to group avatar folder
+        var avatarPath = CopyToGroupAvatarFolder(attachment.RawPath);
+        await _groupRepository.UpdateGroupAvatarAsync(groupId, avatarPath, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+        _ = _chatService.SendNewGroupNotifyAsync(groupId);
     }
 }

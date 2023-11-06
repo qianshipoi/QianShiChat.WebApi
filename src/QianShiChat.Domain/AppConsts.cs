@@ -76,4 +76,8 @@ public class AppConsts
     }
 
     public static string GetAuthorizeCacheKey(string clientType, string id) => $"{clientType}:{id}";
+
+    public static long MaxAvatarLength = 1024 * 1024 * 4;
+    public static string[] AllowAvatarExts = new string[] { ".png", ".jpg", ".jpeg", ".gif" };
+    public const string AvatarPrefix = "Raw/Avatar";
 }

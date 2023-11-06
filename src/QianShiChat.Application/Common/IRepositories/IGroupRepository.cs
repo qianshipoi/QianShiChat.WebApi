@@ -11,4 +11,5 @@ public interface IGroupRepository
     Task<bool> IsCreatorAsync(int userId, int groupId, CancellationToken cancellationToken = default);
     Task<bool> IsJoinGroupAsync(int userId, int groupId, CancellationToken cancellationToken = default);
     Task<int> SetAliasAsync(int userId, int groupId, string? name, CancellationToken cancellationToken = default);
+    Task<int> UpdateGroupAvatarAsync(int groupId, string avatarPath, CancellationToken cancellationToken = default);
 }

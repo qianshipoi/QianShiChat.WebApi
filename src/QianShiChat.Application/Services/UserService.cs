@@ -10,26 +10,28 @@ public class UserService : IUserService, ITransient
     private readonly IApplicationDbContext _context;
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly IFileService _fileService;
-
-    private const string AvatarPrefix = "/Raw/Avatar";
+    private readonly IAttachmentRepository _attachmentRepository;
+    private readonly IUserRepository _userRepository;
+    private readonly string _avatarPath;
 
     public UserService(
         IApplicationDbContext context,
         IMapper mapper,
         ILogger<UserService> logger,
         IWebHostEnvironment webHostEnvironment,
-        IFileService fileService)
+        IFileService fileService,
+        IAttachmentRepository attachmentRepository,
+        IUserRepository userRepository)
     {
         _context = context;
         _mapper = mapper;
         _logger = logger;
         _webHostEnvironment = webHostEnvironment;
-        var avatarPath = Path.Combine(webHostEnvironment.WebRootPath, AvatarPrefix.Trim(new char[] { '/', '\\' }));
-        if (!Directory.Exists(avatarPath))
-        {
-            Directory.CreateDirectory(avatarPath);
-        }
         _fileService = fileService;
+        _attachmentRepository = attachmentRepository;
+        _avatarPath = Path.Combine(webHostEnvironment.WebRootPath, AppConsts.AvatarPrefix);
+        if (!Directory.Exists(_avatarPath)) Directory.CreateDirectory(_avatarPath);
+        _userRepository = userRepository;
     }
 
     public async Task<UserDto?> GetUserByIdAsync(int id, CancellationToken cancellationToken = default)
@@ -77,7 +79,7 @@ public class UserService : IUserService, ITransient
 
         // save avatar.
         var defaultAvatarPath = Path.Combine(_webHostEnvironment.WebRootPath, avatarPath.Trim('/').Trim('\\'));
-        var newPath = Path.Combine(AvatarPrefix, uuid + Path.GetExtension(avatarPath));
+        var newPath = Path.Combine(AppConsts.AvatarPrefix, uuid + Path.GetExtension(avatarPath));
         var newAvatarPath = Path.Combine(_webHostEnvironment.WebRootPath, newPath.Trim('/').Trim('\\'));
         try
         {
@@ -135,14 +137,8 @@ public class UserService : IUserService, ITransient
             .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
             .ToListAsync(cancellationToken);
 
-        items.ForEach(FormatAvatar);
+        items.ForEach(_fileService.FormatAvatar);
         return PagedList.Create(items, totalCount, request.Size);
-    }
-
-    private void FormatAvatar(UserDto user)
-    {
-        if (!string.IsNullOrWhiteSpace(user.Avatar))
-            user.Avatar = _fileService.FormatPublicFile(user.Avatar);
     }
 
     public async Task<List<UserDto>> GetUserByNickNameAsync(int page, int size, string nickName, CancellationToken cancellationToken = default)
@@ -154,7 +150,7 @@ public class UserService : IUserService, ITransient
             .Take(size)
             .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
             .ToListAsync(cancellationToken);
-        users.ForEach(FormatAvatar);
+        users.ForEach(_fileService.FormatAvatar);
         return users;
     }
 
@@ -173,5 +169,55 @@ public class UserService : IUserService, ITransient
     public async Task<bool> IsFriendAsync(int userId, int friendId, CancellationToken cancellationToken = default)
     {
         return await _context.UserRealtions.AnyAsync(x => x.UserId == userId && x.FriendId == friendId, cancellationToken);
+    }
+
+    public async Task ChangeAvatarAsync(int userId, int attachmentId, CancellationToken cancellationToken = default)
+    {
+        var uuid = YitIdHelper.NextId();
+
+        var attachment = await _attachmentRepository.FindByIdAsync(attachmentId, cancellationToken);
+        if (attachment is null) throw Oops.Bah("attachment not found.");
+
+        if (attachment.Size > AppConsts.MaxAvatarLength)
+        {
+            throw Oops.Bah(string.Format("avatar max lenght [{0}]MB.", AppConsts.MaxAvatarLength / 1024 / 1024));
+        }
+
+        var ext = Path.GetExtension(attachment.Name);
+        if (string.IsNullOrEmpty(ext)
+            || !AppConsts.AllowAvatarExts.Any(x => string.Compare(x, ext, true) == 0))
+        {
+            throw Oops.Bah(string.Format("The avatars are in [{0}] format only", string.Join(',', AppConsts.AllowAvatarExts)));
+        }
+
+        var user = await _userRepository.FindByIdAsync(userId, cancellationToken)!;
+
+        // save avatar.
+        var newFilePath = Path.Combine(AppConsts.AvatarPrefix, uuid + ext);
+        var saveFilePath = Path.Combine(_webHostEnvironment.WebRootPath, newFilePath);
+        var attachmentPath = Path.Combine(_webHostEnvironment.WebRootPath, attachment.RawPath.Trim('/').Trim('\\'));
+
+        File.Copy(attachmentPath, destFileName: saveFilePath);
+
+        var avatar = new UserAvatar()
+        {
+            CreateTime = Timestamp.Now,
+            UserId = userId,
+            Path = '/' + newFilePath.Replace('\\', '/'),
+            Size = (ulong)attachment.Size,
+        };
+
+        try
+        {
+            user!.UserAvatars.Add(avatar);
+            user.Avatar = avatar.Path;
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
+            if (File.Exists(saveFilePath)) { File.Delete(saveFilePath); }
+            throw Oops.Oh("server error.");
+        }
     }
 }

@@ -1,7 +1,4 @@
 // config distributed id.
-
-using QianShiChat.Infrastructure.Data;
-
 var options = new IdGeneratorOptions(1);
 YitIdHelper.SetIdGenerator(options);
 

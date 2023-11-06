@@ -11,7 +11,6 @@ public class FileManager : IFileManager, ISingleton
         var signature = ComputeHmacSha256(data, key);
         return Convert.ToBase64String(signature);
     }
-
     private bool VerifyFileSignature(string fileName, string contentType, string fileHash, string fileLength, string fileSecret, string signature)
     {
         var data = EncryptStringToBytes_Aes($"{fileName}\n{contentType}\n{fileHash}\n{fileLength}", Encoding.UTF8.GetBytes(fileSecret));
@@ -19,7 +18,6 @@ public class FileManager : IFileManager, ISingleton
         var signatureBytes = Convert.FromBase64String(signature);
         return VerifyHmacSha256(data, signatureBytes, key);
     }
-
     static byte[] EncryptStringToBytes_Aes(string plainText, byte[] key)
     {
         byte[] encrypted;

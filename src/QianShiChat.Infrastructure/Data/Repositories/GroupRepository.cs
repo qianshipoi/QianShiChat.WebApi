@@ -34,6 +34,13 @@ internal class GroupRepository : IGroupRepository, IScoped
             .ExecuteUpdateAsync(x => x.SetProperty(a => a.Name, b => name), cancellationToken);
     }
 
+    public Task<int> UpdateGroupAvatarAsync(int groupId, string avatarPath, CancellationToken cancellationToken = default)
+    {
+        return _context.Groups
+            .Where(x => x.Id == groupId)
+            .ExecuteUpdateAsync(x => x.SetProperty(a => a.Avatar, b => avatarPath), cancellationToken);
+    }
+
     public Task<bool> IsCreatorAsync(int userId, int groupId, CancellationToken cancellationToken = default)
     {
         return _context.Groups

@@ -74,4 +74,5 @@ public interface IUserService
 
     Task<bool> IsFriendAsync(int userId, int friendId, CancellationToken cancellationToken = default);
     Task<PagedList<UserDto>> SearchUsersAsync(UserSearchRequest request, CancellationToken cancellationToken = default);
+    Task ChangeAvatarAsync(int userId, int attachmentId, CancellationToken cancellationToken = default);
 }

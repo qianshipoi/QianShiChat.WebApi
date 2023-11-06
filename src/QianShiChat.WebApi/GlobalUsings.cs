@@ -17,6 +17,7 @@ global using Microsoft.AspNetCore.Mvc.Filters;
 global using Microsoft.AspNetCore.SignalR;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.FileProviders;
+global using Microsoft.Extensions.Localization;
 global using Microsoft.Extensions.Options;
 global using Microsoft.Extensions.Primitives;
 global using Microsoft.IdentityModel.Tokens;
@@ -33,6 +34,7 @@ global using QianShiChat.Domain.Core.AppOops;
 global using QianShiChat.Domain.Models;
 global using QianShiChat.Domain.Options;
 global using QianShiChat.Domain.Shared;
+global using QianShiChat.Infrastructure.Data;
 global using QianShiChat.WebApi.BackgroundHost;
 global using QianShiChat.WebApi.Extensions;
 global using QianShiChat.WebApi.Filters;
@@ -50,6 +52,7 @@ global using SixLabors.ImageSharp.Web.Providers;
 
 global using Swashbuckle.AspNetCore.SwaggerGen;
 
+global using System.Collections;
 global using System.ComponentModel.DataAnnotations;
 global using System.Globalization;
 global using System.Net;

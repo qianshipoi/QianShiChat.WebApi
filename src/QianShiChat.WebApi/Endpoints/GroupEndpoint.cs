@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Localization;
-
-namespace QianShiChat.WebApi.Endpoints;
+﻿namespace QianShiChat.WebApi.Endpoints;
 
 
 public class LocaliationEndpoint : ICarterModule

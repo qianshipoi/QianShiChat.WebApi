@@ -1,6 +1,4 @@
-﻿using QianShiChat.Application.Services.IServices;
-
-namespace QianShiChat.WebApi.Controllers;
+﻿namespace QianShiChat.WebApi.Controllers;
 
 /// <summary>
 /// auth controller

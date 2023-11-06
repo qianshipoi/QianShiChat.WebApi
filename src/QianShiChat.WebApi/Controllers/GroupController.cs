@@ -1,6 +1,4 @@
-﻿using QianShiChat.Application.Services.IServices;
-
-namespace QianShiChat.WebApi.Controllers;
+﻿namespace QianShiChat.WebApi.Controllers;
 
 /// <summary>
 /// group api.
@@ -87,4 +85,8 @@ public class GroupController : BaseController
     [HttpPut("{groupId:int}/alias")]
     public Task ReMyAliasAsync([FromRoute] int groupId, AliasRequest request, CancellationToken cancellationToken = default)
         => _groupService.SetAliasAsync(CurrentUserId, groupId, request.Alias, cancellationToken);
+
+    [HttpPut("{groupId:int}/avatar")]
+    public Task UpdateAvatarAsync([FromRoute] int groupId, AvatarRequest request, CancellationToken cancellationToken = default)
+        => _groupService.ChangeAvatarAsync(CurrentUserId, groupId, request.FileId, cancellationToken);
 }

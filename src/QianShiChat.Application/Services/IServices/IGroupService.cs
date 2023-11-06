@@ -5,6 +5,7 @@ public interface IGroupService
     Task ApplyAsync(int id, int userId, GroupApplyRequest request, CancellationToken cancellationToken = default);
     Task<List<GroupApplyDto>> ApprovalAsync(int userId, GroupJoiningApprovalRequest request, CancellationToken cancellationToken = default);
     Task<GroupApplyDto> ApprovalAsync(int applyId, int userId, ApplyStatus status, CancellationToken cancellationToken = default);
+    Task ChangeAvatarAsync(int userId, int groupId, int attachmentId, CancellationToken cancellationToken = default);
     Task<GroupDto> CreateAsync(int userId, string name, CancellationToken cancellationToken = default);
     Task<GroupDto> CreateByFriendAsync(int userId, CreateGroupRequest request, CancellationToken cancellationToken = default);
     Task DeleteAsync(int userId, int id, CancellationToken cancellationToken = default);

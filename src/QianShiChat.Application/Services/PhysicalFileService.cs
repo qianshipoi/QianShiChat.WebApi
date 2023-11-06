@@ -1,6 +1,4 @@
-﻿using QianShiChat.Application.Services.IServices;
-
-namespace QianShiChat.Application.Services;
+﻿namespace QianShiChat.Application.Services;
 
 public class PhysicalFileService : IFileService, IScoped
 {

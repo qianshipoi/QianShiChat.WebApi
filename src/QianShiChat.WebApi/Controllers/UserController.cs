@@ -1,6 +1,4 @@
-﻿using QianShiChat.Application.Services.IServices;
-
-namespace QianShiChat.WebApi.Controllers;
+﻿namespace QianShiChat.WebApi.Controllers;
 
 /// <summary>
 /// user controller
@@ -110,5 +108,11 @@ public class UserController : BaseController
         var user = await _userService.AddAsync(dto, avatarPath, cancellationToken);
 
         return Ok(user);
+    }
+
+    [HttpPut("avatar")]
+    public async Task ChangeAvatarAsync(AvatarRequest request, CancellationToken cancellationToken = default)
+    {
+        await _userService.ChangeAvatarAsync(CurrentUserId, request.FileId, cancellationToken);
     }
 }

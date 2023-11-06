@@ -1,6 +1,4 @@
-﻿using QianShiChat.Application.Services.IServices;
-
-namespace QianShiChat.WebApi.Controllers;
+﻿namespace QianShiChat.WebApi.Controllers;
 
 /// <summary>
 /// avatar controller
@@ -29,17 +27,4 @@ public class AvatarController : BaseController
         [FromQuery] QueryUserAvatarRequest query,
         CancellationToken cancellationToken = default)
         => _avatarService.GetUserAvatarsAsync(CurrentUserId, query, cancellationToken);
-
-    [HttpPost]
-    public async Task<ActionResult<string>> UpdateAvatar([Required] IFormFile file, CancellationToken cancellationToken = default)
-    {
-        var (success, msg) = await _avatarService.UploadAvatarAsync(CurrentUserId, file, cancellationToken);
-
-        if (!success)
-        {
-            return BadRequest(msg);
-        }
-
-        return Ok(msg);
-    }
 }

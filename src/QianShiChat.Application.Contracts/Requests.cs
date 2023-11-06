@@ -6,6 +6,13 @@ public class AliasRequest
     public string? Alias { get; set; }
 }
 
+public class AvatarRequest
+{
+    [Required]
+    [Range(1, int.MaxValue)]
+    public int FileId { get; set; }
+}
+
 public class NameRequest
 {
     [Required, StringLength(32, MinimumLength = 1)]

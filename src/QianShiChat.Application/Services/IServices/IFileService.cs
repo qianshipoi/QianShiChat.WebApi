@@ -24,3 +24,22 @@ public interface IFileService
     /// <returns></returns>
     Task<AttachmentDto> SaveFileAsync(Stream stream, string filename, CancellationToken cancellationToken = default);
 }
+
+public static class IFileServiceExtensions
+{
+    public static void FormatAvatar(this IFileService fileService, UserDto user)
+    {
+        if (!string.IsNullOrWhiteSpace(user.Avatar))
+            user.Avatar = fileService.FormatPublicFile(user.Avatar);
+    }
+
+    public static void FormatAvatar(this IFileService fileService, GroupDto group)
+    {
+        if (!string.IsNullOrWhiteSpace(group.Avatar))
+            group.Avatar = fileService.FormatPublicFile(group.Avatar);
+        else
+        {
+            group.Avatar = fileService.GetDefaultGroupAvatar();
+        }
+    }
+}
