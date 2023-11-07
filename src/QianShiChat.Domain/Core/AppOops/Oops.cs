@@ -4,7 +4,8 @@ public static class Oops
 {
     public static BusinessException Bah(string errorMessage, params object[] args)
     {
-        var friendlyException = Oh(errorMessage, typeof(ValidationException), args).StatusCode(StatusCodes.Status400BadRequest);
+        var friendlyException = Oh(errorMessage, typeof(ValidationException), args)
+            .StatusCode(StatusCodes.Status400BadRequest);
         friendlyException.ValidationException = true;
         return friendlyException;
     }

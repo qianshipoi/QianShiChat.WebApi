@@ -80,4 +80,12 @@ public class AppConsts
     public static long MaxAvatarLength = 1024 * 1024 * 4;
     public static string[] AllowAvatarExts = new string[] { ".png", ".jpg", ".jpeg", ".gif" };
     public const string AvatarPrefix = "Raw/Avatar";
+
+    /// <summary>
+    /// trim / or \
+    /// </summary>
+    public static char[] TrimChars = new[] { '/', '\\' };
+
+    public const string GroupTokenKey = "359378D07D64404C93EA4658DB4A0AB0";
+
 }

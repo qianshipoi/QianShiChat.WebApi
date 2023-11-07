@@ -1,4 +1,4 @@
-﻿namespace QianShiChat.Domain.Shared;
+﻿namespace QianShiChat.Domain;
 
 public static class IQueryableExtenctions
 {

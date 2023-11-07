@@ -29,9 +29,9 @@ public class UserService : IUserService, ITransient
         _webHostEnvironment = webHostEnvironment;
         _fileService = fileService;
         _attachmentRepository = attachmentRepository;
+        _userRepository = userRepository;
         _avatarPath = Path.Combine(webHostEnvironment.WebRootPath, AppConsts.AvatarPrefix);
         if (!Directory.Exists(_avatarPath)) Directory.CreateDirectory(_avatarPath);
-        _userRepository = userRepository;
     }
 
     public async Task<UserDto?> GetUserByIdAsync(int id, CancellationToken cancellationToken = default)
@@ -68,23 +68,20 @@ public class UserService : IUserService, ITransient
              .AnyAsync(x => x.Account.Equals(account), cancellationToken);
     }
 
-    public async Task<UserDto> AddAsync(
-        CreateUserRequest dto,
-        string avatarPath,
-        CancellationToken cancellationToken = default)
+    public async Task<UserDto> AddAsync(CreateUserRequest request, string avatarPath, CancellationToken cancellationToken = default)
     {
         var uuid = YitIdHelper.NextId();
-        var user = _mapper.Map<UserInfo>(dto);
+        var user = _mapper.Map<UserInfo>(request);
         user.Password = user.Password.ToMd5();
 
         // save avatar.
-        var defaultAvatarPath = Path.Combine(_webHostEnvironment.WebRootPath, avatarPath.Trim('/').Trim('\\'));
+        var defaultAvatarPath = Path.Combine(_webHostEnvironment.WebRootPath, avatarPath.Trim(AppConsts.TrimChars));
         var newPath = Path.Combine(AppConsts.AvatarPrefix, uuid + Path.GetExtension(avatarPath));
-        var newAvatarPath = Path.Combine(_webHostEnvironment.WebRootPath, newPath.Trim('/').Trim('\\'));
+        var newAvatarPath = Path.Combine(_webHostEnvironment.WebRootPath, newPath.Trim(AppConsts.TrimChars));
         try
         {
             File.Copy(defaultAvatarPath, newAvatarPath);
-            user.Avatar = newPath.Replace('\\', '/');
+            user.Avatar = newPath.Trim(AppConsts.TrimChars);
             // add default friend group;
             var friendGroup = new FriendGroup
             {
@@ -96,8 +93,9 @@ public class UserService : IUserService, ITransient
             user.FriendGroups.Add(friendGroup);
             await _context.UserInfos.AddAsync(user, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
-            user.Avatar = _fileService.FormatPublicFile(user.Avatar);
-            return _mapper.Map<UserDto>(user);
+            var dto = _mapper.Map<UserDto>(user);
+            _fileService.FormatAvatar(dto);
+            return dto;
         }
         catch (Exception ex)
         {
@@ -114,9 +112,7 @@ public class UserService : IUserService, ITransient
             .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
             .ToListAsync(cancellationToken);
 
-        users.ForEach(item => {
-            item.Avatar = _fileService.FormatPublicFile(item.Avatar);
-        });
+        users.ForEach(_fileService.FormatAvatar);
         return users;
     }
 
@@ -143,7 +139,8 @@ public class UserService : IUserService, ITransient
 
     public async Task<List<UserDto>> GetUserByNickNameAsync(int page, int size, string nickName, CancellationToken cancellationToken = default)
     {
-        var users = await _context.UserInfos.AsNoTracking()
+        var users = await _context.UserInfos
+            .AsNoTracking()
             .Where(x => EF.Functions.Like(x.NickName, $"%{nickName}%"))
             .OrderBy(x => x.CreateTime)
             .Skip((page - 1) * size)
@@ -156,19 +153,24 @@ public class UserService : IUserService, ITransient
 
     public async Task<long> GetUserCountByNickNameAsync(string nickName, CancellationToken cancellationToken = default)
     {
-        return await _context.UserInfos.AsNoTracking()
-                .Where(x => EF.Functions.Like(x.NickName, $"%{nickName}%"))
-                .CountAsync(cancellationToken);
+        return await _context.UserInfos
+            .AsNoTracking()
+            .Where(x => EF.Functions.Like(x.NickName, $"%{nickName}%"))
+            .CountAsync(cancellationToken);
     }
 
     public async Task<string?> GetNickNameByIdAsync(int userId, CancellationToken cancellationToken = default)
     {
-        return await _context.UserInfos.Where(x => x.Id == userId).Select(x => x.NickName).FirstOrDefaultAsync(cancellationToken);
+        return await _context.UserInfos
+            .Where(x => x.Id == userId)
+            .Select(x => x.NickName)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
     public async Task<bool> IsFriendAsync(int userId, int friendId, CancellationToken cancellationToken = default)
     {
-        return await _context.UserRealtions.AnyAsync(x => x.UserId == userId && x.FriendId == friendId, cancellationToken);
+        return await _context.UserRealtions
+            .AnyAsync(x => x.UserId == userId && x.FriendId == friendId, cancellationToken);
     }
 
     public async Task ChangeAvatarAsync(int userId, int attachmentId, CancellationToken cancellationToken = default)
@@ -195,15 +197,15 @@ public class UserService : IUserService, ITransient
         // save avatar.
         var newFilePath = Path.Combine(AppConsts.AvatarPrefix, uuid + ext);
         var saveFilePath = Path.Combine(_webHostEnvironment.WebRootPath, newFilePath);
-        var attachmentPath = Path.Combine(_webHostEnvironment.WebRootPath, attachment.RawPath.Trim('/').Trim('\\'));
+        var attachmentPath = Path.Combine(_webHostEnvironment.WebRootPath, attachment.RawPath.Trim(AppConsts.TrimChars));
 
-        File.Copy(attachmentPath, destFileName: saveFilePath);
+        File.Copy(attachmentPath, saveFilePath);
 
         var avatar = new UserAvatar()
         {
             CreateTime = Timestamp.Now,
             UserId = userId,
-            Path = '/' + newFilePath.Replace('\\', '/'),
+            Path = newFilePath.Trim(AppConsts.TrimChars),
             Size = (ulong)attachment.Size,
         };
 

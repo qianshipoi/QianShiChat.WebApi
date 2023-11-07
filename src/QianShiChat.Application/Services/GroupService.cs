@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.Application.Services;
+﻿using System.Threading;
+
+namespace QianShiChat.Application.Services;
 
 public class GroupService : IGroupService, ITransient
 {
@@ -281,6 +283,23 @@ public class GroupService : IGroupService, ITransient
 
         var now = Timestamp.Now;
 
+        if (!string.IsNullOrWhiteSpace(request.InviteToken))
+        {
+            var result = ValidateGroupToken(request.InviteToken);
+            if (result.Successful)
+            {
+                // join group
+                await JoinGroupAsync(group, userId, now, cancellationToken);
+                if (entity != null)
+                {
+                    entity.Status = ApplyStatus.Passed;
+                    entity.UpdateTime = now;
+                }
+                await _context.SaveChangesAsync(cancellationToken);
+                return;
+            }
+        }
+
         if (entity is null)
         {
             entity = new GroupApply
@@ -360,24 +379,25 @@ public class GroupService : IGroupService, ITransient
 
         if (status == ApplyStatus.Passed)
         {
-            apply.Group!.UserGroupRealtions.Add(new UserGroupRealtion
-            {
-                UserId = apply.UserId,
-                GroupId = apply.GroupId,
-                CreateTime = now,
-            });
-
-            await _groupRepository.TotalUserIncrementAsync(apply.Group.Id, cancellationToken);
+            await JoinGroupAsync(apply.Group!, apply.UserId, now, cancellationToken);
         }
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        if (status == ApplyStatus.Passed)
-        {
-            _ = _chatService.SendNewGroupNotifyByUsersAsync(apply.GroupId, new List<int> { apply.UserId });
-        }
-
         return _mapper.Map<GroupApplyDto>(apply);
+    }
+
+    private async Task JoinGroupAsync(Group group, int userId, long now, CancellationToken cancellationToken = default)
+    {
+        group.UserGroupRealtions.Add(new UserGroupRealtion
+        {
+            UserId = userId,
+            GroupId = group.Id,
+            CreateTime = now,
+        });
+
+        await _groupRepository.TotalUserIncrementAsync(group.Id, cancellationToken);
+        _ = _chatService.SendNewGroupNotifyByUsersAsync(group.Id, new List<int> { userId });
     }
 
     public async Task<PagedList<GroupApplyDto>> GetApplyPendingAsync(int userId, QueryGroupApplyPendingRequest request, CancellationToken cancellationToken = default)
@@ -502,5 +522,79 @@ public class GroupService : IGroupService, ITransient
         await _groupRepository.UpdateGroupAvatarAsync(groupId, avatarPath, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
         _ = _chatService.SendNewGroupNotifyAsync(groupId);
+    }
+
+    public async Task<GroupJoinToken> GenerateGroupTokenAsync(int userId, int groupId, TimeSpan expirationTime, CancellationToken cancellationToken = default)
+    {
+        var isGroupMember = await _groupRepository.IsJoinGroupAsync(userId, groupId, cancellationToken);
+        if (!isGroupMember) throw Oops.Bah("not permission").StatusCode(HttpStatusCode.Forbidden);
+
+        var expiration = DateTime.Now.Add(expirationTime);
+
+        var characterText = AESCryptoTextProvider.Encrypt(AppConsts.GroupTokenKey, FormatGroupTokenStr(groupId, userId, expiration));
+
+        return new(groupId.ToString(), characterText, expiration);
+    }
+
+    public ValidateGroupTokenResult ValidateGroupToken(string token)
+    {
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            throw Oops.Bah("token can not be empty.");
+        }
+        var plaintext = string.Empty;
+
+        try
+        {
+            plaintext = AESCryptoTextProvider.Decrypt(AppConsts.GroupTokenKey, token);
+
+            var data = plaintext
+                 .Split(TokenSeparator, StringSplitOptions.RemoveEmptyEntries);
+
+            var expirationTimeTicksStr = data
+                 .First(x => x.StartsWith(ExpirationTimeStr))
+                 .Substring(ExpirationTimeStr.Length);
+
+            var expirationTime = new DateTime(long.Parse(expirationTimeTicksStr));
+
+            var groupId = int.Parse(data.First(x => x.StartsWith(GroupCodeStr))
+                .Substring(GroupCodeStr.Length));
+
+            var userId = int.Parse(data.First(x => x.StartsWith(InitiatorStr)).Substring(InitiatorStr.Length));
+
+            var payload = new GroupTokenPayload(groupId, userId, expirationTime.Ticks);
+
+            return new ValidateGroupTokenResult(DateTime.Now <= expirationTime, payload);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "group token decrypt error. token: {token}", token);
+            throw Oops.Bah("token validate error.").StatusCode(HttpStatusCode.Forbidden);
+        }
+
+    }
+
+    private const string ExpirationTimeStr = "expiration_time";
+    private const string GroupCodeStr = "group_code";
+    private const string InitiatorStr = "initiator";
+    private const char TokenSeparator = '\n';
+    private const char ValueSeparator = '=';
+
+    private static string FormatGroupTokenStr(int groupId, int initiator, DateTime expirationTime)
+    {
+        return new StringBuilder()
+            .Append(GroupCodeStr)
+            .Append(ValueSeparator)
+            .Append(groupId)
+            .Append(TokenSeparator)
+            .Append(InitiatorStr)
+            .Append(ValueSeparator)
+            .Append(initiator)
+            .Append(TokenSeparator)
+            .Append(ExpirationTimeStr)
+            .Append(ValueSeparator)
+            .Append(expirationTime.Ticks)
+            .Append(TokenSeparator)
+            .ToString();
     }
 }

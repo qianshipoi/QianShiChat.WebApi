@@ -141,4 +141,6 @@ public class GroupApplyRequest
 {
     [MaxLength(250)]
     public string? Remark { get; set; }
+    [MaxLength(1024)]
+    public string? InviteToken { get; set; }
 }

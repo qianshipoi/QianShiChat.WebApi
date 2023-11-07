@@ -1,4 +1,4 @@
-﻿namespace QianShiChat.Domain.Shared;
+﻿namespace QianShiChat.Domain;
 
 public static class HttpRequestExtensions
 {
@@ -30,7 +30,7 @@ public static class HttpRequestExtensions
 
     public static bool TryGetAccessToken(this HttpContext httpContext, out string? accessToken)
     {
-        if (!TryGetHeaderFirstValue(httpContext, "Authorization", out accessToken))
+        if (!httpContext.TryGetHeaderFirstValue("Authorization", out accessToken))
         {
             return false;
         }
