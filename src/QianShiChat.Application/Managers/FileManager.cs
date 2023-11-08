@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-
-namespace QianShiChat.Application.Managers;
+﻿namespace QianShiChat.Application.Managers;
 
 public class FileManager : IFileManager, ISingleton
 {

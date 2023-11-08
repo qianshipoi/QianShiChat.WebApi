@@ -1,5 +1,4 @@
-﻿
-namespace QianShiChat.Application.Common.IRepositories;
+﻿namespace QianShiChat.Application.Common.IRepositories;
 
 public interface IFriendGroupRepository
 {

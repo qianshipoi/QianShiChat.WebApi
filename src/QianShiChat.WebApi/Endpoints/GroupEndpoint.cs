@@ -1,6 +1,5 @@
 ﻿namespace QianShiChat.WebApi.Endpoints;
 
-
 public class LocaliationEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)

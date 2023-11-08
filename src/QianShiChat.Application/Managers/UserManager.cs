@@ -1,6 +1,4 @@
-﻿using QianShiChat.Application.Services.IServices;
-
-namespace QianShiChat.Application.Services;
+﻿namespace QianShiChat.Application.Managers;
 
 public class UserManager : IUserManager, IScoped
 {

@@ -1,6 +1,4 @@
-﻿using System.Threading;
-
-namespace QianShiChat.Application.Services;
+﻿namespace QianShiChat.Application.Services;
 
 public class GroupService : IGroupService, ITransient
 {

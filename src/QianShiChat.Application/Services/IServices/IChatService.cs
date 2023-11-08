@@ -1,5 +1,4 @@
-﻿
-namespace QianShiChat.Application.Services.IServices;
+﻿namespace QianShiChat.Application.Services.IServices;
 
 public interface IChatService
 {

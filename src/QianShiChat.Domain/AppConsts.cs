@@ -3,7 +3,7 @@
 /// <summary>
 /// app consts.
 /// </summary>
-public class AppConsts
+public static class AppConsts
 {
     /// <summary>
     /// cors name.

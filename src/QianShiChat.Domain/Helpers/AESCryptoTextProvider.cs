@@ -221,5 +221,4 @@ public static class AESCryptoTextProvider
     }
 
     #endregion
-
 }

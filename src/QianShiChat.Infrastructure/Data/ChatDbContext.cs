@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
-
-namespace QianShiChat.Infrastructure.Data;
+﻿namespace QianShiChat.Infrastructure.Data;
 
 public class ChatDbContext : DbContext, IApplicationDbContext
 {

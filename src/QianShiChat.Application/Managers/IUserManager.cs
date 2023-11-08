@@ -1,4 +1,4 @@
-﻿namespace QianShiChat.Application.Services.IServices;
+﻿namespace QianShiChat.Application.Managers;
 
 public interface IUserManager
 {

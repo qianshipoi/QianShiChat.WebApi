@@ -1,6 +1,4 @@
-﻿using QianShiChat.Application.Services.IServices;
-
-namespace QianShiChat.Application.Services;
+﻿namespace QianShiChat.Application.Services;
 
 /// <summary>
 /// chat message service
@@ -86,6 +84,7 @@ public class ChatMessageService : IChatMessageService, ITransient
                 var attachmentDtos = _mapper.Map<List<AttachmentDto>>(attachments);
                 attachmentDtos.ForEach(FormatAttachment);
                 message.Content = attachmentDtos;
+                message.Attachments = attachmentDtos;
             }
             else
             {
@@ -93,6 +92,7 @@ public class ChatMessageService : IChatMessageService, ITransient
                 var attachmentDto = _mapper.Map<AttachmentDto>(attachment);
                 FormatAttachment(attachmentDto);
                 message.Content = attachmentDto;
+                message.Attachments = new List<AttachmentDto>() { attachmentDto };
             }
         }
     }

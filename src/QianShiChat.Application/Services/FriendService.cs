@@ -41,7 +41,7 @@ public class FriendService : IFriendService, ITransient
 
     public async Task DeleteAsync(int userId, int friendId, CancellationToken cancellationToken = default)
     {
-        var realtions= await _context.UserRealtions.Where(x => (x.UserId == userId && x.FriendId == friendId) || (x.FriendId == userId && x.UserId == friendId)).ToListAsync(cancellationToken);
+        var realtions = await _context.UserRealtions.Where(x => (x.UserId == userId && x.FriendId == friendId) || (x.FriendId == userId && x.UserId == friendId)).ToListAsync(cancellationToken);
 
         _context.UserRealtions.RemoveRange(realtions);
 
@@ -67,21 +67,21 @@ public class FriendService : IFriendService, ITransient
 
     public async Task SetAliasAsync(int userId, int friendId, string? name, CancellationToken cancellationToken = default)
     {
-        var isFriend =await _userRepository.IsFriendAsync(userId, friendId, cancellationToken);
+        var isFriend = await _userRepository.IsFriendAsync(userId, friendId, cancellationToken);
         if (!isFriend) throw Oops.Bah("").StatusCode(HttpStatusCode.Forbidden);
         await _userRepository.SetAliasAsync(userId, friendId, name, cancellationToken);
     }
 }
 
-public class FriendGroupService : IFriendGroupService
+public class FriendGroupService : IFriendGroupService, ITransient
 {
     private readonly IApplicationDbContext _context;
     private readonly ILogger<FriendGroupService> _logger;
     private readonly IMapper _mapper;
 
     public FriendGroupService(
-        IApplicationDbContext context, 
-        ILogger<FriendGroupService> logger, 
+        IApplicationDbContext context,
+        ILogger<FriendGroupService> logger,
         IMapper mapper)
     {
         _context = context;

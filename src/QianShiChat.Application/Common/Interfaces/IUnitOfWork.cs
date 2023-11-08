@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
-
-namespace QianShiChat.Application.Common.Interfaces;
+﻿namespace QianShiChat.Application.Common.Interfaces;
 
 public interface IUnitOfWork : IDisposable
 {
