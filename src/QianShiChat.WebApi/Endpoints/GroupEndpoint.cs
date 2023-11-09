@@ -1,17 +1,36 @@
-﻿namespace QianShiChat.WebApi.Endpoints;
+﻿using QianShiChat.WebApi.Attributes;
+
+namespace QianShiChat.WebApi.Endpoints;
+
+public class NameRequestValidator : AbstractValidator<NameRequest>
+{
+    public NameRequestValidator(IStringLocalizer<Language> stringLocalizer)
+    {
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .WithMessage(stringLocalizer[Language.NameCanNotBeEmpty]);
+    }
+}
 
 public class LocaliationEndpoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGroup("/api/locale")
+            .AddEndpointFilterFactory(ValidationFilter.ValidationFilterFactory)
             .WithGroupName("endpoint")
             .MapPost("", GetIndex);
     }
 
-    private static IResult GetIndex([FromBody]NameRequest localeRequest, [FromServices] IStringLocalizer<SharedResource> stringLocalizer)
+    private static async Task<IResult> GetIndex([FromBody, Validate] NameRequest localeRequest,/* IValidator<NameRequest> validator, */[FromServices] IStringLocalizer<Language> stringLocalizer)
     {
-        return Results.Ok(stringLocalizer["password_not_empty"]);
+        //var result = await validator.ValidateAsync(localeRequest);
+        //if (!result.IsValid)
+        //{
+        //    return Results.ValidationProblem(result.ToDictionary());
+        //}
+
+        return Results.Ok(stringLocalizer[Language.NameCanNotBeEmpty]);
     }
 }
 

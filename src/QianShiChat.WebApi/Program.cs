@@ -7,7 +7,7 @@ builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, relo
 
 // config mvc builder.
 builder.Services
-    .AddLocalization(options => options.ResourcesPath = "Resources");
+    .AddJsonLocalization(options => options.ResourcesPath = "Resources");
 builder.Services
     .AddControllers(setup => {
         setup.Filters.Add<ClientAuthotizationFilter>();
@@ -55,7 +55,7 @@ builder.Services
         });
     })
     .AddMediatR(configure => configure.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()))
-    .AddValidatorsFromAssemblyContaining<Program>()
+    .AddValidatorsFromAssemblyContaining<Program>(ServiceLifetime.Singleton)
     .AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies())
     .AddOpenApi()
     .AddJwtAuthentication(builder.Configuration)
@@ -80,6 +80,15 @@ await app.InitialiseDatabaseAsync();
 app.UseRequestLocalization();
 
 app.UseForwardedHeaders();
+
+if (app.Environment.IsProduction())
+{
+    app.UseExceptionHandler(exceptionHandlerApp
+        => exceptionHandlerApp.Run(async context
+            => await Results.Problem()
+                         .ExecuteAsync(context)));
+}
+
 app.UseOpenApi();
 
 app.UseCors(AppConsts.MyAllowSpecificOrigins);

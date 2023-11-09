@@ -1,0 +1,4 @@
+﻿{
+  "name_can_not_be_empty": "name can not be empty. JSON",
+  "password_not_empty": "password not empty. JSON"
+}

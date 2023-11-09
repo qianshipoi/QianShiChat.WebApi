@@ -1,0 +1,4 @@
+﻿{
+  "name_can_not_be_empty": "名称不能为空JSON",
+  "password_not_empty": "密码不能为空JSON"
+}

@@ -5,20 +5,17 @@ public class ChatService : IChatService, ISingleton
     private readonly ILogger<ChatService> _logger;
     private readonly IMapper _mapper;
     private readonly IServiceScopeFactory _scopeFactory;
-    private readonly IFileService _fileService;
     private readonly IOnlineManager _onlineManager;
 
     public ChatService(
         ILogger<ChatService> logger,
         IMapper mapper,
         IServiceScopeFactory scopeFactory,
-        IFileService fileService,
         IOnlineManager onlineManager)
     {
         _logger = logger;
         _mapper = mapper;
         _scopeFactory = scopeFactory;
-        _fileService = fileService;
         _onlineManager = onlineManager;
     }
 
@@ -27,8 +24,9 @@ public class ChatService : IChatService, ISingleton
         using var scope = _scopeFactory.CreateScope();
         var hubContext = scope.ServiceProvider.GetRequiredService<IHubContext<ChatHub, IChatClient>>();
         var groupRepository = scope.ServiceProvider.GetRequiredService<IGroupRepository>();
+        var fileService = scope.ServiceProvider.GetRequiredService<IFileService>();
 
-        var group = await GetGroupAsync(groupRepository, groupId);
+        var group = await GetGroupAsync(fileService, groupRepository, groupId);
 
         await hubContext
             .Clients
@@ -36,17 +34,17 @@ public class ChatService : IChatService, ISingleton
             .Notification(new NotificationMessage(NotificationType.NewGroup, group));
     }
 
-    private async Task<GroupDto> GetGroupAsync(IGroupRepository groupRepository, int groupId)
+    private async Task<GroupDto> GetGroupAsync(IFileService fileService, IGroupRepository groupRepository, int groupId)
     {
         var group = await groupRepository.FindByIdAsync(groupId);
         var dto = _mapper.Map<GroupDto>(group);
         if (string.IsNullOrWhiteSpace(dto.Avatar))
         {
-            dto.Avatar = _fileService.GetDefaultGroupAvatar();
+            dto.Avatar = fileService.GetDefaultGroupAvatar();
         }
         else
         {
-            dto.Avatar = _fileService.FormatPublicFile(dto.Avatar);
+            dto.Avatar = fileService.FormatPublicFile(dto.Avatar);
         }
         return dto;
     }
@@ -56,7 +54,8 @@ public class ChatService : IChatService, ISingleton
         using var scope = _scopeFactory.CreateScope();
         var hubContext = scope.ServiceProvider.GetRequiredService<IHubContext<ChatHub, IChatClient>>();
         var groupRepository = scope.ServiceProvider.GetRequiredService<IGroupRepository>();
-        var group = await GetGroupAsync(groupRepository, groupId);
+        var fileService = scope.ServiceProvider.GetRequiredService<IFileService>();
+        var group = await GetGroupAsync(fileService, groupRepository, groupId);
 
         await hubContext
             .Clients
@@ -72,7 +71,7 @@ public class ChatService : IChatService, ISingleton
         var entity = await context.GroupApplies
             .AsNoTracking()
             .Include(x => x.User)
-            .Include(x=>x.Group)
+            .Include(x => x.Group)
             .Where(x => x.Id == applyId)
             .SingleAsync();
 
