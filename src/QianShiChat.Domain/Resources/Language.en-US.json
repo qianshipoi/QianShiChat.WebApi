@@ -1,4 +1,9 @@
 ﻿{
-  "name_can_not_be_empty": "name can not be empty. JSON",
-  "password_not_empty": "password not empty. JSON"
+  "name_can_not_be_empty": "name can not be empty.",
+  "password_not_empty": "password not empty.",
+  "request_parameters_error": "request parameters error.",
+  "length_can_not_be_greater_than": "length can not be greater than {MaxLength}",
+  "property_can_not_be_empty": "{PropertyName} can not be empty.",
+  "property_can_not_be_null": "{PropertyName} can not be null.",
+  "property_can_not_be_null_or_empty": "{PropertyName} can not be null or empty."
 }

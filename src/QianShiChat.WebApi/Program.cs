@@ -55,7 +55,7 @@ builder.Services
         });
     })
     .AddMediatR(configure => configure.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()))
-    .AddValidatorsFromAssemblyContaining<Program>(ServiceLifetime.Singleton)
+    .AddValidatorsFromAssemblyContaining<Program>(ServiceLifetime.Transient)
     .AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies())
     .AddOpenApi()
     .AddJwtAuthentication(builder.Configuration)
@@ -84,10 +84,25 @@ app.UseForwardedHeaders();
 if (app.Environment.IsProduction())
 {
     app.UseExceptionHandler(exceptionHandlerApp
-        => exceptionHandlerApp.Run(async context
-            => await Results.Problem()
-                         .ExecuteAsync(context)));
+        => exceptionHandlerApp.Run(async context => {
+            await Results.Problem().ExecuteAsync(context);
+        }));
 }
+
+app.UseExceptionHandler(exceptionHandlerApp
+    => exceptionHandlerApp.Run(async context => {
+        var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+        logger.LogError(exceptionHandlerPathFeature?.Error, "GlobalExeptionHandler");
+        if (exceptionHandlerPathFeature?.Error is BadHttpRequestException exception)
+        {
+            var stringLocalizer = context.RequestServices.GetRequiredService<IStringLocalizer<Language>>();
+
+            await Results.Problem(stringLocalizer[Language.RequestParametersError], statusCode: 400).ExecuteAsync(context);
+            return;
+        }
+        await Results.Problem().ExecuteAsync(context);
+    }));
 
 app.UseOpenApi();
 

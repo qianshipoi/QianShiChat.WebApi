@@ -1,4 +1,9 @@
 ﻿{
-  "name_can_not_be_empty": "名称不能为空JSON",
-  "password_not_empty": "密码不能为空JSON"
+  "name_can_not_be_empty": "名称不能为空",
+  "password_not_empty": "密码不能为空",
+  "request_parameters_error": "请求参数错误",
+  "length_can_not_be_greater_than": "长度不能大于 {MaxLength}",
+  "property_can_not_be_empty": "{PropertyName} 不能为空",
+  "property_can_not_be_null": "{PropertyName} 不能为空",
+  "property_can_not_be_null_or_empty": "{PropertyName} 不能为空或空字符串"
 }

@@ -9,6 +9,7 @@ global using FluentValidation;
 
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.Diagnostics;
 global using Microsoft.AspNetCore.Http.HttpResults;
 global using Microsoft.AspNetCore.HttpOverrides;
 global using Microsoft.AspNetCore.Mvc;
@@ -36,6 +37,7 @@ global using QianShiChat.Domain.Models;
 global using QianShiChat.Domain.Options;
 global using QianShiChat.Domain.Shared;
 global using QianShiChat.Infrastructure.Data;
+global using QianShiChat.WebApi.Attributes;
 global using QianShiChat.WebApi.BackgroundHost;
 global using QianShiChat.WebApi.Extensions;
 global using QianShiChat.WebApi.Filters;

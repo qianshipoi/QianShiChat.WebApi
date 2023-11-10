@@ -1,38 +1,4 @@
-﻿using QianShiChat.WebApi.Attributes;
-
-namespace QianShiChat.WebApi.Endpoints;
-
-public class NameRequestValidator : AbstractValidator<NameRequest>
-{
-    public NameRequestValidator(IStringLocalizer<Language> stringLocalizer)
-    {
-        RuleFor(x => x.Name)
-            .NotEmpty()
-            .WithMessage(stringLocalizer[Language.NameCanNotBeEmpty]);
-    }
-}
-
-public class LocaliationEndpoint : ICarterModule
-{
-    public void AddRoutes(IEndpointRouteBuilder app)
-    {
-        app.MapGroup("/api/locale")
-            .AddEndpointFilterFactory(ValidationFilter.ValidationFilterFactory)
-            .WithGroupName("endpoint")
-            .MapPost("", GetIndex);
-    }
-
-    private static async Task<IResult> GetIndex([FromBody, Validate] NameRequest localeRequest,/* IValidator<NameRequest> validator, */[FromServices] IStringLocalizer<Language> stringLocalizer)
-    {
-        //var result = await validator.ValidateAsync(localeRequest);
-        //if (!result.IsValid)
-        //{
-        //    return Results.ValidationProblem(result.ToDictionary());
-        //}
-
-        return Results.Ok(stringLocalizer[Language.NameCanNotBeEmpty]);
-    }
-}
+﻿namespace QianShiChat.WebApi.Endpoints;
 
 public class GroupEndpoint : ICarterModule
 {
@@ -48,7 +14,7 @@ public class GroupEndpoint : ICarterModule
 
     public async Task<Results<UnauthorizedHttpResult, NotFound, ForbidHttpResult, Ok<List<GroupApplyDto>>>> ApprovalPendingJoning(
         int groupId,
-        [AsParameters] GroupJoiningApprovalRequest request,
+        [FromBody, Validate] GroupJoiningApprovalRequest request,
         IUserManager userManager,
         IGroupService groupService,
         CancellationToken cancellationToken = default)
@@ -63,7 +29,7 @@ public class GroupEndpoint : ICarterModule
 
     public async Task<Results<Ok<PagedList<GroupApplyDto>>, NotFound, UnauthorizedHttpResult, NoContent>> GetPendingJoining(
         int groupId,
-        [AsParameters] QueryGroupApplyPendingRequest request,
+        [AsParameters, Validate] QueryGroupApplyPendingRequest request,
         IUserManager userManager,
         IGroupService groupService,
         CancellationToken cancellationToken = default)

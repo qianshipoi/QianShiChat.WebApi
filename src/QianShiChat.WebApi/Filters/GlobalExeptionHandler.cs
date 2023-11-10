@@ -1,18 +1,40 @@
-﻿namespace QianShiChat.WebApi.Filters
+﻿namespace QianShiChat.WebApi.Filters;
+
+public class GlobalExceptionEndpointFilter : IEndpointFilter
 {
-    public class GlobalExeptionHandler
+    private readonly ILogger<GlobalExceptionEndpointFilter> _logger;
+
+    public GlobalExceptionEndpointFilter(ILogger<GlobalExceptionEndpointFilter> logger)
     {
-        private readonly RequestDelegate _next;
+        _logger = logger;
+    }
 
-        public GlobalExeptionHandler(RequestDelegate next)
+    public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
+    {
+        try
         {
-            _next = next;
+            return await next(context);
         }
+        catch (BadHttpRequestException ex)
+        {
+            _logger.LogError(ex, "BadHttpRequestException");
+            return Results.BadRequest();
+        }
+    }
+}
 
-        public async Task InvokeAsync(HttpContext context)
-        {
-            await Results.Problem()
-                     .ExecuteAsync(context);
-        }
+public class GlobalExeptionHandler
+{
+    private readonly RequestDelegate _next;
+
+    public GlobalExeptionHandler(RequestDelegate next)
+    {
+        _next = next;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        await Results.Problem()
+                 .ExecuteAsync(context);
     }
 }

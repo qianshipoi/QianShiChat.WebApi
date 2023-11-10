@@ -1,6 +1,4 @@
-﻿using QianShiChat.WebApi.Attributes;
-
-namespace QianShiChat.WebApi.Filters;
+﻿namespace QianShiChat.WebApi.Filters;
 
 public static class ValidationFilter
 {
@@ -32,12 +30,8 @@ public static class ValidationFilter
                 if (!validationResult.IsValid)
                 {
                     return Results.ValidationProblem(validationResult.ToDictionary(),
-                        statusCode: (int)HttpStatusCode.UnprocessableEntity);
+                        statusCode: (int)HttpStatusCode.BadRequest);
                 }
-            }
-            else
-            {
-                return Results.BadRequest();
             }
         }
 
