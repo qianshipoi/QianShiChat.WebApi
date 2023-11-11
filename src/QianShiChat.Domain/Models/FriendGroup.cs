@@ -11,5 +11,4 @@ public class FriendGroup : ISoftDelete
     public bool IsDeleted { get; set; }
     public long DeleteTime { get; set; }
     public virtual UserInfo? User { get; set; }
-    public virtual ICollection<UserRealtion> FriendRealtions { get; set; } = new HashSet<UserRealtion>();
 }

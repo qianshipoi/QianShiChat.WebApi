@@ -23,9 +23,7 @@ public class UserRealtionEntityTypeConfiguration : IEntityTypeConfiguration<User
             .IsRequired(false);
 
         builder.Property(p => p.FriendGroupId)
+            .HasDefaultValue(0)
             .IsRequired();
-        builder.HasOne(e => e.FriendGroup)
-            .WithMany(e => e.FriendRealtions)
-            .IsRequired(false);
     }
 }

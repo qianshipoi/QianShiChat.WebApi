@@ -13,5 +13,4 @@ public class UserRealtion
     public int FriendGroupId { get; set; }
     public virtual UserInfo? User { get; set; }
     public virtual UserInfo? Friend { get; set; }
-    public virtual FriendGroup? FriendGroup { get; set; }
 }
