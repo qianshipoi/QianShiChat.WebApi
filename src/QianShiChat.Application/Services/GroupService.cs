@@ -34,6 +34,9 @@ public class GroupService : IGroupService, ITransient
         _attachmentRepository = attachmentRepository;
         _webHostEnvironment = webHostEnvironment;
         _chatService = chatService;
+
+        var avatarDirPath = Path.Combine(_webHostEnvironment.WebRootPath, AvatarPrefix.Trim(AppConsts.TrimChars));
+        if (!Directory.Exists(avatarDirPath)) Directory.CreateDirectory(avatarDirPath);
     }
 
     /// <summary>
@@ -70,14 +73,14 @@ public class GroupService : IGroupService, ITransient
 
     private string CopyToGroupAvatarFolder(string filePath)
     {
-        var defaultAvatarPath = string.Empty;
+        string? defaultAvatarPath;
         if (filePath.StartsWith(_webHostEnvironment.WebRootPath))
         {
             defaultAvatarPath = filePath;
         }
         else
         {
-            defaultAvatarPath = Path.Combine(_webHostEnvironment.WebRootPath, filePath.Trim('/').Trim('\\'));
+            defaultAvatarPath = Path.Combine(_webHostEnvironment.WebRootPath, filePath.Trim(AppConsts.TrimChars));
         }
 
         var newPath = Path.Combine(AvatarPrefix, YitIdHelper.NextId() + Path.GetExtension(filePath));
@@ -148,7 +151,7 @@ public class GroupService : IGroupService, ITransient
             await _context.Groups.AddAsync(group, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
 
-            var userIds = request.FriendIds.Select(x => x).ToList();
+            var userIds = request.FriendIds.Select(x => x).ToHashSet();
             userIds.Add(userId);
 
             foreach (var id in userIds)
@@ -158,7 +161,7 @@ public class GroupService : IGroupService, ITransient
                 {
                     Id = roomId,
                     CreateTime = now,
-                    FromId = userId,
+                    FromId = id,
                     MessagePosition = YitIdHelper.NextId(),
                     ToId = group.Id,
                     Type = ChatMessageSendType.Group,

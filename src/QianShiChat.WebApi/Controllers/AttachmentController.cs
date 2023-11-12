@@ -25,7 +25,7 @@ public class AttachmentController : BaseController
     public async Task<AttachmentDto> UploadAsync([FromForm] UploadAttachmentRequest request, CancellationToken cancellationToken = default)
     {
         using var stream = request.File.OpenReadStream();
-        return await _fileService.SaveFileAsync(stream, request.File.FileName, cancellationToken);
+        return await _fileService.SaveFileAsync(CurrentUserId, stream, request.File.FileName, cancellationToken);
     }
 
     [HttpPut("bind-tus-file/{fileId}")]
@@ -34,7 +34,7 @@ public class AttachmentController : BaseController
         var diskStorePath = HttpContext.RequestServices.GetRequiredService<TusDiskStorageOptionHelper>().StorageDiskPath;
         var store = new TusDiskStore(diskStorePath);
         var file = await store.GetFileAsync(fileId, cancellationToken);
-        if(file is null)
+        if (file is null)
         {
             throw Oops.Bah("file not exists.");
         }
@@ -42,6 +42,6 @@ public class AttachmentController : BaseController
         var fileStream = await file.GetContentAsync(cancellationToken);
         var metadata = await file.GetMetadataAsync(cancellationToken);
         metadata.TryGetValue("filename", out var name);
-        return await _fileService.SaveFileAsync(fileStream, name!.GetString(Encoding.UTF8), cancellationToken);
+        return await _fileService.SaveFileAsync(CurrentUserId, fileStream, name!.GetString(Encoding.UTF8), cancellationToken);
     }
 }

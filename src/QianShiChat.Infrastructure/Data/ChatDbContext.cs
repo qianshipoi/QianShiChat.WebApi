@@ -15,7 +15,9 @@ public class ChatDbContext : DbContext, IApplicationDbContext
     public DbSet<Room> Rooms { get; set; }
     public DbSet<FriendGroup> FriendGroups { get; set; }
 
+#pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
     public ChatDbContext(DbContextOptions options) : base(options)
+#pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑声明为可以为 null。
     {
     }
 
@@ -181,15 +183,15 @@ public class ChatDbContext : DbContext, IApplicationDbContext
         }
     }
 
-    private IDbContextTransaction? _currentTransaction;
+    private IDbContextTransaction _currentTransaction;
 
     public bool HasActiveTransaction => _currentTransaction != null;
 
-    public IDbContextTransaction? GetCurrentTransaction => _currentTransaction;
+    public IDbContextTransaction GetCurrentTransaction => _currentTransaction;
 
-    public async Task<IDbContextTransaction?> BeginTransactionAsync()
+    public async Task<IDbContextTransaction> BeginTransactionAsync()
     {
-        if (_currentTransaction != null) return null;
+        if (_currentTransaction != null) return null!;
         _currentTransaction = await Database.BeginTransactionAsync();
         return _currentTransaction;
     }

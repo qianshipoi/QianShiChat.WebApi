@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.Extensions.DependencyInjection;
 
-public static class DependencyInjection
+public static class InfrastructureDependencyInjection
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
@@ -12,7 +12,7 @@ public static class DependencyInjection
 
         services.AddDbContext<ChatDbContext>((sp, options) => {
             options.AddInterceptors(sp.GetServices<ISaveChangesInterceptor>());
-            options.UseMySql(connectionString, ServerVersion.Parse("8.0.31"), builder => builder.MigrationsAssembly(typeof(DependencyInjection).Assembly.FullName));
+            options.UseMySql(connectionString, ServerVersion.Parse("8.0.31"), builder => builder.MigrationsAssembly(typeof(InfrastructureDependencyInjection).Assembly.FullName));
         });
 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ChatDbContext>());

@@ -1,7 +1,9 @@
 ﻿global using Microsoft.AspNetCore.Http;
+global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.Primitives;
 
 global using QianShiChat.Domain.Core.AutoDI;
+global using QianShiChat.Domain.Options;
 global using QianShiChat.Domain.Shared;
 
 global using System.ComponentModel.DataAnnotations;

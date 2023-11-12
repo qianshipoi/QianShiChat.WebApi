@@ -1,62 +1,62 @@
-﻿namespace QianShiChat.Application.Services;
+﻿using Microsoft.Extensions.DependencyInjection;
 
-public class PhysicalFileService : IFileService, IScoped
+namespace QianShiChat.Application.Services;
+
+public class PhysicalFileService : IFileService, ISingleton
 {
-    private readonly ILogger<PhysicalFileService> _logger;
-    private readonly IWebHostEnvironment _webHostEnvironment;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IUserManager _userManager;
-    private readonly IApplicationDbContext _chatDbContext;
-    private readonly IMapper _mapper;
-
-    private static HashSet<string> _compressibleExts = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-    { ".png", ".jpg", ".jpeg" };
-
     private const int MAX_WIDTH = 300;
     private const string FILES_DIRNAME = "files";
     private const string PREVIEW_DIRNAME = "previews";
     private const string STREAM_CONRENT_TYPE = "application/octet-stream";
+    private const string AVATAR_DIRNAME = "avatar";
+    private const string GROUP_AVATAR_DIRNAME = "group_avatar";
+
+    private readonly static HashSet<string> _compressibleExts = new(StringComparer.OrdinalIgnoreCase)
+    { ".png", ".jpg", ".jpeg" };
+
+    private readonly ILogger<PhysicalFileService> _logger;
+    private readonly IWebHostEnvironment _webHostEnvironment;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
+    private readonly IMapper _mapper;
+    private AppSettingsOptions _appSettings;
 
     public PhysicalFileService(
         IWebHostEnvironment webHostEnvironment,
         ILogger<PhysicalFileService> logger,
-        IHttpContextAccessor httpContextAccessor,
-        IUserManager userManager,
-        IApplicationDbContext chatDbContext,
-        IMapper mapper)
+        IMapper mapper,
+        IOptionsMonitor<AppSettingsOptions> appSettings,
+        IServiceScopeFactory serviceScopeFactory)
     {
         _logger = logger;
         _webHostEnvironment = webHostEnvironment;
-        _httpContextAccessor = httpContextAccessor;
-        _userManager = userManager;
-        _chatDbContext = chatDbContext;
         _mapper = mapper;
+        _appSettings = appSettings.CurrentValue;
+        appSettings.OnChange(x => _appSettings = x);
+        _serviceScopeFactory = serviceScopeFactory;
         Init();
     }
 
     private void Init()
     {
-        string[] dirNames = new string[] { FILES_DIRNAME, PREVIEW_DIRNAME };
+        var dirNames = new string[] { FILES_DIRNAME, PREVIEW_DIRNAME, AVATAR_DIRNAME, GROUP_AVATAR_DIRNAME };
 
         foreach (string dirName in dirNames)
         {
             var dir = Path.Combine(_webHostEnvironment.WebRootPath, dirName);
-            if (!Directory.Exists(dir))
-            {
-                Directory.CreateDirectory(dir);
-            }
+            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
         }
     }
 
     public string FormatPublicFile(string filePath)
     {
         if (string.IsNullOrWhiteSpace(filePath)) return string.Empty;
-        return _httpContextAccessor.HttpContext!.Request.GetBaseUrl() + '/' + filePath.TrimStart('/').Replace("\\", "/");
+        var apiUrl = _appSettings.ApiUrl.TrimEnd(AppConsts.TrimChars);
+        return apiUrl + '/' + filePath.TrimStart(AppConsts.TrimChars);
     }
 
     public string GetDefaultGroupAvatar() => FormatPublicFile("Raw/DefaultAvatar/1.jpg");
 
-    public async Task<AttachmentDto> SaveFileAsync(Stream stream, string filename, CancellationToken cancellationToken = default)
+    public async Task<AttachmentDto> SaveFileAsync(int userId, Stream stream, string filename, CancellationToken cancellationToken = default)
     {
         Guard.IsNotNull(stream);
         Guard.IsNotNullOrEmpty(filename);
@@ -137,27 +137,22 @@ public class PhysicalFileService : IFileService, IScoped
             PreviewPath = string.IsNullOrWhiteSpace(absPrevFilepath) ? null : absPrevFilepath.Replace('\\', '/'),
             RawPath = absFilepath.Replace('\\', '/'),
             Size = stream.Length,
-            UserId = _userManager.CurrentUserId,
+            UserId = userId,
         };
-
+        using var scope = _serviceScopeFactory.CreateScope();
+        var chatDbContext = scope.ServiceProvider.GetRequiredService<IApplicationDbContext>();
         try
         {
-            await _chatDbContext.Attachments.AddAsync(attachment, cancellationToken);
-            await _chatDbContext.SaveChangesAsync(cancellationToken);
+            await chatDbContext.Attachments.AddAsync(attachment, cancellationToken);
+            await chatDbContext.SaveChangesAsync(cancellationToken);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "save file error.");
 
             // clear file.
-            if (File.Exists(filepath))
-            {
-                File.Delete(filepath);
-            }
-            if (File.Exists(prevPath))
-            {
-                File.Delete(prevPath);
-            }
+            if (File.Exists(filepath)) File.Delete(filepath);
+            if (File.Exists(prevPath)) File.Delete(prevPath);
             throw Oops.Oh();
         }
 

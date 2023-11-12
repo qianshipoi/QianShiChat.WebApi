@@ -18,11 +18,12 @@ public interface IFileService
     /// <summary>
     /// save file.
     /// </summary>
+    /// <param name="userId"></param>
     /// <param name="stream"></param>
     /// <param name="filename"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<AttachmentDto> SaveFileAsync(Stream stream, string filename, CancellationToken cancellationToken = default);
+    Task<AttachmentDto> SaveFileAsync(int userId, Stream stream, string filename, CancellationToken cancellationToken = default);
 }
 
 public static class IFileServiceExtensions

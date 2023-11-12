@@ -60,6 +60,7 @@ builder.Services
     .AddOpenApi()
     .AddJwtAuthentication(builder.Configuration)
     .AddCache(builder.Configuration)
+    .AddDomain(builder.Configuration)
     .AddInfrastructureServices(builder.Configuration)
     .AddAutoDI()
     .AddSaveChatMessageJob()
