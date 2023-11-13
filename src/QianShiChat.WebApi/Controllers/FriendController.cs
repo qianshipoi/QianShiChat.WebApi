@@ -9,14 +9,16 @@
 public class FriendController : BaseController
 {
     private readonly IFriendService _friendService;
+    private readonly IFriendGroupService _friendGroupService;
 
     /// <summary>
     /// friend api.
     /// </summary>
     public FriendController(
-        IFriendService friendService)
+        IFriendService friendService, IFriendGroupService friendGroupService)
     {
         _friendService = friendService;
+        _friendGroupService = friendGroupService;
     }
 
     /// <summary>
@@ -25,10 +27,18 @@ public class FriendController : BaseController
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet]
-    public async Task<ActionResult<List<UserDto>>> GetAllFriends(CancellationToken cancellationToken
+    public async Task<ActionResult<List<FriendDto>>> GetAllFriends(CancellationToken cancellationToken
         = default)
     {
         var result = await _friendService.GetFriendsAsync(CurrentUserId, cancellationToken);
+        return Ok(result);
+    }
+
+    [HttpGet("groups")]
+    public async Task<ActionResult<List<FriendGroupDto>>> GetFriendGroups(CancellationToken cancellationToken
+               = default)
+    {
+        var result = await _friendGroupService.GetGroupsAsync(CurrentUserId, cancellationToken);
         return Ok(result);
     }
 

@@ -48,13 +48,13 @@ public class FriendService : IFriendService, ITransient
         await _context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<List<UserDto>> GetFriendsAsync(int userId, CancellationToken cancellationToken = default)
+    public async Task<List<FriendDto>> GetFriendsAsync(int userId, CancellationToken cancellationToken = default)
     {
         var friends = await _context.UserRealtions
             .AsNoTracking()
             .Where(x => x.UserId == userId)
             .Include(x => x.Friend)
-            .ProjectTo<UserDto>(_mapper.ConfigurationProvider)
+            .ProjectTo<FriendDto>(_mapper.ConfigurationProvider)
             .ToListAsync(cancellationToken);
 
         friends.ForEach(item => {

@@ -3,7 +3,6 @@
 
 public interface IRoomToObject
 {
-
 }
 
 public class RoomDto

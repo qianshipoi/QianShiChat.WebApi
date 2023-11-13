@@ -4,7 +4,7 @@ public class FriendGroup : ISoftDelete
 {
     public int Id { get; set; }
     public int UserId { get; set; }
-    public string? Name { get; set; } = string.Empty;
+    public string? Name { get; set; }
     public int Sort { get; set; }
     public bool IsDefault { get; set; }
     public long CreateTime { get; set; }
