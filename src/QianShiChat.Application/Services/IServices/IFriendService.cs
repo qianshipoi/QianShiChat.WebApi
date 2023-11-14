@@ -21,7 +21,7 @@ public interface IFriendService
     /// <param name="userId"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<List<UserDto>> GetFriendsAsync(int userId, CancellationToken cancellationToken = default);
+    Task<List<FriendDto>> GetFriendsAsync(int userId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 判断是否为好友

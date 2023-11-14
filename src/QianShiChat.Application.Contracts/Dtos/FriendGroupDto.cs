@@ -6,4 +6,5 @@ public class FriendGroupDto
     public string? Name { get; set; }
     public int Sort { get; set; }
     public bool IsDefault { get; set; }
+    public long CreateTime { get; set; }
 }

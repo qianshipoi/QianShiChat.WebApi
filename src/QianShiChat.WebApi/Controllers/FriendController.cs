@@ -34,15 +34,31 @@ public class FriendController : BaseController
         return Ok(result);
     }
 
-    [HttpGet("groups")]
-    public async Task<ActionResult<List<FriendGroupDto>>> GetFriendGroups(CancellationToken cancellationToken
-               = default)
-    {
-        var result = await _friendGroupService.GetGroupsAsync(CurrentUserId, cancellationToken);
-        return Ok(result);
-    }
-
     [HttpPut("{friendId:int}/alias")]
     public Task ReMyAliasAsync([FromRoute] int friendId, AliasRequest request, CancellationToken cancellationToken = default)
         => _friendService.SetAliasAsync(CurrentUserId, friendId, request.Alias, cancellationToken);
+
+    [HttpGet("groups")]
+    public async Task<List<FriendGroupDto>> GetFriendGroups(CancellationToken cancellationToken = default)
+        => await _friendGroupService.GetGroupsAsync(CurrentUserId, cancellationToken);
+
+    [HttpPost("groups")]
+    public Task CreateGroupAsync([FromBody] NameRequest request, CancellationToken cancellationToken = default)
+        => _friendGroupService.AddAsync(CurrentUserId, request.Name, cancellationToken);
+
+    [HttpPut("groups/{groupId:int}/rename")]
+    public Task RenameGroupNameAsync([FromRoute] int groupId, [FromBody] RenameRequest request, CancellationToken cancellationToken = default)
+        => _friendGroupService.UpdateAsync(CurrentUserId, groupId, request.Name, cancellationToken);
+
+    [HttpDelete("groups/{groupId:int}")]
+    public Task DeleteGroupAsync([FromRoute] int groupId, CancellationToken cancellationToken = default)
+        => _friendGroupService.DeleteAsync(CurrentUserId, groupId, cancellationToken);
+
+    [HttpPut("groups/sort")]
+    public Task SortGroupAsync([FromBody] SortRequest request, CancellationToken cancellationToken = default)
+        => _friendGroupService.SortAsync(CurrentUserId, request, cancellationToken);
+
+    [HttpPut("{friendId:int}/move")]
+    public Task MoveToGroupAsync([FromRoute] int friendId, [FromBody] MoveToGroupRequest request, CancellationToken cancellationToken = default)
+        => _friendGroupService.MoveToAsync(CurrentUserId, friendId, request, cancellationToken);
 }

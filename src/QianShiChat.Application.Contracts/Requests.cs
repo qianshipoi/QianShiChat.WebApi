@@ -19,6 +19,12 @@ public class NameRequest
     public string Name { get; set; } = string.Empty;
 }
 
+public class RenameRequest
+{
+    [Required, StringLength(32, MinimumLength = 1)]
+    public required string Name { get; set; }
+}
+
 public class LocaleRequest
 {
     [Required(ErrorMessage = "name_can_not_be_empty")]
@@ -143,4 +149,30 @@ public class GroupApplyRequest
     public string? Remark { get; set; }
     [MaxLength(1024)]
     public string? InviteToken { get; set; }
+}
+
+public class SortRequest
+{
+    [Required]
+    public required List<int> State { get; set; }
+}
+
+public class SliderMoveRequest
+{
+    public MoveDirection Direction { get; set; } = MoveDirection.Down;
+
+    [Required]
+    public int CurrentSequence { get; set; }
+}
+
+public enum MoveDirection
+{
+    Down = 0,
+    Up = 1
+}
+
+public class MoveToGroupRequest
+{
+    [Required, Range(1, int.MaxValue)]
+    public int GroupId { get; set; }
 }

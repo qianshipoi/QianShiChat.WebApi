@@ -105,7 +105,7 @@ public class UserEndpoint : ICarterModule
         return TypedResults.Ok(await groupService.GetAllByUserIdAsync(userManager.CurrentUserId, cancellationToken));
     }
 
-    public static async Task<Results<Ok<List<UserDto>>, UnauthorizedHttpResult>> GetMyFriends(
+    public static async Task<Results<Ok<List<FriendDto>>, UnauthorizedHttpResult>> GetMyFriends(
         IUserManager userManager,
         IFriendService friendService,
         CancellationToken cancellationToken = default)
