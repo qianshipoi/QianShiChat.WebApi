@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 using System.ComponentModel.DataAnnotations;
 
@@ -29,6 +30,18 @@ public class FriendGroupService : IFriendGroupService, ITransient
             .ProjectTo<FriendGroupDto>(_mapper.ConfigurationProvider)
             .ToListAsync(cancellationToken);
 
+        if (!groups.Any(x => x.IsDefault))
+        {
+            groups.Insert(0, new FriendGroupDto()
+            {
+                Id = 0,
+                IsDefault = true,
+                CreateTime = Timestamp.Now,
+                Name = "好友",
+                Sort = 0
+            });
+        }
+
         return groups;
     }
 
@@ -38,7 +51,7 @@ public class FriendGroupService : IFriendGroupService, ITransient
         {
             UserId = userId,
             Name = name,
-            Sort = 0,
+            Sort = 255,
             IsDefault = false,
             CreateTime = Timestamp.Now,
         };
@@ -52,8 +65,18 @@ public class FriendGroupService : IFriendGroupService, ITransient
 
     public async Task<FriendGroupDto> UpdateAsync(int userId, int groupId, string? name, CancellationToken cancellationToken = default)
     {
-        var group = await _context.FriendGroups.FirstOrDefaultAsync(x => x.Id == groupId && x.UserId == userId, cancellationToken);
-        if (group == null) throw Oops.Bah("").StatusCode(HttpStatusCode.Forbidden);
+        FriendGroup? group;
+        if(groupId == 0)
+        {
+            // update default group
+            group = await GetOrCreateDefaultGroupAsync(userId, cancellationToken);
+        }
+        else
+        {
+            group = await _context.FriendGroups
+            .FirstOrDefaultAsync(x => x.Id == groupId && x.UserId == userId, cancellationToken);
+            if (group == null) throw Oops.Bah("").StatusCode(HttpStatusCode.Forbidden);
+        }
 
         group.Name = name;
 
@@ -90,11 +113,11 @@ public class FriendGroupService : IFriendGroupService, ITransient
             {
                 CreateTime = Timestamp.Now,
                 IsDefault = true,
-                Name = "friends",
+                Name = "好友",
                 Sort = 0,
                 UserId = userId,
             };
-
+            _context.FriendGroups.Add(defaultGroup);
             await _context.SaveChangesAsync(cancellationToken);
         }
 

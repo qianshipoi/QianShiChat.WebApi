@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.WebApi.Controllers;
+﻿using System.Threading.Tasks;
+
+namespace QianShiChat.WebApi.Controllers;
 
 /// <summary>
 /// friend api.
@@ -43,11 +45,11 @@ public class FriendController : BaseController
         => await _friendGroupService.GetGroupsAsync(CurrentUserId, cancellationToken);
 
     [HttpPost("groups")]
-    public Task CreateGroupAsync([FromBody] NameRequest request, CancellationToken cancellationToken = default)
+    public Task<FriendGroupDto> CreateGroupAsync([FromBody] NameRequest request, CancellationToken cancellationToken = default)
         => _friendGroupService.AddAsync(CurrentUserId, request.Name, cancellationToken);
 
     [HttpPut("groups/{groupId:int}/rename")]
-    public Task RenameGroupNameAsync([FromRoute] int groupId, [FromBody] RenameRequest request, CancellationToken cancellationToken = default)
+    public Task<FriendGroupDto> RenameGroupNameAsync([FromRoute] int groupId, [FromBody] RenameRequest request, CancellationToken cancellationToken = default)
         => _friendGroupService.UpdateAsync(CurrentUserId, groupId, request.Name, cancellationToken);
 
     [HttpDelete("groups/{groupId:int}")]
