@@ -2,23 +2,17 @@
 
 public class ChatService : IChatService, ISingleton
 {
-    private readonly ILogger<ChatService> _logger;
     private readonly IMapper _mapper;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IFileService _fileService;
-    private readonly IOnlineManager _onlineManager;
 
     public ChatService(
-        ILogger<ChatService> logger,
         IMapper mapper,
         IServiceScopeFactory scopeFactory,
-        IOnlineManager onlineManager,
         IFileService fileService)
     {
-        _logger = logger;
         _mapper = mapper;
         _scopeFactory = scopeFactory;
-        _onlineManager = onlineManager;
         _fileService = fileService;
     }
 

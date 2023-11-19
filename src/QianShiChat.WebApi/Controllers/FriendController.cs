@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace QianShiChat.WebApi.Controllers;
+﻿namespace QianShiChat.WebApi.Controllers;
 
 /// <summary>
 /// friend api.

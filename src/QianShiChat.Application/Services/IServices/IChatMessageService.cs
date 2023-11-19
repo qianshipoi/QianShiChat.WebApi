@@ -1,8 +1,5 @@
 ﻿namespace QianShiChat.Application.Services.IServices;
 
-/// <summary>
-/// chat message service.
-/// </summary>
 public interface IChatMessageService
 {
     Task<PagedList<ChatMessageDto>> GetGroupHistoryAsync(int toId, QueryMessageRequest request, CancellationToken cancellationToken = default);
