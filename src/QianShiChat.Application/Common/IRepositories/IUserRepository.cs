@@ -1,4 +1,5 @@
-﻿namespace QianShiChat.Application.Common.IRepositories;
+﻿
+namespace QianShiChat.Application.Common.IRepositories;
 
 public interface IUserRepository
 {
@@ -8,4 +9,5 @@ public interface IUserRepository
 
     Task<UserInfo?> FindByIdAsync(int userId, CancellationToken cancellationToken = default);
     Task<int> SetAliasAsync(int userId, int friendId, string? name, CancellationToken cancellationToken = default);
+    Task<List<UserInfo>> FindByIdsAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default);
 }

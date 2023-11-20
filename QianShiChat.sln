@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
-		打包ChatService.md = 打包ChatService.md
+		BuildChatService.md = BuildChatService.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QianShiChat.Infrastructure", "src\QianShiChat.Infrastructure\QianShiChat.Infrastructure.csproj", "{17756DCA-A483-4490-9A54-0D2630698500}"

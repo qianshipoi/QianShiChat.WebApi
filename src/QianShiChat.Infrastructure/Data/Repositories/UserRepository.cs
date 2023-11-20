@@ -29,6 +29,11 @@ internal class UserRepository : IUserRepository, IScoped
         return await _context.UserRealtions.AnyAsync(x => x.UserId == id1 && x.FriendId == id2, cancellationToken);
     }
 
+    public async Task<List<UserInfo>> FindByIdsAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default)
+    {
+        return await _context.UserInfos.Where(x => ids.Contains(x.Id)).ToListAsync(cancellationToken);
+    }
+
     public Task<int> SetAliasAsync(int userId, int friendId, string? name, CancellationToken cancellationToken = default)
     {
         return _context.UserRealtions

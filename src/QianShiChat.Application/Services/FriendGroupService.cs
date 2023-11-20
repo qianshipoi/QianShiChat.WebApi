@@ -69,7 +69,7 @@ public class FriendGroupService : IFriendGroupService, ITransient
         else
         {
             group = await _context.FriendGroups
-            .FirstOrDefaultAsync(x => x.Id == groupId && x.UserId == userId, cancellationToken);
+                .FirstOrDefaultAsync(x => x.Id == groupId && x.UserId == userId, cancellationToken);
             if (group == null) throw Oops.Bah("").StatusCode(HttpStatusCode.Forbidden);
         }
 

@@ -1,4 +1,6 @@
-﻿namespace QianShiChat.Application.Services;
+﻿using Microsoft.AspNetCore.SignalR;
+
+namespace QianShiChat.Application.Services;
 
 public class ChatService : IChatService, ISingleton
 {
@@ -66,5 +68,23 @@ public class ChatService : IChatService, ISingleton
         var apply = _mapper.Map<GroupApplyDto>(entity);
 
         await hubContext.Clients.User(apply.User!.Id.ToString()).Notification(new NotificationMessage(NotificationType.GroupApply, apply));
+    }
+
+    public async Task SendNewFriendNotifyAsync(IEnumerable<int> ids)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var hubContext = scope.ServiceProvider.GetRequiredService<IHubContext<ChatHub, IChatClient>>();
+        var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+        var users = (await userRepository
+            .FindByIdsAsync(ids))
+            .Select(x=> {
+                var dto = _mapper.Map<UserDto>(x);
+                _fileService.FormatAvatar(dto);
+                return dto;
+            });
+
+        var tasks = users.Select(x => hubContext.Clients.User(x.Id.ToString()).Notification(new NotificationMessage(NotificationType.NewFriend, x)));
+
+        await Task.WhenAll(tasks);
     }
 }

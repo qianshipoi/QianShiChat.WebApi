@@ -82,16 +82,17 @@ public class UserService : IUserService, ITransient
         {
             File.Copy(defaultAvatarPath, newAvatarPath);
             user.Avatar = newPath.Trim(AppConsts.TrimChars);
+            await _context.UserInfos.AddAsync(user, cancellationToken);
             // add default friend group;
             var friendGroup = new FriendGroup
             {
-                Name = "My friend",
+                Name = "friends",
                 CreateTime = Timestamp.Now,
                 IsDefault = true,
-                Sort = 999,
+                UserId = user.Id,
+                Sort = 0,
             };
-            user.FriendGroups.Add(friendGroup);
-            await _context.UserInfos.AddAsync(user, cancellationToken);
+            await _context.FriendGroups.AddAsync(friendGroup, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
             var dto = _mapper.Map<UserDto>(user);
             _fileService.FormatAvatar(dto);

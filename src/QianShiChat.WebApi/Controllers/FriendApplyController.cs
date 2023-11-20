@@ -40,6 +40,11 @@ public class FriendApplyController : BaseController
     [HttpPost]
     public async Task<IActionResult> Apply([FromBody] CreateFriendApplyRequest dto, CancellationToken cancellationToken = default)
     {
+        if (dto.UserId == CurrentUserId)
+        {
+            return BadRequest();
+        }
+
         var friend = await _userService.GetUserByIdAsync(dto.UserId, cancellationToken);
         var user = await _userService.GetUserByIdAsync(CurrentUserId, cancellationToken);
 
