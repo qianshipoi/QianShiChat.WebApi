@@ -111,15 +111,22 @@ public class FriendApplyController : BaseController
         await _friendApplyService.ClearAllApplyAsync(cancellationToken);
     }
 
+    public class FriendApprovalRequest
+    {
+        [Range(1, int.MaxValue)]
+        public int? FriendGroupId { get; set; }
+    }
+
     /// <summary>
     /// 审批
     /// </summary>
     /// <param name="id"></param>
     /// <param name="status"></param>
+    /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPut("{id}/Approval/{status}")]
-    public async Task<IActionResult> Approval([FromRoute] int id, [FromRoute] ApplyStatus status, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Approval([FromRoute] int id, [FromRoute] ApplyStatus status, [FromBody] FriendApprovalRequest request, CancellationToken cancellationToken = default)
     {
         var user = await _context.UserInfos
             .FindAsync(new object[] { CurrentUserId }, cancellationToken);
@@ -134,7 +141,7 @@ public class FriendApplyController : BaseController
             return BadRequest("该申请已处理");
         }
 
-        var dto = await _friendApplyService.ApprovalAsync(CurrentUserId, id, status, cancellationToken);
+        var dto = await _friendApplyService.ApprovalAsync(CurrentUserId, new ApprovalRequest(id, status, request.FriendGroupId), cancellationToken);
 
         await _hubContext.Clients
             .Users(dto.UserId.ToString(), dto.FriendId.ToString())

@@ -57,26 +57,14 @@ public interface IFriendApplyService
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<List<FriendApplyDto>> GetPendingListByUserAsync(int size, int userId, long beforeTime = 0, CancellationToken cancellationToken = default);
-
-    ///// <summary>
-    ///// 获取申请列表
-    ///// </summary>
-    ///// <param name="page"></param>
-    ///// <param name="size"></param>
-    ///// <param name="userId"></param>
-    ///// <param name="cancellationToken"></param>
-    ///// <returns></returns>
-    //Task<List<FriendApplyDto>> GetPendingListByUserAsync(int page, int size, int userId, CancellationToken cancellationToken = default);
-
     /// <summary>
     /// 审批
     /// </summary>
     /// <param name="userId"></param>
-    /// <param name="id"></param>
-    /// <param name="status"></param>
+    /// <param name="request"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<FriendApplyDto> ApprovalAsync(int userId, int id, ApplyStatus status, CancellationToken cancellationToken = default);
+    Task<FriendApplyDto> ApprovalAsync(int userId, ApprovalRequest request, CancellationToken cancellationToken = default);
     Task ClearApplyAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default);
     Task RemoveByIdAsync(int id, CancellationToken cancellationToken = default);
     Task ClearAllApplyAsync(CancellationToken cancellationToken = default);

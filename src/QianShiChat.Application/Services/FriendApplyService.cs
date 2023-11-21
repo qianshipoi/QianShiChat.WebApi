@@ -17,7 +17,15 @@ public class FriendApplyService : IFriendApplyService, ITransient
     /// <summary>
     /// firend apply service.
     /// </summary>
-    public FriendApplyService(ILogger<FriendApplyService> logger, IApplicationDbContext context, IMapper mapper, IFileService fileService, IUserManager userManager, IHubContext<ChatHub, IChatClient> hubContext, IFriendGroupRepository friendGroupRepository, IChatService chatService)
+    public FriendApplyService(
+        ILogger<FriendApplyService> logger,
+        IApplicationDbContext context,
+        IMapper mapper,
+        IFileService fileService,
+        IUserManager userManager,
+        IHubContext<ChatHub, IChatClient> hubContext,
+        IFriendGroupRepository friendGroupRepository,
+        IChatService chatService)
     {
         _logger = logger;
         _context = context;
@@ -60,6 +68,7 @@ public class FriendApplyService : IFriendApplyService, ITransient
 
         apply.Remark = dto.Remark ?? "";
         apply.UpdateTime = Timestamp.Now;
+        apply.FriendGroupId = dto.FriendGroupId;
         await _context.SaveChangesAsync(cancellationToken);
 
         return _mapper.Map<FriendApplyDto>(apply);
@@ -151,40 +160,52 @@ public class FriendApplyService : IFriendApplyService, ITransient
         return group;
     }
 
-    public async Task<FriendApplyDto> ApprovalAsync(int userId, int id, ApplyStatus status, CancellationToken cancellationToken = default)
+    private async Task<int> GetFriendGroupId(int userId, int? friendGroupId)
+    {
+        if (friendGroupId.HasValue && friendGroupId.Value > 0)
+        {
+            var result = await _friendGroupRepository.ExistsAsync(userId, friendGroupId.Value);
+
+            if (result)
+                return friendGroupId.Value;
+        }
+        var group = GetUserFriendGroupAsync(userId);
+        return group.Id;
+    }
+
+    public async Task<FriendApplyDto> ApprovalAsync(int userId, ApprovalRequest request, CancellationToken cancellationToken = default)
     {
         var apply = await _context.FriendApplies
             .Include(x => x.User)
             .Include(x => x.Friend)
-            .Where(x => x.UserId == userId && x.Id == id && x.Status == ApplyStatus.Applied)
+            .Where(x => x.UserId == userId && x.Id == request.Id && x.Status == ApplyStatus.Applied)
             .FirstAsync(cancellationToken);
 
-        apply.Status = status;
+        apply.Status = request.Status;
         apply.UpdateTime = Timestamp.Now;
 
-        if (status == ApplyStatus.Passed
+        if (request.Status == ApplyStatus.Passed
             && !await _context.UserRealtions.AnyAsync(x => x.UserId == apply.UserId && x.FriendId == apply.FriendId, cancellationToken))
         {
-            var currentUserDefaultFriendGroup = GetUserFriendGroupAsync(apply.UserId, cancellationToken);
+            var friendGroupId = await GetFriendGroupId(apply.FriendId, apply.FriendGroupId);
             _context.UserRealtions.Add(new UserRealtion
             {
                 UserId = apply.FriendId,
                 FriendId = apply.UserId,
                 CreateTime = apply.UpdateTime,
-                FriendGroupId = currentUserDefaultFriendGroup.Id
+                FriendGroupId = friendGroupId
             });
-
-            var friendDefaultFriendGroup = await GetUserFriendGroupAsync(apply.FriendId, cancellationToken);
+            var currentGroupId = await GetFriendGroupId(apply.UserId, request.FriendGroupId);
             _context.UserRealtions.Add(new UserRealtion
             {
                 UserId = apply.UserId,
                 FriendId = apply.FriendId,
                 CreateTime = apply.UpdateTime,
-                FriendGroupId = friendDefaultFriendGroup.Id
+                FriendGroupId = currentGroupId
             });
         }
 
-        if (status == ApplyStatus.Passed)
+        if (request.Status == ApplyStatus.Passed)
         {
             var roomId = AppConsts.GetPrivateChatRoomId(apply.UserId, apply.FriendId);
             var messagePosition = YitIdHelper.NextId();
@@ -219,7 +240,7 @@ public class FriendApplyService : IFriendApplyService, ITransient
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        if (status == ApplyStatus.Passed)
+        if (request.Status == ApplyStatus.Passed)
         {
             // send new friend notification
             var userDto = _mapper.Map<UserDto>(apply.User);

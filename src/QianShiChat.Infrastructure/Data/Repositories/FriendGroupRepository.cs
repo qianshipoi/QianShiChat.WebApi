@@ -11,6 +11,16 @@ internal class FriendGroupRepository : IFriendGroupRepository, IScoped
 
     public Task<FriendGroup?> FindUserDefaultGroupByIdAsync(int userId, CancellationToken cancellationToken = default)
     {
-        return _context.FriendGroups.Where(x => x.UserId == userId && x.IsDeleted && !x.IsDeleted).FirstOrDefaultAsync(cancellationToken);
+        return _context.FriendGroups
+            .Where(x => x.UserId == userId && x.IsDefault)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public Task<bool> ExistsAsync(int userId, int id, CancellationToken cancellationToken = default)
+    {
+        return _context.FriendGroups
+            .Where(x => x.UserId == userId)
+            .Where(x => x.Id == id)
+            .AnyAsync(cancellationToken);
     }
 }

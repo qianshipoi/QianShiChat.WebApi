@@ -106,6 +106,8 @@ public class CreateFriendApplyRequest
     public int UserId { get; set; }
     [MaxLength(50)]
     public string? Remark { get; set; }
+    [Range(1, int.MaxValue)]
+    public int? FriendGroupId { get; set; }
 }
 
 public class QueryFriendApplyPendingRequest
@@ -176,3 +178,5 @@ public class MoveToGroupRequest
     [Required, Range(1, int.MaxValue)]
     public int GroupId { get; set; }
 }
+
+public record ApprovalRequest(int Id, ApplyStatus Status, int? FriendGroupId = null);
